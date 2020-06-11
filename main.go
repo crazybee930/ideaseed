@@ -13,8 +13,7 @@ func main() {
 		Name: "ideasprout",
 		Usage: "Swiftly catch that idea and get back to what you were doing",
 		Action: func(c *cli.Context) error {
-			fmt.Println("An error occured :/")
-			fmt.Println(c)
+			fmt.Println("-- Work in progress :) --")
 			return nil
 		},
 	}
