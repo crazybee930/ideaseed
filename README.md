@@ -32,7 +32,7 @@ Obviously, depending on your shell, you might want to escape special characters 
 
 ### Options
 
-Jump straight to the [options table](#options-table)
+[[Jump straight to the options table](#options-table)]
 
 By default, the latter example will add a new card to your Google Keep account. To save it to GitHub, you can add the `--gh` flag. `--gh` optionally takes an argument, which is either `REPO` (resolves to `your-user-name/REPO`) or `OWNER/REPO`. You can also pass `-p` or `--project` and type the name of the project to add the card to. 
 
