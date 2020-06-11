@@ -32,6 +32,8 @@ Obviously, depending on your shell, you might want to escape special characters 
 
 ### Options
 
+Jump straight to the [options table](#options-table)
+
 By default, the latter example will add a new card to your Google Keep account. To save it to GitHub, you can add the `--gh` flag. `--gh` optionally takes an argument, which is either `REPO` (resolves to `your-user-name/REPO`) or `OWNER/REPO`. You can also pass `-p` or `--project` and type the name of the project to add the card to. 
 
 In all cases, the card will get added to the leftmost column, except with `-c` or `--column`, which can be given a column name or an index, starting from one. If the column name does not exist, it'll choose the closest column that exists by fuzzy matching. You can also use `--create-columns` and it'll create them for you, after you confirm (you don't want to create columns accidently by making a typo, don't you?).
@@ -89,3 +91,16 @@ alias idea="ideasprout --gh --column To-Do"
 ```
 
 And you're all set!
+
+#### Options table
+
+| Shorthand            | Flag               | Arguments        | Repeatable | Description                                                                                                                                                                                                                              |
+| -------------------- | ------------------ | ---------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-g`                 | `--gh`             | `[[OWNER/]REPO]` |            | Put the idea to github. If no argument is given, the card is added to one of the user's projects.                                                                                                                                        |
+| `-p`                 | `--project`        | `PROJECT NAME`   |            | Select which project to put the project too. Can only be used with `--gh`.                                                                                                                                                               |
+| `-c`                 | `--column`         | `COLUMN NAME`    |            | Select which column of the project to use. Can only be used with `--gh`.                                                                                                                                                                 |
+|                      | `--create-columns` |                  |            | Prompt to create non-existant columns specified with `--columns`.                                                                                                                                                                        |
+| `-d` (as in **d**ye) | `--color`          | `COLOR`          |            | Chooses which color to use for Google Keep cards. Cannot be used with `--gh`. `COLOR` can be one of: `bl[ue]`, `br[own]`, `d[arkblue]`, `gra[y]`, `gre[en]`, `o[range]`, `pi[nk]`, `pu[rple]`, `r[ed]`, `t[eal]`, `w[hite]`, `y[ellow]`, |
+| `-t`                 | `--tag`            | `TAG NAME`       | yes        | Adds tags to the Google Keep card. Cannot be used with `--gh`.                                                                                                                                                                           |
+|                      | `--create-tags`    |                  |            | Prompt to create non-existant tags specified with `--tag`.                                                                                                                                                                               |
+| `-?`                 | `--prompt-mode`    |                  |            | Prompts you for the above options when not provided.                                                                                                                                                                                     |
