@@ -18,7 +18,7 @@ So I started this CLI, as my first Go project, and my first project consuming a 
 
 I'm also using an unofficial, reverse-engineered REST API—turns out Google Keep doesn't have an official one.
 
-Enough rambing. Here's what you came for.
+Enough rambling. Here's what you came for.
 
 ## Usage
 
