@@ -25,6 +25,13 @@ Options:
 	-t 	--tag=TAG NAME                Adds tags to the Google Keep card. Cannot be used with --gh.
 		--create-tags                 Prompt to create non-existant tags specified with --tag.
 	-? 	--prompt-mode                 Prompts you for the above options when they are not provided.
+
+Examples: (In all examples, USERNAME refers to your username.)
+	# Create a new card with content "Choose audio normalization loudness with --loudness" in USERNAME/phelng > project #1 > column "To-Do" 
+	ideaseed --gh -r phelng Choose audio normalization loudness with --loudness
+	
+	# Create a new yellow card tagged "project", "vfx" in Google Keep with text "Lyrics video for Mazde - Neverland"
+	ideaseed -t project -t vfx -d yel Lyrics video for Mazde - Neverland
 `
 
 	opts, _ := docopt.ParseDoc(usage)
