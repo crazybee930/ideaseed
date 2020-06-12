@@ -1,4 +1,4 @@
-# Ideasprout
+# ideaseed
 
 ---
 
@@ -25,7 +25,7 @@ Enough rambling. Here's what you came for.
 The interface itself is pretty simple and POSIX-compliant
 
 ```bash
-ideasprout your idea and no you dont need quotes because that takes too much time
+ideaseed your idea and no you dont need quotes because that takes too much time
 ```
 
 Obviously, depending on your shell, you might want to escape special characters or use quotes
@@ -68,11 +68,11 @@ You don't have to specify the whole color name, just enough to be non-ambiguous:
 - w
 - y
 
-Also with Google Keep, you can add tags to your card with `--tag` or `-t`. If your tag contains spaces, you must quote the option's argument. Of course you can add multiple tags by using the argument multiple times: `ideasprout -t web -t app a webapp to permanently solve all conflicts in the world` will add both tags `web` and `app`. Same as with `--column`, non-existant tags will resolve to the closes ones by fuzzy matching, and you can also use `--create-tags` to create them, after being prompted.
+Also with Google Keep, you can add tags to your card with `--tag` or `-t`. If your tag contains spaces, you must quote the option's argument. Of course you can add multiple tags by using the argument multiple times: `ideaseed -t web -t app a webapp to permanently solve all conflicts in the world` will add both tags `web` and `app`. Same as with `--column`, non-existant tags will resolve to the closes ones by fuzzy matching, and you can also use `--create-tags` to create them, after being prompted.
 
 #### Relax. You don't need to remember those options
 
-You can also use `ideasprout -?` to prompt you some information:
+You can also use `ideaseed -?` to prompt you some information:
 
 - Where do you want to upload this idea? (github, google keep)
 - Which repo? (using REPO or OWNER/REPO) (autocompletes with repositories you contribute to)
@@ -80,14 +80,14 @@ You can also use `ideasprout -?` to prompt you some information:
 
 #### Type even less not-your-idea stuff
 
-If you always want to be prompted, or always post to github, or just to type faster, you can make your alias to "configure" ideasprout (no config files are planned for now, I'm trying to follow [n³'s way of configuring things](https://github.com/jarun/nnn#quickstart)).
+If you always want to be prompted, or always post to github, or just to type faster, you can make your alias to "configure" ideaseed (no config files are planned for now, I'm trying to follow [n³'s way of configuring things](https://github.com/jarun/nnn#quickstart)).
 
 This works well because, as you don't need quotes to type your idea, dashes are of course allowed in your idea, and so flags need to be added before the idea text. Thus, aliases work well in this case because you only have to _append_ input.
 
-As an example, if you want to only have to type `idea` to use `ideasprout --gh -c To-Do`, do
+As an example, if you want to only have to type `idea` to use `ideaseed --gh -c To-Do`, do
 
 ```bash
-alias idea="ideasprout --gh --column To-Do"
+alias idea="ideaseed --gh --column To-Do"
 ```
 
 And you're all set!
