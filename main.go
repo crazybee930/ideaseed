@@ -2,10 +2,11 @@ package main
 
 import (
 	"errors"
-	"strings"
 	"fmt"
+	"strings"
 
 	"github.com/docopt/docopt-go"
+	"github.com/mgutz/ansi"
 )
 
 func main() {
@@ -37,9 +38,9 @@ Options:
 		// Show the error
 		if err != nil {
 			fmt.Println(err)
-		// If we successfully expanded it, print it (for now!)
+			// If we successfully expanded it, print it (for now!)
 		} else {
-			println(color)
+			println(coloredColorName(color))
 		}
 	}
 
@@ -76,8 +77,30 @@ func expandColorName(color string) (string, error) {
 	}
 	// If we had multiple choice, the given color was ambiguous.
 	if len(matchingColorNames) > 1 {
-		return "", errors.New("Ambiguous color shorthand '" + color + "': could be one of: " + strings.Join(matchingColorNames, ", "))
+		var matchingColorNamesDisplay []string
+		for _, matchingColorName := range matchingColorNames {
+			matchingColorNamesDisplay = append(matchingColorNamesDisplay, coloredColorName(matchingColorName))
+		}
+		return "", errors.New("Ambiguous color shorthand '" + color + "': could be one of: " + strings.Join(matchingColorNamesDisplay, ", "))
 	}
 	// If we had an empty array, then the given color name was incorrect.
-	return "", errors.New("Unvalid color " + color)
+	return "", errors.New("Unvalid color '" + color + "'")
+}
+
+func coloredColorName(color string) string {
+	colorMap := map[string]func(string)string{
+		"blue":     ansi.ColorFunc("blue+h"),
+		"brown":    ansi.ColorFunc("red"),
+		"darkblue": ansi.ColorFunc("blue"),
+		"gray":     ansi.ColorFunc("black+h"),
+		"green":    ansi.ColorFunc("green"),
+		"orange":   ansi.ColorFunc("yellow"),
+		"pink":     ansi.ColorFunc("magenta+h"),
+		"purple":   ansi.ColorFunc("magenta"),
+		"red":      ansi.ColorFunc("red+h"),
+		"teal":     ansi.ColorFunc("cyan"),
+		"white":    ansi.ColorFunc("off"),
+		"yellow":   ansi.ColorFunc("yellow+h"),
+	}
+	return colorMap[color](color)
 }
