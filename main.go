@@ -16,8 +16,8 @@ Usage:
 	ideaseed [options] IDEA...
 
 Options:
-	-r 	--repo=[[OWNER/]REPO]         Put the idea to github. If no argument is given, the card is added to one of the user's projects.
-	-g	--gh
+	-r 	--repo=[OWNER/]REPO           Select which repo to put the idea to. If OWNER/ is omitted, OWNER is your GitHub username
+	-g	--gh                          Put the idea to github. If --repo is not given, the card is added to one of the user's projects.
 	-p 	--project=PROJECT-NAME        Select which project to put the project too. Can only be used with --gh.
 	-c 	--column=COLUMN NAME|INDEX    Select which column of the project to use. Can only be used with --gh.
 		--create-columns              Prompt to create non-existant columns specified with --columns.
