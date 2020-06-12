@@ -18,29 +18,76 @@ Usage:
 Options:
 	-r 	--repo=[OWNER/]REPO           Select which repo to put the idea to. If OWNER/ is omitted, OWNER is your GitHub username
 	-g	--gh                          Put the idea to github. If --repo is not given, the card is added to one of the user's projects.
-	-p 	--project=PROJECT-NAME        Select which project to put the project too. Can only be used with --gh.
-	-c 	--column=COLUMN NAME|INDEX    Select which column of the project to use. Can only be used with --gh.
+	-p 	--project=PROJECT-NAME|INDEX  Select which project to put the project too. Can only be used with --gh. [default: 1]
+	-c 	--column=COLUMN NAME          Select which column of the project to use. Can only be used with --gh. [default: To-Do]
 		--create-columns              Prompt to create non-existant columns specified with --columns.
 	-d 	--color=COLOR                 Chooses which color to use for Google Keep cards. Cannot be used with --gh. COLOR can be one of: bl[ue], br[own], d[arkblue], gra[y], gre[en], o[range], pi[nk], pu[rple], r[ed], t[eal], w[hite], y[ellow],
 	-t 	--tag=TAG NAME                Adds tags to the Google Keep card. Cannot be used with --gh.
 		--create-tags                 Prompt to create non-existant tags specified with --tag.
 	-? 	--prompt-mode                 Prompts you for the above options when they are not provided.
-`	
+`
 
 	opts, _ := docopt.ParseDoc(usage)
-	// Get the color option
-	color, _ := opts.String("--color")
-	// If we have specified it
-	if color != "" {
-		// Try to get the full color name (to handle eg. dar => darkblue)
-		var err error
-		color, err = expandColorName(color)
-		// Show the error
+	// Get the full text
+	idea, _ := opts.String("IDEA...")
+	
+	usingGithub, _ := opts.Bool("--gh")
+	if usingGithub {
+		gh, err := CreateGithubClient()
 		if err != nil {
-			fmt.Println(err)
-			// If we successfully expanded it, print it (for now!)
+			println(err.Error())
+			return
+		}
+		repository, usingUserProject := opts.String("--repo")
+		if usingUserProject != nil {
+
 		} else {
-			println(coloredColorName(color))
+			repositorySplitted := strings.Split(repository, "/")
+			var repoOwner string
+			var repoName string
+			if len(repositorySplitted) == 1 {
+				// We only provided the repo name
+				repoOwner, err = GetGithubUsername(gh)
+				if err != nil {
+					println(err.Error())
+					return
+				}
+				repoName = repositorySplitted[0]
+			} else if len(repositorySplitted) == 2 {
+				// We also specified the owner
+				repoOwner = repositorySplitted[0]
+				repoName = repositorySplitted[1]
+			}
+			// Get the repo
+			if !RepoExists(gh, repoOwner, repoName) {
+				println("repository " + repoOwner + "/" + repoName + " does not exist")
+				return
+			}
+			// Create the card
+			projectNumber, _ := opts.Int("--project")
+			columnNumber, _  := opts.Int("--column")
+			url, err := CreateCard(gh, repoOwner, repoName, projectNumber, columnNumber, idea)
+			if err != nil {
+				println(err.Error())
+				return
+			}
+			println(url)
+		}
+	} else {
+		// Get the color option
+		color, _ := opts.String("--color")
+		// If we have specified it
+		if color != "" {
+			// Try to get the full color name (to handle eg. dar => darkblue)
+			var err error
+			color, err = expandColorName(color)
+			// Show the error
+			if err != nil {
+				fmt.Println(err)
+				// If we successfully expanded it, print it (for now!)
+			} else {
+				println(coloredColorName(color))
+			}
 		}
 	}
 
@@ -88,7 +135,7 @@ func expandColorName(color string) (string, error) {
 }
 
 func coloredColorName(color string) string {
-	colorMap := map[string]func(string)string{
+	colorMap := map[string]func(string) string{
 		"blue":     ansi.ColorFunc("blue+h"),
 		"brown":    ansi.ColorFunc("red"),
 		"darkblue": ansi.ColorFunc("blue"),
