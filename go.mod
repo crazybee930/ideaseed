@@ -1,4 +1,4 @@
-module github.com/ewen-lbh/ideasprout
+module github.com/ewen-lbh/ideaseed
 
 go 1.14
 

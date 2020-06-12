@@ -12,7 +12,7 @@ func main() {
 	usage := `Do you have ideas suddenly and just wished you could catch them as fast as possible, as to not loose them, without having to interrupt what you were doing?
 
 Usage:
-	ideasprout [options] IDEA...
+	ideaseed [options] IDEA...
 
 Options:
 	-g 	--gh=[[OWNER/]REPO]     	  Put the idea to github. If no argument is given, the card is added to one of the user's projects.
