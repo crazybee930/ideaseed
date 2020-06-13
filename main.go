@@ -25,6 +25,7 @@ Options:
 	-t 	--tag=TAG NAME                Adds tags to the Google Keep card. Cannot be used with --gh.
 		--create-tags                 Prompt to create non-existant tags specified with --tag.
 	-? 	--prompt-mode                 Prompts you for the above options when they are not provided.
+	-o	--open                        Open the created card in your browser
 
 Examples: (In all examples, USERNAME refers to your username.)
 	# Create a new card with content "Choose audio normalization loudness with --loudness" in USERNAME/phelng > project #1 > column "To-Do" 
@@ -79,6 +80,9 @@ Examples: (In all examples, USERNAME refers to your username.)
 				return
 			}
 			println(url)
+			if flagIsSet, _ := opts.Bool("--open"); flagIsSet {
+				openInBrowser(url)
+			}
 		}
 	} else {
 		// Get the color option
@@ -94,6 +98,12 @@ Examples: (In all examples, USERNAME refers to your username.)
 				// If we successfully expanded it, print it (for now!)
 			} else {
 				println(coloredColorName(color))
+			}
+		}
+		if flagIsSet, _ := opts.Bool("--open"); flagIsSet {
+			err := openInBrowser("https://keep.google.com/")
+			if err != nil {
+				println(err.Error())
 			}
 		}
 	}
@@ -157,4 +167,21 @@ func coloredColorName(color string) string {
 		"yellow":   ansi.ColorFunc("yellow+h"),
 	}
 	return colorMap[color](color)
+}
+
+func openInBrowser(url string) error {
+	var err error
+
+	switch runtime.GOOS {
+	case "linux":
+		err = exec.Command("xdg-open", url).Start()
+	case "windows":
+		err = exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+	case "darwin":
+		err = exec.Command("open", url).Start()
+	default:
+		return errors.New("Unsupported platform '" + runtime.GOOS + "'")
+	}
+	return err
+
 }
