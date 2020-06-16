@@ -14,3 +14,6 @@ COLOR_NAME_TO_HEX_MAP: Dict[str, int] = {
     "white": 0xFFFFFF,
     "yellow": 0xFFF475,
 }
+
+# colors
+C_PRIMARY = 0x268CCE
