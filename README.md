@@ -37,13 +37,18 @@ If the `OWNER/` part is omitted, your GitHub username is assumed.
 
 ### Options
 
-[[Jump straight to the options table](#options-table)]
+| Shorthand | Full-length      | Description                                                                                          |
+| --------- | ---------------- | ---------------------------------------------------------------------------------------------------- |
+| -p        | --project        | Creates a GitHub project on your user profile instead of a Google Keep card if REPO is not given     |
+| -c        | --color COLOR    | Chooses which color to use for Google Keep cards. See [Color names](#color-names) for allowed values |
+| -t        | --tag TAG        | Adds tags to the Google Keep card.                                                                   |
+| -i        | --issue TITLE    | Creates an issue with title TITLE.                                                                   |
+| -I        | --interactive    | Prompts you for the above options when they are not provided.                                        |
+|           | --create-missing | Create non-existant tags, projects or columns specified (needs confirmation if -I is used)           |
+|           | --about          | Details about ideaseed like currently-installed version                                              |
+|           | --version        | Like --about, without dumb and useless stuff                                                         |
 
-By default, the latter example will add a new card to your Google Keep account. To save it to GitHub, you can add the `--gh` flag. `--gh` optionally takes an argument, which is either `REPO` (resolves to `your-user-name/REPO`) or `OWNER/REPO`. You can also pass `-p` or `--project` and type the name of the project to add the card to. 
-
-In all cases, the card will get added to the leftmost column, except with `-c` or `--column`, which can be given a column name or an index, starting from one. If the column name does not exist, it'll choose the closest column that exists by fuzzy matching. You can also use `--create-columns` and it'll create them for you, after you confirm (you don't want to create columns accidently by making a typo, don't you?).
-
-With Google Keep, you can use `--color` or `-d` (d for **d**ye) to specify one of these colors:
+#### Color names
 
 - blue
 - brown
@@ -73,36 +78,16 @@ You don't have to specify the whole color name, just enough to be non-ambiguous:
 - w
 - y
 
-Also with Google Keep, you can add tags to your card with `--tag` or `-t`. If your tag contains spaces, you must quote the option's argument. Of course you can add multiple tags by using the argument multiple times: `ideaseed -t web -t app a webapp to permanently solve all conflicts in the world` will add both tags `web` and `app`. Same as with `--column`, non-existant tags will resolve to the closes ones by fuzzy matching, and you can also use `--create-tags` to create them, after being prompted.
-
 #### Relax. You don't need to remember those options
 
-You can also use `ideaseed -?` to prompt you some information:
+You can also use `ideaseed -?` to prompt you for some information:
 
 - Where do you want to upload this idea? (github, google keep)
-- Which repo? (using REPO or OWNER/REPO) (autocompletes with repositories you contribute to)
-- Which column? (choices are the column names, and you can type the column's index to be quicker)
-
-#### Type even less not-your-idea stuff
-
-If you always want to be prompted, or always post to github, or just to type faster, you can make your alias to "configure" ideaseed (no config files are planned for now, I'm trying to follow [n³'s way of configuring things](https://github.com/jarun/nnn#quickstart)).
-
-This works well because, as you don't need quotes to type your idea, dashes are of course allowed in your idea, and so flags need to be added before the idea text. Thus, aliases work well in this case because you only have to _append_ input.
-
-As an example, if you want to only have to type `idea` to use `ideaseed --gh -c To-Do`, do
-
-```bash
-alias idea="ideaseed --gh --column To-Do"
-```
-
-And you're all set!
-
-#### Options table
-
-| Shorthand | Flag               | Arguments  | Repeatable | Description                                                                                                                                                                                                                              |
-| --------- | ------------------ | ---------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|           | `--create-columns` |            |            | Prompt to create non-existant columns specified with `--columns`.                                                                                                                                                                        |
-| `-c`      | `--color`          | `COLOR`    |            | Chooses which color to use for Google Keep cards. Cannot be used with `--gh`. `COLOR` can be one of: `bl[ue]`, `br[own]`, `d[arkblue]`, `gra[y]`, `gre[en]`, `o[range]`, `pi[nk]`, `pu[rple]`, `r[ed]`, `t[eal]`, `w[hite]`, `y[ellow]`, |
-| `-t`      | `--tag`            | `TAG NAME` | yes        | Adds tags to the Google Keep card. Cannot be used with `--gh`.                                                                                                                                                                           |
-|           | `--create-tags`    |            |            | Prompt to create non-existant tags specified with `--tag`.                                                                                                                                                                               |
-| `-?`      | `--prompt-mode`    |            |            | Prompts you for the above options when they are not provided.                                                                                                                                                                            |
+- If you decide to use github,
+  - On your profile?
+  - If not:
+    - Which repo? (using REPO or OWNER/REPO) (autocompletes with repositories you contribute to)
+    - Which column? (choices are the column names, and you can type the column's index to be quicker)
+- If you decide to use google keep,
+  - Which color? (defaults to white)
+  - Some tags?
