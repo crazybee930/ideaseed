@@ -16,33 +16,52 @@ But when I don't get to decide _when_ this idea comes, and I often need to inter
 
 Enough rambling. Here's what you came for.
 
+Note down your ideas and get them to the right place, without switching away from your terminal
+
 ## Usage
 
-The interface itself is pretty simple and POSIX-compliant
-
 ```bash
-ideaseed [options] [[OWNER/]REPO [PROJECT [COLUMN]]] IDEA
+ideaseed (--help | --about | --version)
+ideaseed [options] ARGUMENTS...
 ```
 
-`[OWNER/]REPO` allows you to select a repository. If not given, the idea will be added to Google Keep
-If the `OWNER/` part is omitted, your GitHub username is assumed.
+### Examples
 
-`PROJECT` allows you to select a project by name to put your card to. If omitted, `REPO` is assumed (eg `ideaseed myrepo "do this thing"` is the same as `ideaseed myrepo myrepo "do this thing"`)
+```sh-session
+# Save a card "test" in schoolsyst/webapp > project "UX" > column "To-Do"
+$ ideaseed schoolsyst/webapp UX "test"
+# Save a card "lorem" in your-username/ipsum > project "ipsum" > column "To-Do"
+$ ideaseed ipsum "lorem"
+# Save a card "a CLI to note down ideas named ideaseed" in your user profile > project "incubator" > column "willmake"
+$ ideaseed --user-keyword=project --user-project=incubator project "a CLI to note down ideas named ideaseed"
+```
 
-`COLUMN`, much like `PROJECTS`, allows you to select a project's column by name, and defaults to `To-Do`
+### Arguments
+| Argument | Meaning                                                                                                              | Default value  |
+| -------- | -------------------------------------------------------------------------------------------------------------------- | -------------- |
+| REPO     | Select a repository by name                                                                                          |
+|          | If not given, uses Google Keep instead of GitHub (or uses your user profile's projects if --project is used)         |
+|          | If --user-keyword's value is given, creates a card on your user's project (select which project with --user-project) |
+|          | If given in the form OWNER/REPO, uses the repository OWNER/REPO                                                      |
+|          | If given in the form REPO, uses the repository "your username/REPO"                                                  |
+| PROJECT  | Select a project by name to put your card to [default: REPO's value]                                                 | `REPO`'s value |
+|          | If creating a card on your user's project, this becomes the COLUMN                                                   |
+| COLUMN   | Select a project's column by name [default: To-Do]                                                                   | To-Do          |
+|          | If creating a card on your user's project, this is ignored                                                           |
 
 ### Options
-
-| Shorthand | Full-length      | Description                                                                                          |
-| --------- | ---------------- | ---------------------------------------------------------------------------------------------------- |
-| -p        | --project        | Creates a GitHub project on your user profile instead of a Google Keep card if REPO is not given     |
-| -c        | --color COLOR    | Chooses which color to use for Google Keep cards. See [Color names](#color-names) for allowed values |
-| -t        | --tag TAG        | Adds tags to the Google Keep card.                                                                   |
-| -i        | --issue TITLE    | Creates an issue with title TITLE.                                                                   |
-| -I        | --interactive    | Prompts you for the above options when they are not provided.                                        |
-|           | --create-missing | Create non-existant tags, projects or columns specified (needs confirmation if -I is used)           |
-|           | --about          | Details about ideaseed like currently-installed version                                              |
-|           | --version        | Like --about, without dumb and useless stuff                                                         |
+| Shorthand | Full-length         | Description                                                                                                  |
+| --------- | ------------------- | ------------------------------------------------------------------------------------------------------------ |
+| -c        | --color COLOR       | Chooses which color to use for Google Keep cards. See [Color names](#color-names) for a list of valid values |
+| -t        | --tag TAG           | Adds tags to the Google Keep card.                                                                           |
+| -i        | --issue TITLE       | Creates an issue with title TITLE.                                                                           |
+| -I        | --interactive       | Prompts you for the above options when they are not provided.                                                |
+|           | --logout            | Clears the authentification cache                                                                            |
+|           | --create-missing    | Create non-existant tags, projects or columns specified (needs confirmation if -I is used)                   |
+|           | --about             | Details about ideaseed like currently-installed version                                                      |
+|           | --version           | Like --about, without dumb and useless stuff                                                                 |
+|           | --user-project NAME | Name of the project to use as your user project                                                              |
+|           | --user-keyword NAME | When REPO is NAME, creates a GitHub card on your user profile instead of putting it on REPO                  |
 
 #### Color names
 
@@ -76,7 +95,7 @@ You don't have to specify the whole color name, just enough to be non-ambiguous:
 
 #### Relax. You don't need to remember those options
 
-You can also use `ideaseed -?` to prompt you for some information:
+You can also use `ideaseed -I` to prompt you for some information:
 
 - Where do you want to upload this idea? (github, google keep)
 - If you decide to use github,

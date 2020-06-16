@@ -4,6 +4,14 @@ Usage:
     ideaseed (--help | --about | --version)
     ideaseed [options] ARGUMENTS...
 
+Examples:
+    # Save a card "test" in schoolsyst/webapp > project "UX" > column "To-Do"
+    $ ideaseed schoolsyst/webapp UX "test"
+    # Save a card "lorem" in your-username/ipsum > project "ipsum" > column "To-Do"
+    $ ideaseed ipsum "lorem"
+    # Save a card "a CLI to note down ideas named ideaseed" in your user profile > project "incubator" > column "willmake"
+    $ ideaseed --user-keyword=project --user-project=incubator project "a CLI to note down ideas named ideaseed"
+
 Arguments:
     REPO        Select a repository
                     If not given                        Uses Google Keep instead of GitHub (or uses your user profile's projects if --project is used)
@@ -11,7 +19,9 @@ Arguments:
                     If given in the form OWNER/REPO     Uses the repository OWNER/REPO
                     If given in the form REPO           Uses the repository "your username/REPO"
     PROJECT     Select a project by name to put your card to [default: REPO's value]
-    COLUMNS     Select a project's column by name [default: To-Do]
+                    If creating a card on your user's project, this becomes the COLUMN
+    COLUMN      Select a project's column by name [default: To-Do]
+                    If creating a card on your user's project, this is ignored
 
 Options:
     -c --color COLOR        Chooses which color to use for Google Keep cards. Can be one of: "bl[ue]", "br[own]", "d[arkblue]", "gra[y]", "gre[en]", "o[range]", "pi[nk]", "pu[rple]", "r[ed]", "t[eal]", "w[hite]", "y[ellow]"
