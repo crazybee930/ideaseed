@@ -1,18 +1,18 @@
 from typing import *
 
 COLOR_NAME_TO_HEX_MAP: Dict[str, int] = {
-    "blue": 0xAECBFA,
-    "brown": 0xE6C9A8,
-    "darkblue": 0xAECBFA,
-    "gray": 0xE8EAED,
-    "green": 0xCCFF90,
-    "orange": 0xFBBC04,
-    "pink": 0xFDCFE8,
-    "purple": 0xD7AEFB,
-    "red": 0xF28B82,
-    "teal": 0xA7FFEB,
-    "white": 0xFFFFFF,
-    "yellow": 0xFFF475,
+    "Blue": 0xAECBFA,
+    "Brown": 0xE6C9A8,
+    "DarkBlue": 0xAECBFA,
+    "Gray": 0xE8EAED,
+    "Green": 0xCCFF90,
+    "Orange": 0xFBBC04,
+    "Pink": 0xFDCFE8,
+    "Purple": 0xD7AEFB,
+    "Red": 0xF28B82,
+    "Teal": 0xA7FFEB,
+    "White": 0xFFFFFF,
+    "Yellow": 0xFFF475,
 }
 
 # colors

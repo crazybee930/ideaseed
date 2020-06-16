@@ -20,7 +20,7 @@ def dye(
     )
 
 
-def ask(*questions) -> List[Any]:
+def ask(*questions) -> Union[List[Any], Any]:
     if len(questions) == 1:
         # No need to turn the hash into a tuple, just return the only value
         questions[0].name = "ans"
@@ -38,5 +38,5 @@ def ask(*questions) -> List[Any]:
     answers = [a[1] for a in answers]
     return answers
 
-def get_token_cache_filepath() -> str:
-    return path.join(path.dirname(path.dirname(__file__)), f'.auth-cache')
+def get_token_cache_filepath(service: str) -> str:
+    return path.join(path.dirname(path.dirname(__file__)), f'.auth-cache--{service}')

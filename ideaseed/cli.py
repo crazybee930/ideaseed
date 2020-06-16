@@ -2,7 +2,7 @@
 
 Usage: 
     ideaseed (--help | --about | --version)
-    ideaseed [options] ARGUMENTS...
+    ideaseed [options] [-t TAG...] ARGUMENTS...
 
 Examples:
     # Save a card "test" in schoolsyst/webapp > project "UX" > column "To-Do"
@@ -20,16 +20,19 @@ Arguments:
                     If given in the form REPO           Uses the repository "your username/REPO"
     PROJECT     Select a project by name to put your card to [default: REPO's value]
                     If creating a card on your user's project, this becomes the COLUMN
-    COLUMN      Select a project's column by name [default: To-Do]
+    COLUMN      Select a project's column by name [default: To do]
                     If creating a card on your user's project, this is ignored
 
 Options:
-    -c --color COLOR        Chooses which color to use for Google Keep cards. Can be one of: "bl[ue]", "br[own]", "d[arkblue]", "gra[y]", "gre[en]", "o[range]", "pi[nk]", "pu[rple]", "r[ed]", "t[eal]", "w[hite]", "y[ellow]"
-    -t --tag TAG            Adds tags to the Google Keep card. 
-    -i --issue TITLE        Creates an issue with title TITLE.
-    -I --interactive        Prompts you for the above options when they are not provided.
+    -c --color COLOR        Chooses which color to use for Google Keep cards. See Color names for allowed values.
+    -t --tag TAG            Adds tags to the Google Keep card. Use it multiple times to set multiple tags.
+                            When used together with --issue, --tag means labels.
+    -i --issue              Creates an issue for the card and link them together. IDEA becomes the issue's title, except if --title is specified,
+                            in which case IDEA becomes the issue's description and --title's value the issue title.
+    (WIP) -I --interactive  Prompts you for the above options when they are not provided.
+    -T --title TEXT         Sets the Google Keep card's title. When used with --issue, sets the issue's title.
     -L --logout             Clears the authentification cache
-    -m --create-missing     Create non-existant tags, projects or columns specified (needs confirmation if -I is used)
+    -m --create-missing     Create non-existant tags, labels, projects or columns specified, upon confirmation.
        --about              Details about ideaseed like currently-installed version
        --version            Like --about, without dumb and useless stuff
 
@@ -37,6 +40,9 @@ Settings options: It's comfier to set these in your alias, e.g. alias idea="idea
        --user-project NAME  Name of the project to use as your user project
        --user-keyword NAME  When REPO is NAME, creates a GitHub card on your user profile instead of putting it on REPO
        --no-auth-cache      Don't save credentials in a temporary file at {cache_filepath}
+
+Color names: Try with the first letter only too
+    blue, brown, darkblue, gray, green, orange, pink, purple, red, teal, white, yellow
 """
 
 from ideaseed.gkeep import push_to_gkeep
@@ -51,7 +57,7 @@ from ideaseed.dumb_utf8_art import DUMB_UTF8_ART
 
 def run(argv=None):
     args = resolve_arguments(
-        docopt(__doc__.format(cache_filepath=get_token_cache_filepath()), argv)
+        docopt(__doc__.format(cache_filepath=get_token_cache_filepath("*")), argv)
     )
     validate_argument_presence(args)
     args = resolve_arguments_defaults(args)
@@ -101,7 +107,7 @@ def resolve_arguments_defaults(args: Dict[str, Any]) -> Dict[str, Any]:
     return {
         **args,
         "PROJECT": args["PROJECT"] or args["REPO"],
-        "COLUMN": args["COLUMN"] or "To-Do",
+        "COLUMN": args["COLUMN"] or "To do",
     }
 
 
@@ -117,15 +123,15 @@ def validate_argument_presence(args: Dict[str, str]) -> None:
 
     GOOGLE_KEEP_ONLY = ("--color", "--tag")
     GITHUB_ONLY = ("--issue",)
-
-    using_github = bool(args["REPO"])
+    using_github = len(args["ARGUMENTS"]) > 1
 
     if using_github and any([v for k, v in args.items() if k in GOOGLE_KEEP_ONLY]):
         raise ValidationError(
             "The following options are not allowed when using GitHub: "
             + ", ".join(GOOGLE_KEEP_ONLY)
+            + f"\n{args!r}"
         )
-    elif any([v for k, v in args.items() if k in GITHUB_ONLY]):
+    if not using_github and any([v for k, v in args.items() if k in GITHUB_ONLY]):
         raise ValidationError(
             "The following options are not allowed when using Google Keep: "
             + ", ".join(GITHUB_ONLY)
@@ -134,12 +140,12 @@ def validate_argument_presence(args: Dict[str, str]) -> None:
 
 def expand_color_name(color: str) -> str:
     # All possible color names
-    color_names = list(COLOR_NAME_TO_HEX_MAP.keys())
+    color_names = [k for k in COLOR_NAME_TO_HEX_MAP.keys()]
     # Initialize the array of matches
     matching_color_names: List[str] = []
     # Filter `color_names` to only get the color names that start with `color`
     for color_name in color_names:
-        if color_name.startswith(color):
+        if color_name.lower().startswith(color.lower()):
             matching_color_names += [color_name]
     # If we have exactly _one_ element of `color_names` that matches, we return the only
     # element: it's a match!
