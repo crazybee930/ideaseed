@@ -62,6 +62,7 @@ $ ideaseed --user-keyword=project --user-project=incubator project "a CLI to not
 | -I        | --interactive       | Prompts you for the above options when they are not provided.                                                |
 | -L        | --logout            | Clears the authentification cache                                                                            |
 | -m        | --create-missing    | Create non-existant tags, projects or columns specified (needs confirmation if -I is used)                   |
+| -o        | --open              | Open the relevant URL in your web browser.                                                                   |
 |           | --about             | Details about ideaseed like currently-installed version                                                      |
 |           | --version           | Like --about, without dumb and useless stuff                                                                 |
 |           | --user-project NAME | Name of the project to use as your user project                                                              |

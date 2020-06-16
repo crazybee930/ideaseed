@@ -33,6 +33,7 @@ Options:
     -T --title TEXT         Sets the Google Keep card's title. When used with --issue, sets the issue's title.
     -L --logout             Clears the authentification cache
     -m --create-missing     Create non-existant tags, labels, projects or columns specified, upon confirmation.
+    -o --open               Open the relevant URL in your web browser.
        --about              Details about ideaseed like currently-installed version
        --version            Like --about, without dumb and useless stuff
 

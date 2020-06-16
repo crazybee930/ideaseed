@@ -1,4 +1,5 @@
 import os
+import webbrowser
 import pprint
 from os.path import dirname
 import github
@@ -19,8 +20,8 @@ def login_with_cache() -> Optional[Github]:
     Tries to login using the cached credentials.
     `None` is returned if the cache does not exist or is invalid.
     """
-    if os.path.exists(get_token_cache_filepath('github')):
-        with open(get_token_cache_filepath('github'), encoding="utf8") as file:
+    if os.path.exists(get_token_cache_filepath("github")):
+        with open(get_token_cache_filepath("github"), encoding="utf8") as file:
             creds = json.load(file)
             creds = (
                 [creds["username"], creds["password"]]
@@ -39,13 +40,13 @@ def login_with_cache() -> Optional[Github]:
 
 
 def clear_auth_cache():
-    if os.path.exists(get_token_cache_filepath('github')):
-        os.remove(get_token_cache_filepath('github'))
+    if os.path.exists(get_token_cache_filepath("github")):
+        os.remove(get_token_cache_filepath("github"))
 
 
 def write_auth_cache(auth):
-    os.makedirs(dirname(get_token_cache_filepath('github')), exist_ok=True)
-    with open(get_token_cache_filepath('github'), "w", encoding="utf8") as file:
+    os.makedirs(dirname(get_token_cache_filepath("github")), exist_ok=True)
+    with open(get_token_cache_filepath("github"), "w", encoding="utf8") as file:
         json.dump(auth, file)
 
 
@@ -181,9 +182,19 @@ def push_to_repo(args: Dict[str, Any]) -> None:
             labels=args["--tag"],
         )
         card = column.create_card(content_id=issue.id, content_type="Issue")
+
+        if args["--open"]:
+            if args["--title"]:
+                webbrowser.open(issue.html_url)
+            else:
+                webbrowser.open(project.html_url)
     else:
         card = column.create_card(note=idea)
-        pass
+
+        # Open project URL
+        if args["--open"]:
+            webbrowser.open(project.html_url)
+
 
 def push_to_user(args: Dict[str, Any]) -> None:
     gh = login(args)
@@ -233,3 +244,8 @@ def push_to_user(args: Dict[str, Any]) -> None:
         return
 
     column.create_card(note=idea)
+
+    # Open project URL
+    if args["--open"]:
+        webbrowser.open(project.html_url)
+

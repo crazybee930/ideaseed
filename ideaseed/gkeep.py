@@ -1,5 +1,6 @@
 from ideaseed.constants import COLOR_NAME_TO_HEX_MAP, C_PRIMARY
 import json
+import webbrowser
 from os import path
 from ideaseed.utils import ask, dye, get_token_cache_filepath
 from typing import *
@@ -97,3 +98,8 @@ def push_to_gkeep(args: Dict[str, Any]) -> None:
 
     # Beam it up to Google's servers
     keep.sync()
+    
+    # Open the browser
+    if args['--open']:
+        url = f"https://keep.google.com/u/0/#NOTE/{note.id}"
+        webbrowser.open(url)
