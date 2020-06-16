@@ -14,10 +14,6 @@ I recently started to use GitHub Projects for _coding_ project ideas as a [singl
 
 But when I don't get to decide _when_ this idea comes, and I often need to interrupt what am I doing to open github, get to the right page, input my idea and get back. And I find it frustrating.
 
-So I started this CLI, as my first Go project, and my first project consuming a GraphQL API (GitHub's)
-
-I'm also using an unofficial, reverse-engineered REST API—turns out Google Keep doesn't have an official one.
-
 Enough rambling. Here's what you came for.
 
 ## Usage
