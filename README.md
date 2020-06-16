@@ -25,10 +25,15 @@ Enough rambling. Here's what you came for.
 The interface itself is pretty simple and POSIX-compliant
 
 ```bash
-ideaseed your idea and no you dont need quotes because that takes too much time
+ideaseed [options] [[OWNER/]REPO [PROJECT [COLUMN]]] IDEA
 ```
 
-Obviously, depending on your shell, you might want to escape special characters or use quotes
+`[OWNER/]REPO` allows you to select a repository. If not given, the idea will be added to Google Keep
+If the `OWNER/` part is omitted, your GitHub username is assumed.
+
+`PROJECT` allows you to select a project by name to put your card to. If omitted, `REPO` is assumed (eg `ideaseed myrepo "do this thing"` is the same as `ideaseed myrepo myrepo "do this thing"`)
+
+`COLUMN`, much like `PROJECTS`, allows you to select a project's column by name, and defaults to `To-Do`
 
 ### Options
 
@@ -94,14 +99,10 @@ And you're all set!
 
 #### Options table
 
-| Shorthand            | Flag               | Arguments      | Repeatable | Description                                                                                                                                                                                                                              |
-| -------------------- | ------------------ | -------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `-g`                 | `--gh`             |                |            | Put the idea to github. If `--repo` is not given, the card is added to one of the user's projects.                                                                                                                                       |
-| `-r`                 | `--repo`           | `[OWNER/]REPO` |            | Select which repo to put the idea to. If `OWNER/` is not specified, `OWNER` is your GitHub username                                                                                                                                      |
-| `-p`                 | `--project`        | `PROJECT NAME` |            | Select which project to put the project too. Can only be used with `--gh`.                                                                                                                                                               |
-| `-c`                 | `--column`         | `COLUMN NAME`  |            | Select which column of the project to use. Can only be used with `--gh`.                                                                                                                                                                 |
-|                      | `--create-columns` |                |            | Prompt to create non-existant columns specified with `--columns`.                                                                                                                                                                        |
-| `-d` (as in **d**ye) | `--color`          | `COLOR`        |            | Chooses which color to use for Google Keep cards. Cannot be used with `--gh`. `COLOR` can be one of: `bl[ue]`, `br[own]`, `d[arkblue]`, `gra[y]`, `gre[en]`, `o[range]`, `pi[nk]`, `pu[rple]`, `r[ed]`, `t[eal]`, `w[hite]`, `y[ellow]`, |
-| `-t`                 | `--tag`            | `TAG NAME`     | yes        | Adds tags to the Google Keep card. Cannot be used with `--gh`.                                                                                                                                                                           |
-|                      | `--create-tags`    |                |            | Prompt to create non-existant tags specified with `--tag`.                                                                                                                                                                               |
-| `-?`                 | `--prompt-mode`    |                |            | Prompts you for the above options when they are not provided.                                                                                                                                                                            |
+| Shorthand | Flag               | Arguments  | Repeatable | Description                                                                                                                                                                                                                              |
+| --------- | ------------------ | ---------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|           | `--create-columns` |            |            | Prompt to create non-existant columns specified with `--columns`.                                                                                                                                                                        |
+| `-c`      | `--color`          | `COLOR`    |            | Chooses which color to use for Google Keep cards. Cannot be used with `--gh`. `COLOR` can be one of: `bl[ue]`, `br[own]`, `d[arkblue]`, `gra[y]`, `gre[en]`, `o[range]`, `pi[nk]`, `pu[rple]`, `r[ed]`, `t[eal]`, `w[hite]`, `y[ellow]`, |
+| `-t`      | `--tag`            | `TAG NAME` | yes        | Adds tags to the Google Keep card. Cannot be used with `--gh`.                                                                                                                                                                           |
+|           | `--create-tags`    |            |            | Prompt to create non-existant tags specified with `--tag`.                                                                                                                                                                               |
+| `-?`      | `--prompt-mode`    |            |            | Prompts you for the above options when they are not provided.                                                                                                                                                                            |
