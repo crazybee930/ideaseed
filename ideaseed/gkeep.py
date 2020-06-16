@@ -72,7 +72,7 @@ def push_to_gkeep(args: Dict[str, Any]) -> None:
     print(" Done.")
 
     # Announce what we'll do
-    color = args["--color"] or 'white'
+    color = args["--color"] or 'White'
     print(
         f"Creating a "
         + dye(' ' + color.lower() + ' ', fg=0x000, bg=COLOR_NAME_TO_HEX_MAP[color])
@@ -81,7 +81,7 @@ def push_to_gkeep(args: Dict[str, Any]) -> None:
 
     # Create the note
     note = keep.createNote(title=args["--title"], text=args["IDEA"])
-    note.color = getattr(ColorValue, args["--color"])
+    note.color = getattr(ColorValue, color)
     note.pinned = True
 
     # Find/create all the labels
