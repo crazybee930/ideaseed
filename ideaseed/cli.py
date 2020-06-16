@@ -64,11 +64,11 @@ def run(argv=None):
     args = resolve_arguments_defaults(args)
 
     if args["--about"]:
-        print(DUMB_UTF8_ART.format(version="0.2.0"))
+        print(DUMB_UTF8_ART.format(version="0.2.1"))
         return
 
     if args["--version"]:
-        print("0.2.0")
+        print("0.2.1")
         return
 
     if args["--color"]:
