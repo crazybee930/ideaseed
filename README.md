@@ -1,11 +1,5 @@
 # ideaseed
 
----
-
-_Disclaimer_ This project is at a "I'm figuring out the interface" state, so nothing is working yet.
-
----
-
 Do you have ideas suddenly and just wished you could catch them as fast as possible, as to not loose them, without having to interrupt what you were doing?
 
 As I guy without a lot of more or less stupid ideas, I use Google Keep as a centralized place to put all of my thoughts that I deem worthy of consideration.
@@ -17,6 +11,14 @@ But when I don't get to decide _when_ this idea comes, and I often need to inter
 Enough rambling. Here's what you came for.
 
 Note down your ideas and get them to the right place, without switching away from your terminal
+
+## Installation
+
+Ideaseed is available [on PyPI.org](https://pypi.org/project/ideaseed):
+
+```sh-session
+pip install ideaseed
+```
 
 ## Usage
 
