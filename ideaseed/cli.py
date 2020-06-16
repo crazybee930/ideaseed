@@ -28,14 +28,15 @@ Options:
     -t --tag TAG            Adds tags to the Google Keep card. 
     -i --issue TITLE        Creates an issue with title TITLE.
     -I --interactive        Prompts you for the above options when they are not provided.
-       --logout             Clears the authentification cache
-       --create-missing     Create non-existant tags, projects or columns specified (needs confirmation if -I is used)
+    -L --logout             Clears the authentification cache
+    -m --create-missing     Create non-existant tags, projects or columns specified (needs confirmation if -I is used)
        --about              Details about ideaseed like currently-installed version
        --version            Like --about, without dumb and useless stuff
 
-Settings options:
+Settings options: It's comfier to set these in your alias, e.g. alias idea="ideaseed --user-project=incubator --user-keyword=project --no-auth-cache --create-missing"
        --user-project NAME  Name of the project to use as your user project
        --user-keyword NAME  When REPO is NAME, creates a GitHub card on your user profile instead of putting it on REPO
+       --no-auth-cache      Don't save credentials in a temporary file at {cache_filepath}
 """
 
 from ideaseed.gkeep import push_to_gkeep
@@ -43,13 +44,15 @@ from ideaseed.github import clear_auth_cache, push_to_repo, push_to_user
 from typing import *
 from docopt import docopt
 from pprint import pprint
-from ideaseed.utils import dye
+from ideaseed.utils import dye, get_token_cache_filepath
 from ideaseed.constants import COLOR_NAME_TO_HEX_MAP
 from ideaseed.dumb_utf8_art import DUMB_UTF8_ART
 
 
 def run(argv=None):
-    args = resolve_arguments(docopt(__doc__, argv))
+    args = resolve_arguments(
+        docopt(__doc__.format(cache_filepath=get_token_cache_filepath()), argv)
+    )
     validate_argument_presence(args)
     args = resolve_arguments_defaults(args)
 

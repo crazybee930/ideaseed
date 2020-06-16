@@ -37,6 +37,7 @@ $ ideaseed --user-keyword=project --user-project=incubator project "a CLI to not
 ```
 
 ### Arguments
+
 | Argument | Meaning                                                                                                              | Default value  |
 | -------- | -------------------------------------------------------------------------------------------------------------------- | -------------- |
 | REPO     | Select a repository by name                                                                                          |
@@ -50,18 +51,20 @@ $ ideaseed --user-keyword=project --user-project=incubator project "a CLI to not
 |          | If creating a card on your user's project, this is ignored                                                           |
 
 ### Options
+
 | Shorthand | Full-length         | Description                                                                                                  |
 | --------- | ------------------- | ------------------------------------------------------------------------------------------------------------ |
 | -c        | --color COLOR       | Chooses which color to use for Google Keep cards. See [Color names](#color-names) for a list of valid values |
 | -t        | --tag TAG           | Adds tags to the Google Keep card.                                                                           |
 | -i        | --issue TITLE       | Creates an issue with title TITLE.                                                                           |
 | -I        | --interactive       | Prompts you for the above options when they are not provided.                                                |
-|           | --logout            | Clears the authentification cache                                                                            |
-|           | --create-missing    | Create non-existant tags, projects or columns specified (needs confirmation if -I is used)                   |
+| -L        | --logout            | Clears the authentification cache                                                                            |
+| -m        | --create-missing    | Create non-existant tags, projects or columns specified (needs confirmation if -I is used)                   |
 |           | --about             | Details about ideaseed like currently-installed version                                                      |
 |           | --version           | Like --about, without dumb and useless stuff                                                                 |
 |           | --user-project NAME | Name of the project to use as your user project                                                              |
 |           | --user-keyword NAME | When REPO is NAME, creates a GitHub card on your user profile instead of putting it on REPO                  |
+|           | --no-auth-cache     | Don't save credentials in a temporary file                                                                   |
 
 #### Color names
 

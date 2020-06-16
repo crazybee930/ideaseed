@@ -47,7 +47,7 @@ def write_auth_cache(auth):
         json.dump(auth, file)
 
 
-def login(method: Optional[str] = None) -> Github:
+def login(args: Dict[str, Any], method: Optional[str] = None) -> Github:
     """
     Returns a `Github` instance to interact with.
     Prompts the user to login, either via username/password
@@ -83,8 +83,9 @@ def login(method: Optional[str] = None) -> Github:
         ),
     ]
     answers = q.prompt(questions)
-
-    write_auth_cache(answers)
+    
+    if not args['--no-auth-cache']:
+        write_auth_cache(answers)
 
     if answers["pat"] is not None:
         try:
@@ -93,7 +94,7 @@ def login(method: Optional[str] = None) -> Github:
             return gh
         except BadCredentialsException:
             print("Bad token")
-            return login(method)
+            return login(args, method)
     else:
         try:
             gh = Github(answers["username"], answers["password"])
@@ -103,10 +104,10 @@ def login(method: Optional[str] = None) -> Github:
             print(
                 "Your account uses two-factor authentification. Please use a personal access token instead."
             )
-            return login(method="Personal Access Token")
+            return login(args, method="Personal Access Token")
         except BadCredentialsException:
             print("Bad credentials")
-            return login(method)
+            return login(args, method)
 
 
 def github_username(gh: Github) -> str:
@@ -120,7 +121,7 @@ def resolve_self_repository_shorthand(gh: Github, repo: str) -> str:
 
 
 def push_to_repo(args: Dict[str, Any]) -> None:
-    gh = login()
+    gh = login(args)
     repo = resolve_self_repository_shorthand(gh, args["REPO"])
     idea = args["IDEA"]
     project = args["PROJECT"]
