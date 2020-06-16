@@ -205,7 +205,7 @@ def push_to_user(args: Dict[str, Any]) -> None:
         f"Saving card in {dye(github_username(gh), C_PRIMARY)} › {dye(project_name, C_PRIMARY)} › {dye(column_name, C_PRIMARY)}..."
     )
     project = None
-    user = gh.get_user()
+    user = gh.get_user(github_username(gh))
     for p in user.get_projects():
         if p.name.lower() == project_name.lower():
             project = p
