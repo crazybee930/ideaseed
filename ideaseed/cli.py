@@ -44,6 +44,11 @@ Settings options: It's comfier to set these in your alias, e.g. alias idea="idea
 
 Color names: Try with the first letter only too
     blue, brown, darkblue, gray, green, orange, pink, purple, red, teal, white, yellow
+    Some color have aliases:
+    - cyan is the same as teal
+    - indigo is the same as darkblue
+    - grey is the same as gray
+    - magenta is the same as purple
 """
 
 from ideaseed.gkeep import push_to_gkeep
@@ -52,7 +57,7 @@ from typing import *
 from docopt import docopt
 from pprint import pprint
 from ideaseed.utils import dye, get_token_cache_filepath
-from ideaseed.constants import COLOR_NAME_TO_HEX_MAP
+from ideaseed.constants import COLOR_ALIASES, COLOR_NAME_TO_HEX_MAP, VALID_COLOR_NAMES
 from ideaseed.dumb_utf8_art import DUMB_UTF8_ART
 
 
@@ -140,14 +145,19 @@ def validate_argument_presence(args: Dict[str, str]) -> None:
 
 
 def expand_color_name(color: str) -> str:
-    # All possible color names
-    color_names = [k for k in COLOR_NAME_TO_HEX_MAP.keys()]
     # Initialize the array of matches
     matching_color_names: List[str] = []
     # Filter `color_names` to only get the color names that start with `color`
-    for color_name in color_names:
+    for color_name in VALID_COLOR_NAMES:
         if color_name.lower().startswith(color.lower()):
             matching_color_names += [color_name]
+    # Resolve synonyms
+    matching_color_names_resolved = matching_color_names
+    for i, color_name in enumerate(matching_color_names):
+        if color_name in COLOR_ALIASES.keys():
+            matching_color_names_resolved[i] = COLOR_ALIASES[color_name]
+    # Remove duplicates
+    matching_color_names = list(set(matching_color_names))
     # If we have exactly _one_ element of `color_names` that matches, we return the only
     # element: it's a match!
     if len(matching_color_names) == 1:

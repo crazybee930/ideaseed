@@ -1,4 +1,5 @@
 from typing import *
+from flatten_list.flatten_list import flatten
 
 COLOR_NAME_TO_HEX_MAP: Dict[str, int] = {
     "Blue": 0xAECBFA,
@@ -14,6 +15,15 @@ COLOR_NAME_TO_HEX_MAP: Dict[str, int] = {
     "White": 0xFFFFFF,
     "Yellow": 0xFFF475,
 }
+
+COLOR_ALIASES = {
+    "Cyan": "Teal",
+    "Indigo": "DarkBlue",
+    "Grey": "Gray",
+    "Magenta": "Purple",
+}
+
+VALID_COLOR_NAMES = flatten(list(COLOR_ALIASES.items()))
 
 # colors
 C_PRIMARY = 0x268CCE
