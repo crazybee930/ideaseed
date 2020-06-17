@@ -144,6 +144,14 @@ version = "0.6.2"
 
 [[package]]
 category = "main"
+description = "Flatten Irregular Nested Lists"
+name = "flatten-list"
+optional = false
+python-versions = "*"
+version = "0.2.0"
+
+[[package]]
+category = "main"
 description = "Clean single-source support for Python 3 and 2"
 name = "future"
 optional = false
@@ -405,7 +413,7 @@ python-versions = "*"
 version = "1.12.1"
 
 [metadata]
-content-hash = "22e0381ab6b1d188b1763d869bee0d306bf3bbc5489e842cb7a98f8a2c4591f9"
+content-hash = "3ab6f46934bc5f9dff87439239cc8864f5804c76019598b7285d231043ca9890"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -458,6 +466,10 @@ deprecated = [
 ]
 docopt = [
     {file = "docopt-0.6.2.tar.gz", hash = "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491"},
+]
+flatten-list = [
+    {file = "flatten-list-0.2.0.tar.gz", hash = "sha256:885f960f06c17f7ee78417bb1d41c4ea56d01c9e7702ced985786f5164137c63"},
+    {file = "flatten_list-0.2.0-py2.py3-none-any.whl", hash = "sha256:ec1645dfc5f223b3f7c0c838e22dd175bba00a6075fb2f22d4729301713fcea3"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},

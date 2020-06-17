@@ -17,6 +17,7 @@ gkeepapi = "^0.11.16"
 docopt = "^0.6.2"
 colr = "^0.9.1"
 inquirer = "^2.7.0"
+flatten-list = "^0.2.0"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
