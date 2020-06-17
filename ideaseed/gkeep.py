@@ -69,6 +69,7 @@ and use it as your password.""",
 def push_to_gkeep(args: Dict[str, Any]) -> None:
     # Log in
     print("Logging in...", end="")
+    sys.stdout.flush()
     keep = login(args)
     print(" Done.")
 
