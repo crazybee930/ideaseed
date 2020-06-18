@@ -96,6 +96,17 @@ python-versions = "*"
 version = "3.0.4"
 
 [[package]]
+category = "main"
+description = "Add a box around your text for prettier CLIs"
+name = "cli-box"
+optional = false
+python-versions = ">=3.6,<4.0"
+version = "0.1.0"
+
+[package.dependencies]
+wcwidth = ">=0.2.4,<0.3.0"
+
+[[package]]
 category = "dev"
 description = "Composable command line interface toolkit"
 name = "click"
@@ -361,6 +372,14 @@ dev = ["pytest"]
 
 [[package]]
 category = "main"
+description = "A library implementing the 'SemVer' scheme."
+name = "semantic-version"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "2.8.5"
+
+[[package]]
+category = "main"
 description = "Python 2 and 3 compatibility utilities"
 name = "six"
 optional = false
@@ -413,7 +432,7 @@ python-versions = "*"
 version = "1.12.1"
 
 [metadata]
-content-hash = "3ab6f46934bc5f9dff87439239cc8864f5804c76019598b7285d231043ca9890"
+content-hash = "8e178037a551c4fa452e7f27f64846b70a841a4034381f7ca40e9752b7191e91"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -448,6 +467,10 @@ certifi = [
 chardet = [
     {file = "chardet-3.0.4-py2.py3-none-any.whl", hash = "sha256:fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691"},
     {file = "chardet-3.0.4.tar.gz", hash = "sha256:84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae"},
+]
+cli-box = [
+    {file = "cli-box-0.1.0.tar.gz", hash = "sha256:0d73081611ea4ad7241a2db47f49fc69a95ec0ad1f10f3e8b414f75075b39e47"},
+    {file = "cli_box-0.1.0-py3-none-any.whl", hash = "sha256:a6cf1130016f62c74b9ca2c0ee7c8307a2e73015c3aa588d6db5be436be4b965"},
 ]
 click = [
     {file = "click-7.1.2-py2.py3-none-any.whl", hash = "sha256:dacca89f4bfadd5de3d7489b7c8a566eee0d3676333fbb50030263894c38c0dc"},
@@ -611,6 +634,10 @@ requests = [
 ]
 rope = [
     {file = "rope-0.17.0.tar.gz", hash = "sha256:658ad6705f43dcf3d6df379da9486529cf30e02d9ea14c5682aa80eb33b649e1"},
+]
+semantic-version = [
+    {file = "semantic_version-2.8.5-py2.py3-none-any.whl", hash = "sha256:45e4b32ee9d6d70ba5f440ec8cc5221074c7f4b0e8918bdab748cc37912440a9"},
+    {file = "semantic_version-2.8.5.tar.gz", hash = "sha256:d2cb2de0558762934679b9a104e82eca7af448c9f4974d1f3eeccff651df8a54"},
 ]
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
