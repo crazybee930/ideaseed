@@ -24,23 +24,24 @@ Arguments:
                     If creating a card on your user's project, this is ignored
 
 Options:
-    -c --color COLOR        Chooses which color to use for Google Keep cards. See Color names for allowed values.
-    -t --tag TAG            Adds tags to the Google Keep card. Use it multiple times to set multiple tags.
-                            When used together with --issue, --tag means labels.
-    -i --issue              Creates an issue for the card and link them together. IDEA becomes the issue's title, except if --title is specified,
-                            in which case IDEA becomes the issue's description and --title's value the issue title.
-    (WIP) -I --interactive  Prompts you for the above options when they are not provided.
-    -T --title TEXT         Sets the Google Keep card's title. When used with --issue, sets the issue's title.
-    -L --logout             Clears the authentification cache
-    -m --create-missing     Create non-existant tags, labels, projects or columns specified, upon confirmation.
-    -o --open               Open the relevant URL in your web browser.
-       --about              Details about ideaseed like currently-installed version
-       --version            Like --about, without dumb and useless stuff
+    -c --color COLOR           Chooses which color to use for Google Keep cards. See Color names for allowed values.
+    -t --tag TAG               Adds tags to the Google Keep card. Use it multiple times to set multiple tags.
+                               When used together with --issue, --tag means labels.
+    -i --issue                 Creates an issue for the card and link them together. IDEA becomes the issue's title, except if --title is specified,
+                               in which case IDEA becomes the issue's description and --title's value the issue title.
+    (WIP) -I --interactive     Prompts you for the above options when they are not provided.
+    -T --title TEXT            Sets the Google Keep card's title. When used with --issue, sets the issue's title.
+    -L --logout                Clears the authentification cache
+    -m --create-missing        Create non-existant tags, labels, projects or columns specified, upon confirmation.
+    -o --open                  Open the relevant URL in your web browser.
+       --about                 Details about ideaseed like currently-installed version
+       --version               Like --about, without dumb and useless stuff
 
 Settings options: It's comfier to set these in your alias, e.g. alias idea="ideaseed --user-project=incubator --user-keyword=project --no-auth-cache --create-missing"
-       --user-project NAME  Name of the project to use as your user project
-       --user-keyword NAME  When REPO is NAME, creates a GitHub card on your user profile instead of putting it on REPO
-       --no-auth-cache      Don't save credentials in a temporary file at {cache_filepath}
+       --user-project NAME     Name of the project to use as your user project
+       --user-keyword NAME     When REPO is NAME, creates a GitHub card on your user profile instead of putting it on REPO
+       --no-auth-cache         Don't save credentials in a temporary file at {cache_filepath}
+       --no-check-for-updates  Don't check for updates, don't prompt to update when current version is outdated
 
 Color names: Try with the first letter only too
     blue, brown, darkblue, gray, green, orange, pink, purple, red, teal, white, yellow
@@ -51,15 +52,20 @@ Color names: Try with the first letter only too
     - magenta is the same as purple
 """
 
+from ideaseed.update_checker import get_latest_version
+from ideaseed import update_checker
 from ideaseed.gkeep import push_to_gkeep
 from ideaseed.github import clear_auth_cache, push_to_repo, push_to_user
 from typing import *
 from docopt import docopt
 from pprint import pprint
-from ideaseed.utils import dye, get_token_cache_filepath
-from ideaseed.constants import COLOR_ALIASES, COLOR_NAME_TO_HEX_MAP, VALID_COLOR_NAMES
+from ideaseed.utils import ask, dye, get_token_cache_filepath
+from ideaseed.constants import COLOR_ALIASES, COLOR_NAME_TO_HEX_MAP, VALID_COLOR_NAMES, VERSION
 from ideaseed.dumb_utf8_art import DUMB_UTF8_ART
-
+import cli_box as box
+from inquirer import Confirm
+import subprocess
+import sys
 
 def run(argv=None):
     args = resolve_arguments(
@@ -67,13 +73,25 @@ def run(argv=None):
     )
     validate_argument_presence(args)
     args = resolve_arguments_defaults(args)
-
+    
+    if not args['--no-check-for-updates']:
+        latest_version = get_latest_version()
+        if latest_version > VERSION:
+            print(update_checker.notification(VERSION, latest_version))
+            if update_checker.prompt(latest_version):
+                update_checker.upgrade(latest_version)
+                print(f"Re-running your command with ideaseed v{latest_version}...")
+                print('Running ' + ' '.join(sys.argv))
+                subprocess.run(sys.argv)
+                return
+        
+    
     if args["--about"]:
-        print(DUMB_UTF8_ART.format(version="0.3.0"))
+        print(DUMB_UTF8_ART.format(version=VERSION))
         return
 
     if args["--version"]:
-        print("0.3.0")
+        print(VERSION)
         return
 
     if args["--color"]:
