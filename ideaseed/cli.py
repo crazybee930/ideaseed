@@ -66,7 +66,7 @@ from ideaseed.constants import (
     VALID_COLOR_NAMES,
     VERSION,
 )
-from ideaseed.dumb_utf8_art import DUMB_UTF8_ART
+from ideaseed.dumb_utf8_art import ABOUT_SCREEN
 import cli_box as box
 from inquirer import Confirm
 import subprocess
@@ -96,7 +96,7 @@ def run(argv=None):
                 return
 
     if args["--about"]:
-        print(DUMB_UTF8_ART.format(version=VERSION))
+        print(ABOUT_SCREEN.format(version=VERSION))
         return
 
     if args["--version"]:
