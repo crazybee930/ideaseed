@@ -8,6 +8,7 @@ from inquirer import Confirm
 from semantic_version import Version
 import subprocess
 
+
 def get_latest_version() -> Version:
     raw_rss = requests.get(RELEASES_RSS_URL).text
     rss = parse_xml(raw_rss)
@@ -21,6 +22,7 @@ def get_latest_version() -> Version:
     )
     return Version(version)
 
+
 def notification(upgrade_from: Version, upgrade_to: Version) -> str:
     return cli_box.rounded(
         f"""==== Update available! ====
@@ -30,10 +32,12 @@ A new version of ideaseed is available for download:
 """
     )
 
+
 def prompt(upgrade_to: Version):
-    return ask(Confirm('ans', message=f"Upgrade to v{upgrade_to} now?"))
+    return ask(Confirm("ans", message=f"Upgrade to v{upgrade_to} now?"))
+
 
 def upgrade(upgrade_to: Version):
-    cmd = ['pip', 'install', '--upgrade', f'ideaseed=={upgrade_to}']
+    cmd = ["pip", "install", "--upgrade", f"ideaseed=={upgrade_to}"]
     print(f"Running {' '.join(cmd)}...")
     subprocess.run(cmd)

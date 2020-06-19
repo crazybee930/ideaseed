@@ -304,4 +304,3 @@ def push_to_user(args: Dict[str, Any]) -> None:
     # Open project URL
     if args["--open"]:
         webbrowser.open(project.html_url)
-

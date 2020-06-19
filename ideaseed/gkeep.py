@@ -74,10 +74,10 @@ def push_to_gkeep(args: Dict[str, Any]) -> None:
     print(" Done.")
 
     # Announce what we'll do
-    color = args["--color"] or 'White'
+    color = args["--color"] or "White"
     print(
         f"Creating a "
-        + dye(' ' + color.lower() + ' ', fg=0x000, bg=COLOR_NAME_TO_HEX_MAP[color])
+        + dye(" " + color.lower() + " ", fg=0x000, bg=COLOR_NAME_TO_HEX_MAP[color])
         + dye(f" Google Keep card with tags {', '.join(args['--tag'])}", fg=C_PRIMARY)
     )
 
@@ -99,8 +99,8 @@ def push_to_gkeep(args: Dict[str, Any]) -> None:
 
     # Beam it up to Google's servers
     keep.sync()
-    
+
     # Open the browser
-    if args['--open']:
+    if args["--open"]:
         url = f"https://keep.google.com/u/0/#NOTE/{note.id}"
         webbrowser.open(url)

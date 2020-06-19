@@ -5,6 +5,7 @@ import inquirer
 from os import path
 from random import randint
 
+
 def dye(
     text: str,
     fg: Optional[int] = None,
@@ -24,6 +25,7 @@ def dye(
 def get_random_color_hexstring() -> str:
     return f"{randint(0x0, 0xFFFFFF):6x}".upper()
 
+
 def ask(*questions) -> Union[List[Any], Any]:
     if len(questions) == 1:
         # No need to turn the hash into a tuple, just return the only value
@@ -42,5 +44,6 @@ def ask(*questions) -> Union[List[Any], Any]:
     answers = [a[1] for a in answers]
     return answers
 
+
 def get_token_cache_filepath(service: str) -> str:
-    return path.join(path.dirname(path.dirname(__file__)), f'.auth-cache--{service}')
+    return path.join(path.dirname(path.dirname(__file__)), f".auth-cache--{service}")
