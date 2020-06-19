@@ -101,7 +101,7 @@ description = "Add a box around your text for prettier CLIs"
 name = "cli-box"
 optional = false
 python-versions = ">=3.6,<4.0"
-version = "0.1.0"
+version = "0.1.3"
 
 [package.dependencies]
 wcwidth = ">=0.2.4,<0.3.0"
@@ -347,7 +347,7 @@ description = "Python HTTP for Humans."
 name = "requests"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-version = "2.23.0"
+version = "2.24.0"
 
 [package.dependencies]
 certifi = ">=2017.4.17"
@@ -432,7 +432,7 @@ python-versions = "*"
 version = "1.12.1"
 
 [metadata]
-content-hash = "8e178037a551c4fa452e7f27f64846b70a841a4034381f7ca40e9752b7191e91"
+content-hash = "6ee6deec859d3026afbac8d27853348b790d03d40770609f27dfa56863194634"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -469,8 +469,8 @@ chardet = [
     {file = "chardet-3.0.4.tar.gz", hash = "sha256:84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae"},
 ]
 cli-box = [
-    {file = "cli-box-0.1.0.tar.gz", hash = "sha256:0d73081611ea4ad7241a2db47f49fc69a95ec0ad1f10f3e8b414f75075b39e47"},
-    {file = "cli_box-0.1.0-py3-none-any.whl", hash = "sha256:a6cf1130016f62c74b9ca2c0ee7c8307a2e73015c3aa588d6db5be436be4b965"},
+    {file = "cli-box-0.1.3.tar.gz", hash = "sha256:e20246c64b050bdafacf585289cdeea08b28731fba388f5e536a94fb8c28b194"},
+    {file = "cli_box-0.1.3-py3-none-any.whl", hash = "sha256:28c1ed629137533eee32ffce4df3dd9f1bccfa352251163b9ea1df69edcdc8db"},
 ]
 click = [
     {file = "click-7.1.2-py2.py3-none-any.whl", hash = "sha256:dacca89f4bfadd5de3d7489b7c8a566eee0d3676333fbb50030263894c38c0dc"},
@@ -629,8 +629,8 @@ regex = [
     {file = "regex-2020.6.8.tar.gz", hash = "sha256:e9b64e609d37438f7d6e68c2546d2cb8062f3adb27e6336bc129b51be20773ac"},
 ]
 requests = [
-    {file = "requests-2.23.0-py2.py3-none-any.whl", hash = "sha256:43999036bfa82904b6af1d99e4882b560e5e2c68e5c4b0aa03b655f3d7d73fee"},
-    {file = "requests-2.23.0.tar.gz", hash = "sha256:b3f43d496c6daba4493e7c431722aeb7dbc6288f52a6e04e7b6023b0247817e6"},
+    {file = "requests-2.24.0-py2.py3-none-any.whl", hash = "sha256:fe75cc94a9443b9246fc7049224f75604b113c36acb93f87b80ed42c44cbb898"},
+    {file = "requests-2.24.0.tar.gz", hash = "sha256:b3559a131db72c33ee969480840fff4bb6dd111de7dd27c8ee1f820f4f00231b"},
 ]
 rope = [
     {file = "rope-0.17.0.tar.gz", hash = "sha256:658ad6705f43dcf3d6df379da9486529cf30e02d9ea14c5682aa80eb33b649e1"},
