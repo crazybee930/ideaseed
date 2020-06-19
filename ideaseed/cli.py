@@ -2,7 +2,7 @@
 
 Usage: 
     ideaseed (--help | --about | --version)
-    ideaseed [options] [-t TAG...] ARGUMENTS...
+    ideaseed [options] [-t TAG...] [-l LABEL...] ARGUMENTS...
 
 Examples:
     # Save a card "test" in schoolsyst/webapp > project "UX" > column "To-Do"
@@ -33,6 +33,7 @@ Options:
     -L --logout                Clears the authentification cache
     -m --create-missing        Create non-existant tags, labels, projects or columns specified, upon confirmation.
     -o --open                  Open the relevant URL in your web browser.
+    -l --label LABEL           Alias for --tag. See --tag's description.
        --pin                   Pin Google Keep cards
        --about                 Details about ideaseed like currently-installed version
        --version               Like --about, without dumb and useless stuff
@@ -83,6 +84,10 @@ def run(argv=None):
     )
     validate_argument_presence(args)
     args = resolve_arguments_defaults(args)
+    
+    args['--tag'] += args['--label']
+    # Remove duplicate tags
+    args['--tag'] = list(set(args['--tag'])) #XXX: We're loosing order of elements here.
 
     if not args["--no-check-for-updates"]:
         latest_version = get_latest_version()
