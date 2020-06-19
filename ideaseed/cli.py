@@ -33,6 +33,7 @@ Options:
     -L --logout                Clears the authentification cache
     -m --create-missing        Create non-existant tags, labels, projects or columns specified, upon confirmation.
     -o --open                  Open the relevant URL in your web browser.
+       --pin                   Pin Google Keep cards
        --about                 Details about ideaseed like currently-installed version
        --version               Like --about, without dumb and useless stuff
 

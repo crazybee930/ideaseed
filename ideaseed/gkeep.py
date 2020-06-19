@@ -84,7 +84,7 @@ def push_to_gkeep(args: Dict[str, Any]) -> None:
     # Create the note
     note = keep.createNote(title=args["--title"], text=args["IDEA"])
     note.color = getattr(ColorValue, color)
-    note.pinned = True
+    note.pinned = args["--pin"]
 
     # Find/create all the labels
     all_tags = keep.labels()
