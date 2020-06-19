@@ -1,11 +1,18 @@
 import os
+import re
 import webbrowser
 import pprint
 from os.path import dirname
 import github
 from github import Issue
 from github.GithubException import BadCredentialsException, TwoFactorException
-from ideaseed.utils import ask, dye, get_token_cache_filepath
+from ideaseed.utils import (
+    ask,
+    dye,
+    get_random_color_hexstring,
+    get_token_cache_filepath,
+)
+from random import randint
 from ideaseed.constants import C_PRIMARY
 from typing import *
 from github import Github
@@ -13,6 +20,17 @@ import json
 from github.GithubException import TwoFactorException
 import inquirer as q
 from ideaseed.utils import ask
+
+
+def validate_label_color(answers: dict, color: str):
+    """
+    Throws a `inquirer.errors.ValidationError` when the format isn't matched.
+    (format: 6-digit hex int representing a color)
+    """
+    if not re.match(r"[a-fA-F0-9]{6}", color):
+        raise q.errors.ValidationError(
+            "", reason="Please use a valid color (6-digit hexadecimal integer)"
+        )
 
 
 def login_with_cache() -> Optional[Github]:
@@ -136,6 +154,44 @@ def push_to_repo(args: Dict[str, Any]) -> None:
     )
     repo = gh.get_repo(repo_name)
 
+    # Get all labels
+    labels = repo.get_labels()
+    for label_name in args["--tag"]:
+        if (
+            label_name.lower() not in [t.name.lower() for t in labels]
+            and args["--create-missing"]
+        ):
+            if ask(
+                q.Confirm(
+                    "ans", message=f"Label {label_name!r} does not exist. Create it?"
+                )
+            ):
+                label_data = q.prompt(
+                    [
+                        # TODO: Proper color prompt with color names, live color preview, default value that is removed once you start typing.
+                        #       will need to use prompt-toolkit at some point.
+                        # q.Text(
+                        #     "color",
+                        #     message="Choose a color for your label",
+                        #     validate=validate_label_color,
+                        #     default=lambda ans: f"{randint(0x0, 0xFFFFFF):6x}".upper()
+                        # ),
+                        q.Text(
+                            "description",
+                            message="A short description of your label",
+                            default="",
+                        ),
+                    ]
+                )
+                print(
+                    "Creating label "
+                    + dye(label_name, bg=int(label_data["color"], 16), style="reverse")
+                    + " ..."
+                )
+                repo.create_label(
+                    name=label_name, color=get_random_color_hexstring(), **label_data
+                )
+
     project = None
     for p in repo.get_projects():
         if p.name.lower() == project_name.lower():
@@ -146,7 +202,7 @@ def push_to_repo(args: Dict[str, Any]) -> None:
     if project is None and args["--create-missing"]:
         if ask(q.Confirm("ans", message=f"Create missing project {project_name!r}?")):
             description: str = ask(
-                q.Editor("ans", message="Enter the project's description...")
+                q.Text("ans", message="Enter the project's description...")
             )
             project = repo.create_project(name=project_name, body=description)
         else:

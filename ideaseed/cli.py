@@ -25,8 +25,7 @@ Arguments:
 
 Options:
     -c --color COLOR           Chooses which color to use for Google Keep cards. See Color names for allowed values.
-    -t --tag TAG               Adds tags to the Google Keep card. Use it multiple times to set multiple tags.
-                               When used together with --issue, --tag means labels.
+    -t --tag TAG               Adds tags to the Google Keep card or labels to the GitHub issue (see --issue). Use it multiple times to set multiple tags.
     -i --issue                 Creates an issue for the card and link them together. IDEA becomes the issue's title, except if --title is specified,
                                in which case IDEA becomes the issue's description and --title's value the issue title.
     (WIP) -I --interactive     Prompts you for the above options when they are not provided.
@@ -57,35 +56,44 @@ from ideaseed import update_checker
 from ideaseed.gkeep import push_to_gkeep
 from ideaseed.github import clear_auth_cache, push_to_repo, push_to_user
 from typing import *
-from docopt import docopt
+from colr import docopt
 from pprint import pprint
 from ideaseed.utils import ask, dye, get_token_cache_filepath
-from ideaseed.constants import COLOR_ALIASES, COLOR_NAME_TO_HEX_MAP, VALID_COLOR_NAMES, VERSION
+from ideaseed.constants import (
+    COLOR_ALIASES,
+    COLOR_NAME_TO_HEX_MAP,
+    VALID_COLOR_NAMES,
+    VERSION,
+)
 from ideaseed.dumb_utf8_art import DUMB_UTF8_ART
 import cli_box as box
 from inquirer import Confirm
 import subprocess
 import sys
 
+
 def run(argv=None):
     args = resolve_arguments(
-        docopt(__doc__.format(cache_filepath=get_token_cache_filepath("*")), argv)
+        docopt(
+            __doc__.format(cache_filepath=get_token_cache_filepath("*")),
+            argv,
+            script="ideaseed",
+        )
     )
     validate_argument_presence(args)
     args = resolve_arguments_defaults(args)
-    
-    if not args['--no-check-for-updates']:
+
+    if not args["--no-check-for-updates"]:
         latest_version = get_latest_version()
         if latest_version > VERSION:
             print(update_checker.notification(VERSION, latest_version))
             if update_checker.prompt(latest_version):
                 update_checker.upgrade(latest_version)
                 print(f"Re-running your command with ideaseed v{latest_version}...")
-                print('Running ' + ' '.join(sys.argv))
+                print("Running " + " ".join(sys.argv))
                 subprocess.run(sys.argv)
                 return
-        
-    
+
     if args["--about"]:
         print(DUMB_UTF8_ART.format(version=VERSION))
         return
@@ -145,9 +153,15 @@ def validate_argument_presence(args: Dict[str, str]) -> None:
     on the other arguments.
     """
 
-    GOOGLE_KEEP_ONLY = ("--color", "--tag")
+    GOOGLE_KEEP_ONLY = ("--color",)
     GITHUB_ONLY = ("--issue",)
     using_github = len(args["ARGUMENTS"]) > 1
+
+    if using_github and not args["--issue"] and args["--tag"]:
+        raise ValidationError(
+            "--tag may only be used alongside --issue or when"
+            "adding a card to Google Keep."
+        )
 
     if using_github and any([v for k, v in args.items() if k in GOOGLE_KEEP_ONLY]):
         raise ValidationError(

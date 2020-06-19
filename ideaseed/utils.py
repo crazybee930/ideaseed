@@ -3,6 +3,7 @@ from typing import *
 import colr
 import inquirer
 from os import path
+from random import randint
 
 def dye(
     text: str,
@@ -19,6 +20,9 @@ def dye(
         no_closing=no_closing,
     )
 
+
+def get_random_color_hexstring() -> str:
+    return f"{randint(0x0, 0xFFFFFF):6x}".upper()
 
 def ask(*questions) -> Union[List[Any], Any]:
     if len(questions) == 1:
