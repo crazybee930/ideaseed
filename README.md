@@ -20,6 +20,8 @@ Ideaseed is available [on PyPI.org](https://pypi.org/project/ideaseed):
 pip install ideaseed
 ```
 
+See [Installation troubleshooting](#installation-troubleshooting) if you can't install it like this.
+
 ## Usage
 
 ```bash
@@ -120,3 +122,29 @@ You can also use `ideaseed -I` to prompt you for some information:
 - If you decide to use google keep,
   - Which color? (defaults to white)
   - Some tags?
+
+## Installation troubleshooting
+
+If you get an error message saying "No matching distribution found":
+
+```sh-session
+$ pip install ideaseed
+Collecting ideaseed
+  Could not find a version that satisfies the requirement ideaseed (from versions: )
+No matching distribution found for ideaseed
+```
+
+See if the python version `pip` uses is at least 3.6:
+
+```sh-session
+$ pip --version
+pip 9.0.1 from /usr/lib/python2.7/dist-packages (python 2.7) # Should be at least "(python 3.6)"
+```
+
+You can then try with `pip3` (`pip3 --version` should report a python version of at least 3.6):
+
+```sh-session
+$ pip3 --version                                                                                                                                                                                   842ms  2020-06-19
+pip 20.0.2 from /home/ewen/.local/lib/python3.7/site-packages/pip (python 3.7)
+$ pip3 install ideaseed
+```
