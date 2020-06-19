@@ -25,6 +25,7 @@ semantic-version = "^2.8.5"
 black = "^19.10b0"
 pylint = "^2.5.3"
 rope = "^0.17.0"
+toml = "^0.10.1"
 
 [build-system]
 requires = ["poetry>=0.12"]
