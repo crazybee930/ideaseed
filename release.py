@@ -19,7 +19,7 @@ def debug(txt: str = "", **kwargs):
 def shell(*cmd: str, dontrun: bool = False) -> str:
     cmd = [str(arg) for arg in cmd]
     debug(f"$ " + " ".join(cmd))
-    input('Press [ENTER] to continue...')
+    input("Press [ENTER] to continue...")
     if dontrun:
         return
     return subprocess.run(
@@ -179,13 +179,9 @@ release = gh.get_repo("ewen-lbh/ideaseed").create_git_release(
 )
 
 release.upload_asset(
-    f"dist/ideaseed-{new}-py3-none-any.whl",
-    label=f"Python wheel for {new}"
+    f"dist/ideaseed-{new}-py3-none-any.whl", label=f"Python wheel for {new}"
 )
-release.upload_asset(
-    f"dist/ideaseed-{new}.tar.gz",
-    label=f"Source tarball for {new}"
-)
+release.upload_asset(f"dist/ideaseed-{new}.tar.gz", label=f"Source tarball for {new}")
 
 #     attach files dist/ideaseed-$(VERSION)*
 #     set title as $(VERSION)
@@ -193,4 +189,4 @@ release.upload_asset(
 #     set description to CHANGELOG.md's $(VERSION) - $(DATE)'s section
 # pop stashed changes
 
-shell('git', 'stash', 'pop')
+shell("git", "stash", "pop")

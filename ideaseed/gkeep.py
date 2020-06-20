@@ -1,3 +1,4 @@
+from ideaseed.dumb_utf8_art import make_google_keep_art
 from ideaseed.constants import COLOR_NAME_TO_HEX_MAP, C_PRIMARY
 import json
 import webbrowser
@@ -6,9 +7,10 @@ from ideaseed.utils import ask, dye, get_token_cache_filepath
 from typing import *
 from inquirer import Text, Password, Confirm
 from gkeepapi import Keep
-from gkeepapi.exception import LoginException
+from gkeepapi.exception import LoginException, APIException
 from gkeepapi.node import ColorValue
 import sys
+import cli_box
 
 
 def write_to_cache(keep: Keep, email: str) -> None:
@@ -68,23 +70,47 @@ and use it as your password.""",
 
 def push_to_gkeep(args: Dict[str, Any]) -> None:
     # Log in
-    print("Logging in...", end="")
+    print("🔑 Logging in...")
     sys.stdout.flush()
-    keep = login(args)
-    print(" Done.")
+    # Handle API errors
+    try:
+        keep = login(args)
+    except APIException as error:
+        sys.stdout.write("\033[F")
+        print("❌ Error with the Google Keep API")
+        if error.code == 429:
+            print(
+                """Too much requests per minute. Try again later.")
+Don't worry, your idea is still safe,")
+just up-arrow on your terminal to re-run the command :)"""
+            )
+        print(dye(error, style="dim"))
+        return
+    sys.stdout.write("\033[F")
+    print("🔑 Logged in.      ")
 
     # Announce what we'll do
     color = args["--color"] or "White"
-    print(
-        f"Creating a "
-        + dye(" " + color.lower() + " ", fg=0x000, bg=COLOR_NAME_TO_HEX_MAP[color])
-        + dye(f" Google Keep card with tags {', '.join(args['--tag'])}", fg=C_PRIMARY)
-    )
 
     # Create the note
     note = keep.createNote(title=args["--title"], text=args["IDEA"])
     note.color = getattr(ColorValue, color)
     note.pinned = args["--pin"]
+
+    # Get the URL
+    url = f"https://keep.google.com/u/0/#NOTE/{note.id}"
+
+    # Announce the card created
+    print(
+        make_google_keep_art(
+            url=url,
+            title=args["--title"],
+            pinned=args["--pin"],
+            tags=args["--tag"],
+            body=args["IDEA"],
+            color=args["--color"],
+        )
+    )
 
     # Find/create all the labels
     all_tags = keep.labels()
@@ -102,5 +128,4 @@ def push_to_gkeep(args: Dict[str, Any]) -> None:
 
     # Open the browser
     if args["--open"]:
-        url = f"https://keep.google.com/u/0/#NOTE/{note.id}"
         webbrowser.open(url)

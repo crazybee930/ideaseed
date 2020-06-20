@@ -1,3 +1,8 @@
+from ideaseed.dumb_utf8_art import (
+    make_github_issue_art,
+    make_github_project_art,
+    make_github_user_project_art,
+)
 import os
 import re
 import webbrowser
@@ -136,6 +141,9 @@ def github_username(gh: Github) -> str:
 
 
 def resolve_self_repository_shorthand(gh: Github, repo: str) -> str:
+    """
+    Returns adds USERNAME/ to a `repo` that has no slashes
+    """
     if "/" not in repo:
         return github_username(gh) + "/" + repo
     return repo
@@ -147,12 +155,8 @@ def push_to_repo(args: Dict[str, Any]) -> None:
     idea = args["IDEA"]
     project_name = args["PROJECT"]
     column_name = args["COLUMN"]
-    print(
-        f"Saving card in {dye(repo_name, C_PRIMARY)}"
-        f" › {dye(project_name, C_PRIMARY)}"
-        f" › {dye(column_name, C_PRIMARY)}..."
-    )
     repo = gh.get_repo(repo_name)
+    username = github_username(gh)
 
     # Get all labels
     labels = repo.get_labels()
@@ -183,16 +187,14 @@ def push_to_repo(args: Dict[str, Any]) -> None:
                         ),
                     ]
                 )
-                
+
                 color = randint(0x0, 0xFFFFFF)
                 print(
                     "Creating label "
                     + dye(label_name, fg=color, style="reverse")
                     + " ..."
                 )
-                repo.create_label(
-                    name=label_name, color=f'{color:6x}', **label_data
-                )
+                repo.create_label(name=label_name, color=f"{color:6x}", **label_data)
 
     project = None
     for p in repo.get_projects():
@@ -232,26 +234,53 @@ def push_to_repo(args: Dict[str, Any]) -> None:
         print(dye(f"Error: column {column_name!r} does not exist!", fg=0xF00))
         return
 
+    owner, repository = repo_name.split("/")
+
     if args["--issue"]:
         issue = repo.create_issue(
             title=args["--title"] or idea,
             body=idea if args["--title"] else "",
-            assignees=[github_username(gh)],
+            assignees=[username],
             labels=args["--tag"],
         )
         card = column.create_card(content_id=issue.id, content_type="Issue")
+        url = issue.html_url if args["--title"] else project.html_url
+
+        print(
+            make_github_issue_art(
+                owner=owner,
+                repository=repository,
+                project=project.name,
+                column=column.name,
+                username=username,
+                url=url,
+                issue_number=issue.number,
+                labels=args["--tag"],
+                body=issue.body,
+                title=issue.title,
+            )
+        )
 
         if args["--open"]:
-            if args["--title"]:
-                webbrowser.open(issue.html_url)
-            else:
-                webbrowser.open(project.html_url)
+            webbrowser.open(url)
     else:
         card = column.create_card(note=idea)
+        url = project.html_url
+
+        print(
+            make_github_project_art(
+                owner=owner,
+                repository=repository,
+                project=project_name,
+                column=column_name,
+                body=args["IDEA"],
+                url=url,
+            )
+        )
 
         # Open project URL
         if args["--open"]:
-            webbrowser.open(project.html_url)
+            webbrowser.open(url)
 
 
 def push_to_user(args: Dict[str, Any]) -> None:
@@ -259,6 +288,7 @@ def push_to_user(args: Dict[str, Any]) -> None:
     idea = args["IDEA"]
     project_name: str = args["--user-project"]
     column_name: str = args["PROJECT"]
+    username = github_username(gh)
     print(
         f"Saving card in {dye(github_username(gh), C_PRIMARY)} › {dye(project_name, C_PRIMARY)} › {dye(column_name, C_PRIMARY)}..."
     )
@@ -302,7 +332,18 @@ def push_to_user(args: Dict[str, Any]) -> None:
         return
 
     column.create_card(note=idea)
+    url = project.html_url
+
+    print(
+        make_github_user_project_art(
+            username=username,
+            project=project_name,
+            column=column_name,
+            body=args["IDEA"],
+            url=url,
+        )
+    )
 
     # Open project URL
     if args["--open"]:
-        webbrowser.open(project.html_url)
+        webbrowser.open(url)
