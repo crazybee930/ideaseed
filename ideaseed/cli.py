@@ -84,10 +84,12 @@ def run(argv=None):
     )
     validate_argument_presence(args)
     args = resolve_arguments_defaults(args)
-    
-    args['--tag'] += args['--label']
+
+    args["--tag"] += args["--label"]
     # Remove duplicate tags
-    args['--tag'] = list(set(args['--tag'])) #XXX: We're loosing order of elements here.
+    args["--tag"] = list(
+        set(args["--tag"])
+    )  # XXX: We're loosing order of elements here.
 
     if not args["--no-check-for-updates"]:
         latest_version = get_latest_version()

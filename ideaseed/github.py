@@ -1,4 +1,8 @@
-from ideaseed.dumb_utf8_art import make_github_issue_art, make_github_project_art
+from ideaseed.dumb_utf8_art import (
+    make_github_issue_art,
+    make_github_project_art,
+    make_github_user_project_art,
+)
 import os
 import re
 import webbrowser
@@ -183,16 +187,14 @@ def push_to_repo(args: Dict[str, Any]) -> None:
                         ),
                     ]
                 )
-                
+
                 color = randint(0x0, 0xFFFFFF)
                 print(
                     "Creating label "
                     + dye(label_name, fg=color, style="reverse")
                     + " ..."
                 )
-                repo.create_label(
-                    name=label_name, color=f'{color:6x}', **label_data
-                )
+                repo.create_label(name=label_name, color=f"{color:6x}", **label_data)
 
     project = None
     for p in repo.get_projects():
@@ -231,7 +233,7 @@ def push_to_repo(args: Dict[str, Any]) -> None:
     elif column is None:
         print(dye(f"Error: column {column_name!r} does not exist!", fg=0xF00))
         return
-    
+
     owner, repository = repo_name.split("/")
 
     if args["--issue"]:
@@ -265,14 +267,16 @@ def push_to_repo(args: Dict[str, Any]) -> None:
         card = column.create_card(note=idea)
         url = project.html_url
 
-        print(make_github_project_art(
-            owner=owner,
-            repository=repository,
-            project=project_name,
-            column=column_name,
-            body=args['IDEA'],
-            url=url
-        ))
+        print(
+            make_github_project_art(
+                owner=owner,
+                repository=repository,
+                project=project_name,
+                column=column_name,
+                body=args["IDEA"],
+                url=url,
+            )
+        )
 
         # Open project URL
         if args["--open"]:
