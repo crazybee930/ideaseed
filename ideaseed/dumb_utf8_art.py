@@ -4,6 +4,7 @@ from typing import *
 from github.Repository import Repository
 from ideaseed.utils import dye
 from wcwidth import wcswidth
+import textwrap
 import cli_box
 
 ABOUT_SCREEN = """
@@ -148,7 +149,7 @@ def make_github_project_art(
         left=f"{owner}/{repository}", right=f"{column} in {project}"
     )
     card = cli_box.rounded(
-        GITHUB_CARD_ART.format(content=body, card_header=card_header)
+        GITHUB_CARD_ART.format(content=textwrap.fill(body, width=CARD_INNER_WIDTH), card_header=card_header)
     )
     return GITHUB_ART.format(card=card, url=url)
 
@@ -158,7 +159,7 @@ def make_github_user_project_art(
 ):
     card_header = make_card_header(left=f"@{username}", right=f"{column} in {project}")
     card = cli_box.rounded(
-        GITHUB_CARD_ART.format(content=body, card_header=card_header)
+        GITHUB_CARD_ART.format(content=textwrap.fill(body, width=CARD_INNER_WIDTH), card_header=card_header)
     )
     return GITHUB_ART.format(card=card, url=url)
 
@@ -179,7 +180,7 @@ def make_github_issue_art(
     card = cli_box.rounded(
         ISSUE_CARD_ART.format(
             card_header=card_header,
-            content=body,
+            content=textwrap.fill(body, width=CARD_INNER_WIDTH),
             labels=" ".join([TAGS_ART.format(tag=t) for t in labels]),
         ),
         align="left",
