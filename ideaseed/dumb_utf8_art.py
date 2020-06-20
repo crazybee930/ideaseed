@@ -160,6 +160,25 @@ def make_github_project_art(
         card=card,
         url=url
     )
+    
+def make_github_user_project_art(
+    username: str,
+    project: str,
+    column: str,
+    body: str,
+    url: str
+):
+    card_header = make_card_header(left=f"@{username}", right=f"{column} in {project}")
+    card = cli_box.rounded(
+        GITHUB_CARD_ART.format(
+            content=body,
+            card_header=card_header
+        )
+    )
+    return GITHUB_ART.format(
+        card=card,
+        url=url
+    )
 
 def make_github_issue_art(
     owner: str,

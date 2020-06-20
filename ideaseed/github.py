@@ -284,6 +284,7 @@ def push_to_user(args: Dict[str, Any]) -> None:
     idea = args["IDEA"]
     project_name: str = args["--user-project"]
     column_name: str = args["PROJECT"]
+    username = github_username(gh)
     print(
         f"Saving card in {dye(github_username(gh), C_PRIMARY)} › {dye(project_name, C_PRIMARY)} › {dye(column_name, C_PRIMARY)}..."
     )
@@ -327,7 +328,18 @@ def push_to_user(args: Dict[str, Any]) -> None:
         return
 
     column.create_card(note=idea)
+    url = project.html_url
+
+    print(
+        make_github_user_project_art(
+            username=username,
+            project=project_name,
+            column=column_name,
+            body=args["IDEA"],
+            url=url,
+        )
+    )
 
     # Open project URL
     if args["--open"]:
-        webbrowser.open(project.html_url)
+        webbrowser.open(url)
