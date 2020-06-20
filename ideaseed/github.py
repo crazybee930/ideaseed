@@ -183,13 +183,15 @@ def push_to_repo(args: Dict[str, Any]) -> None:
                         ),
                     ]
                 )
+                
+                color = randint(0x0, 0xFFFFFF)
                 print(
                     "Creating label "
-                    + dye(label_name, bg=int(label_data["color"], 16), style="reverse")
+                    + dye(label_name, fg=color, style="reverse")
                     + " ..."
                 )
                 repo.create_label(
-                    name=label_name, color=get_random_color_hexstring(), **label_data
+                    name=label_name, color=f'{color:6x}', **label_data
                 )
 
     project = None
