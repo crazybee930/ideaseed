@@ -145,7 +145,7 @@ pip 9.0.1 from /usr/lib/python2.7/dist-packages (python 2.7) # Should be at leas
 You can then try with `pip3` (`pip3 --version` should report a python version of at least 3.6):
 
 ```sh-session
-$ pip3 --version                                                                                                                                                                                   842ms  2020-06-19
+$ pip3 --version
 pip 20.0.2 from /home/ewen/.local/lib/python3.7/site-packages/pip (python 3.7)
 $ pip3 install ideaseed
 ```
