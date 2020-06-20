@@ -153,7 +153,10 @@ def make_github_project_art(
         left=f"{owner}/{repository}", right=f"{column} in {project}"
     )
     card = cli_box.rounded(
-        GITHUB_CARD_ART.format(content=wrap_card_content(body), card_header=card_header)
+        GITHUB_CARD_ART.format(
+            content=wrap_card_content(body), card_header=card_header
+        ),
+        align="left",
     )
     return GITHUB_ART.format(card=card, url=url)
 
