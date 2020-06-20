@@ -1,4 +1,4 @@
-from ideaseed.dumb_utf8_art import make_github_issue_art
+from ideaseed.dumb_utf8_art import make_github_issue_art, make_github_project_art
 import os
 import re
 import webbrowser
@@ -231,6 +231,8 @@ def push_to_repo(args: Dict[str, Any]) -> None:
     elif column is None:
         print(dye(f"Error: column {column_name!r} does not exist!", fg=0xF00))
         return
+    
+    owner, repository = repo_name.split("/")
 
     if args["--issue"]:
         issue = repo.create_issue(
@@ -241,8 +243,6 @@ def push_to_repo(args: Dict[str, Any]) -> None:
         )
         card = column.create_card(content_id=issue.id, content_type="Issue")
         url = issue.html_url if args["--title"] else project.html_url
-
-        owner, repository = repo_name.split("/")
 
         print(
             make_github_issue_art(
@@ -263,10 +263,20 @@ def push_to_repo(args: Dict[str, Any]) -> None:
             webbrowser.open(url)
     else:
         card = column.create_card(note=idea)
+        url = project.html_url
+
+        print(make_github_project_art(
+            owner=owner,
+            repository=repository,
+            project=project_name,
+            column=column_name,
+            body=args['IDEA'],
+            url=url
+        ))
 
         # Open project URL
         if args["--open"]:
-            webbrowser.open(project.html_url)
+            webbrowser.open(url)
 
 
 def push_to_user(args: Dict[str, Any]) -> None:

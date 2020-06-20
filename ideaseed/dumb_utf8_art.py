@@ -55,6 +55,17 @@ Opening issue in {owner} › {repository} › {project} › {column}...
  →  Issue available at {url}
 """
 
+GITHUB_CARD_ART = """\
+{card_header}
+{content}
+"""
+
+GITHUB_ART = """\
+{card}
+ │
+ →  Project card available at {url}
+"""
+
 
 def make_card_header(left: str, right: str) -> str:
     """
@@ -129,6 +140,26 @@ def make_google_keep_art(
     )
     return GOOGLE_KEEP_ART.format(card=card, url=url)
 
+
+def make_github_project_art(
+    owner: str,
+    repository: str,
+    project: str,
+    column: str,
+    body: str,
+    url: str
+):
+    card_header = make_card_header(left=f"{owner}/{repository}", right=f"{column} in {project}")
+    card = cli_box.rounded(
+        GITHUB_CARD_ART.format(
+            content=body,
+            card_header=card_header
+        )
+    )
+    return GITHUB_ART.format(
+        card=card,
+        url=url
+    )
 
 def make_github_issue_art(
     owner: str,
