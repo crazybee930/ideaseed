@@ -85,7 +85,7 @@ description = "Python package for providing Mozilla's CA Bundle."
 name = "certifi"
 optional = false
 python-versions = "*"
-version = "2020.4.5.2"
+version = "2020.6.20"
 
 [[package]]
 category = "main"
@@ -101,9 +101,10 @@ description = "Add a box around your text for prettier CLIs"
 name = "cli-box"
 optional = false
 python-versions = ">=3.6,<4.0"
-version = "0.1.3"
+version = "0.2.0"
 
 [package.dependencies]
+strip-ansi = ">=0.1.1,<0.2.0"
 wcwidth = ">=0.2.4,<0.3.0"
 
 [[package]]
@@ -398,6 +399,14 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 version = "1.15.0"
 
 [[package]]
+category = "main"
+description = "Strip ANSI escape sequences from a string"
+name = "strip-ansi"
+optional = false
+python-versions = ">=3.6,<4.0"
+version = "0.1.1"
+
+[[package]]
 category = "dev"
 description = "Python Library for Tom's Obvious, Minimal Language"
 name = "toml"
@@ -443,7 +452,7 @@ python-versions = "*"
 version = "1.12.1"
 
 [metadata]
-content-hash = "4678af5966d0460e151e10335053652668f2522a5b225d2018febbe14ffe366c"
+content-hash = "b87c29b989632cfeeb081021765722b814bb504e5812f5cfa495209b829a289d"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -472,16 +481,16 @@ blessed = [
     {file = "blessed-1.17.6.tar.gz", hash = "sha256:a9a774fc6eda05248735b0d86e866d640ca2fef26038878f7e4d23f7749a1e40"},
 ]
 certifi = [
-    {file = "certifi-2020.4.5.2-py2.py3-none-any.whl", hash = "sha256:9cd41137dc19af6a5e03b630eefe7d1f458d964d406342dd3edf625839b944cc"},
-    {file = "certifi-2020.4.5.2.tar.gz", hash = "sha256:5ad7e9a056d25ffa5082862e36f119f7f7cec6457fa07ee2f8c339814b80c9b1"},
+    {file = "certifi-2020.6.20-py2.py3-none-any.whl", hash = "sha256:8fc0819f1f30ba15bdb34cceffb9ef04d99f420f68eb75d901e9560b8749fc41"},
+    {file = "certifi-2020.6.20.tar.gz", hash = "sha256:5930595817496dd21bb8dc35dad090f1c2cd0adfaf21204bf6732ca5d8ee34d3"},
 ]
 chardet = [
     {file = "chardet-3.0.4-py2.py3-none-any.whl", hash = "sha256:fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691"},
     {file = "chardet-3.0.4.tar.gz", hash = "sha256:84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae"},
 ]
 cli-box = [
-    {file = "cli-box-0.1.3.tar.gz", hash = "sha256:e20246c64b050bdafacf585289cdeea08b28731fba388f5e536a94fb8c28b194"},
-    {file = "cli_box-0.1.3-py3-none-any.whl", hash = "sha256:28c1ed629137533eee32ffce4df3dd9f1bccfa352251163b9ea1df69edcdc8db"},
+    {file = "cli-box-0.2.0.tar.gz", hash = "sha256:69a899f85419f87f970cc635284b8a37bf62a8ac067466eb8c71242beb4a2e34"},
+    {file = "cli_box-0.2.0-py3-none-any.whl", hash = "sha256:8cad810a1a7afc673f9dbee6a951e3ce6fd6ebcf3037e5e614c0649f6b114ba1"},
 ]
 click = [
     {file = "click-7.1.2-py2.py3-none-any.whl", hash = "sha256:dacca89f4bfadd5de3d7489b7c8a566eee0d3676333fbb50030263894c38c0dc"},
@@ -657,6 +666,10 @@ semantic-version = [
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
     {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
+]
+strip-ansi = [
+    {file = "strip-ansi-0.1.1.tar.gz", hash = "sha256:5d60f239cc8a37fdd52b43c3e66e893d45ba0423115db59eca0d2eef83b07729"},
+    {file = "strip_ansi-0.1.1-py3-none-any.whl", hash = "sha256:9f55280e1b0ba84dac49d4f18aa6b51b90ff766b22e4918ffc01cc87b394ecd1"},
 ]
 toml = [
     {file = "toml-0.10.1-py2.py3-none-any.whl", hash = "sha256:bda89d5935c2eac546d648028b9901107a595863cb36bae0c73ac804a9b4ce88"},
