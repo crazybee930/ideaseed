@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
-from sys import version
+from os import getenv
+from os.path import abspath
 from typing import *
 from datetime import date
 import sys
@@ -8,6 +9,19 @@ import re
 import toml
 import subprocess
 import github
+from dotenv import load_dotenv
+
+load_dotenv(".env")
+
+if (
+    not getenv("GITHUB_TOKEN")
+    or not getenv("PYPI_USERNAME")
+    or not getenv("PYPI_PASSWORD")
+):
+    print(
+        f"Specify GITHUB_TOKEN, PYPI_USERNAME and PYPI_PASSWORD in {abspath('./.env')}"
+    )
+    sys.exit(1)
 
 # utility fns
 
@@ -27,10 +41,6 @@ def shell(*cmd: str, dontrun: bool = False) -> str:
     ).stdout.decode(encoding="utf8")
 
 
-def shell(*cmd: str):
-    return shell(*cmd, dontrun=True)
-
-
 # load toml files
 with open("pyproject.toml", encoding="utf8") as file:
     pyproject = toml.load(file)
@@ -40,11 +50,21 @@ old = pyproject["tool"]["poetry"]["version"]
 today = date.today().isoformat()
 new = sys.argv[1]
 
+if old == new:
+    print(f"Version {new} has already been released.")
+
 print(f"Updating version: {old} --> {new}")
 
 # stash unstaged changes
 
-# shell('git', 'stash', '--include-untracked','--all', '-m "Stash before release"')
+shell(
+    "git",
+    "stash",
+    "save",
+    "--include-untracked",
+    "--all",
+    f'"Stash before release ({today})"',
+)
 
 # bump version
 
@@ -84,10 +104,13 @@ with open("CHANGELOG.md", "r", encoding="utf8") as changelog:
         elif in_links:
             links += line + "\n"
 
+    if not unreleased_section.strip():
+        print("Aborting: No release notes")
+        sys.exit()
     print("Got unreleased changes to put in next release:")
-    print(unreleased_section)
+    print(unreleased_section.strip())
     print("----------------------------------------------")
-    if input("Confirm? [y/N]") != "y":
+    if input("Confirm? [y/N] ") != "y":
         print("Aborting.")
         sys.exit()
 
@@ -137,6 +160,14 @@ with open("ideaseed/constants.py", encoding="utf8") as constants_py:
         print("ERROR: version not replaced in ideaseed/constants.py")
         sys.exit()
 
+shell(
+    "sed",
+    "-i",
+    "-e",
+    f'"s/^VERSION = .*/VERSION = Version(\\"{new}\\")/g"',
+    "ideaseed/constants.py",
+)
+
 shell("poetry", "version", new)
 
 # add all changes
@@ -153,7 +184,7 @@ shell("git", "commit", "-m", commit_msg)
 latest_commit_hash = shell("git", "log", "--format=%H", "-n", "1").replace("\n", "")
 debug(f"Got latest commit hash {latest_commit_hash!r}")
 
-shell("git", "tag", f"-a=v{new}", latest_commit_hash, "-m", commit_msg)
+shell("git", "tag", "-a", f"v{new}", latest_commit_hash, "-m", commit_msg)
 
 # push
 
@@ -169,11 +200,18 @@ shell("poetry build")
 
 # publish
 
-shell("poetry publish")
+shell(
+    "poetry",
+    "publish",
+    "--username",
+    getenv("PYPI_USERNAME"),
+    "--password",
+    getenv("PYPI_PASSWORD"),
+)
 
 # create github release
 
-gh = github.Github(input("gh tok > "))
+gh = github.Github(os.getenv("GITHUB_TOKEN"))
 release = gh.get_repo("ewen-lbh/ideaseed").create_git_release(
     tag=f"v{new}", name=new, message=release_notes
 )
