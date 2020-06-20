@@ -9,11 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Revamped UI when adding cards:
-    <!-- TODO: Images -->
-  - to Google Keep
+  - to Google Keep: ![demo](./CHANGELOG_RESOURCES/cards-ui--google-keep.png)
   - to GitHub:
-    - with --issue
-    - without --issue
+    - with --issue: ![demo](./CHANGELOG_RESOURCES/cards-ui--github-user-project.png)
+    - without --issue: ![demo](./CHANGELOG_RESOURCES/cards-ui--github-repo-project.png)
 
 ## [0.7.0] - 2020-06-19
 
