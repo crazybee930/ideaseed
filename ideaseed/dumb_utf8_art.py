@@ -142,6 +142,10 @@ def make_google_keep_art(
     return GOOGLE_KEEP_ART.format(card=card, url=url)
 
 
+def wrap_card_content(body: str) -> str:
+    return textwrap.fill(body, width=CARD_INNER_WIDTH, replace_whitespace=False)
+
+
 def make_github_project_art(
     owner: str, repository: str, project: str, column: str, body: str, url: str
 ):
@@ -149,7 +153,7 @@ def make_github_project_art(
         left=f"{owner}/{repository}", right=f"{column} in {project}"
     )
     card = cli_box.rounded(
-        GITHUB_CARD_ART.format(content=textwrap.fill(body, width=CARD_INNER_WIDTH), card_header=card_header)
+        GITHUB_CARD_ART.format(content=wrap_card_content(body), card_header=card_header)
     )
     return GITHUB_ART.format(card=card, url=url)
 
@@ -159,7 +163,7 @@ def make_github_user_project_art(
 ):
     card_header = make_card_header(left=f"@{username}", right=f"{column} in {project}")
     card = cli_box.rounded(
-        GITHUB_CARD_ART.format(content=textwrap.fill(body, width=CARD_INNER_WIDTH), card_header=card_header)
+        GITHUB_CARD_ART.format(content=wrap_card_content(body), card_header=card_header)
     )
     return GITHUB_ART.format(card=card, url=url)
 
@@ -180,7 +184,7 @@ def make_github_issue_art(
     card = cli_box.rounded(
         ISSUE_CARD_ART.format(
             card_header=card_header,
-            content=textwrap.fill(body, width=CARD_INNER_WIDTH),
+            content=wrap_card_content(body),
             labels=" ".join([TAGS_ART.format(tag=t) for t in labels]),
         ),
         align="left",
