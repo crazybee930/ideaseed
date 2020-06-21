@@ -47,7 +47,7 @@ CARD_LINE_SEPARATOR = "─" * CARD_INNER_WIDTH
 ISSUE_ART = """\
 Opening issue in {owner} › {repository} › {project} › {column}...
 
-{issue_card}
+{issue_card}{timeline_item_milestone}
  │
 [Ω] @{username} {assignation_sentence}
  │
@@ -55,6 +55,10 @@ Opening issue in {owner} › {repository} › {project} › {column}...
  │
  →  Issue available at {url}
 """
+
+GITHUB_ISSUE_TIMELINE_ITEM_MILESTONE_ART = """
+ │
+[⚐] @{username} added this to the {title} milestone"""
 
 GITHUB_CARD_ART = """\
 {card_header}
@@ -117,7 +121,12 @@ GOOGLE_KEEP_PINNED = "⚲ Pinned"
 
 
 def make_google_keep_art(
-    title: Optional[str], pinned: bool, tags: List[str], url: str, body: str, color: str
+    title: Optional[str],
+    pinned: bool,
+    tags: List[str],
+    url: str,
+    body: str,
+    color: str,
 ) -> str:
     card_header = make_card_header(
         left=dye(title or "", style="bold"), right=GOOGLE_KEEP_PINNED if pinned else ""
@@ -134,10 +143,7 @@ def make_google_keep_art(
     )
 
     card = "\n".join(
-        [
-            dye(line, fg=COLOR_NAME_TO_HEX_MAP.get(color))
-            for line in card.split("\n")
-        ]
+        [dye(line, fg=COLOR_NAME_TO_HEX_MAP.get(color)) for line in card.split("\n")]
     )
     return GOOGLE_KEEP_ART.format(card=card, url=url)
 
@@ -186,10 +192,16 @@ def make_github_issue_art(
     body: str,
     title: Optional[str],
     assignees: List[str],
+    milestone: Optional[str],
 ) -> str:
     card_header = make_card_header(
         left=dye(title or "", style="bold"), right=dye(f"#{issue_number}", fg=C_PRIMARY)
     )
+    timeline_item_milestone = ""
+    if milestone:
+        timeline_item_milestone = GITHUB_ISSUE_TIMELINE_ITEM_MILESTONE_ART.format(
+            username=username, title=dye(milestone, style="bold")
+        )
     card = cli_box.rounded(
         ISSUE_CARD_ART.format(
             card_header=card_header,
@@ -216,5 +228,6 @@ def make_github_issue_art(
         url=dye(url, style="bold"),
         issue_card=card,
         assignation_sentence=assignation_sentence,
+        timeline_item_milestone=timeline_item_milestone,
     )
 

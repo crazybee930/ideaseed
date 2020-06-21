@@ -273,7 +273,7 @@ def push_to_repo(args: Dict[str, Any]) -> None:
             issue = repo.create_issue(**issue_creation_args, milestone=milestone)
         else:
             issue = repo.create_issue(**issue_creation_args)
-        
+
         card = column.create_card(content_id=issue.id, content_type="Issue")
         url = issue.html_url if args["--title"] else project.html_url
 
@@ -290,6 +290,7 @@ def push_to_repo(args: Dict[str, Any]) -> None:
                 body=issue.body,
                 title=issue.title,
                 assignees=assignees,
+                milestone=(milestone.title if milestone is not None else None),
             )
         )
 
