@@ -86,8 +86,7 @@ just up-arrow on your terminal to re-run the command :)"""
             )
         print(dye(error, style="dim"))
         return
-    sys.stdout.write("\033[F")
-    print("🔑 Logged in.      ")
+    print("✅ Logged in.")
 
     # Announce what we'll do
     color = args["--color"] or "White"
