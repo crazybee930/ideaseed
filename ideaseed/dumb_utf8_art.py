@@ -120,7 +120,7 @@ def make_google_keep_art(
     title: Optional[str], pinned: bool, tags: List[str], url: str, body: str, color: str
 ) -> str:
     card_header = make_card_header(
-        left=title or "", right=GOOGLE_KEEP_PINNED if pinned else ""
+        left=dye(title or "", style="bold"), right=GOOGLE_KEEP_PINNED if pinned else ""
     )
     card = cli_box.rounded(
         GOOGLE_KEEP_CARD_ART.format(
@@ -154,7 +154,7 @@ def make_github_project_art(
     )
     card = cli_box.rounded(
         GITHUB_CARD_ART.format(
-            content=wrap_card_content(body), card_header=card_header
+            content=wrap_card_content(body), card_header=dye(card_header, style="dim")
         ),
         align="left",
     )
@@ -187,7 +187,9 @@ def make_github_issue_art(
     title: Optional[str],
     assignees: List[str],
 ) -> str:
-    card_header = make_card_header(left=title or "", right=f"#{issue_number}")
+    card_header = make_card_header(
+        left=dye(title or "", style="bold"), right=dye(f"#{issue_number}", fg=C_PRIMARY)
+    )
     card = cli_box.rounded(
         ISSUE_CARD_ART.format(
             card_header=card_header,
@@ -210,8 +212,9 @@ def make_github_issue_art(
         repository=dye(repository, fg=C_PRIMARY, style="bold"),
         project=dye(project, fg=C_PRIMARY, style="bold"),
         column=dye(column, fg=C_PRIMARY, style="bold"),
-        username=dye(username, style="bold"),
+        username=username,
         url=dye(url, style="bold"),
         issue_card=card,
         assignation_sentence=assignation_sentence,
     )
+
