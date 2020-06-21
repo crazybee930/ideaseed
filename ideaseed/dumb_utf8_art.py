@@ -135,7 +135,7 @@ def make_google_keep_art(
 
     card = "\n".join(
         [
-            dye(line, bg=COLOR_NAME_TO_HEX_MAP[color], fg=0x000)
+            dye(line, bg=COLOR_NAME_TO_HEX_MAP.get(color), fg=0x000)
             for line in card.split("\n")
         ]
     )
