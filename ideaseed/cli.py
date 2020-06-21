@@ -165,19 +165,25 @@ def validate_argument_presence(args: Dict[str, str]) -> None:
 
     GOOGLE_KEEP_ONLY = ("--color",)
     GITHUB_ONLY = ("--issue",)
+    GITHUB_ISSUE_ONLY = ("--milestone", "--assign-to")
     using_github = len(args["ARGUMENTS"]) > 1
 
-    if using_github and not args["--issue"] and args["--tag"]:
+    if using_github and not args['--issue'] and (args['--tag'] or args['--label']):
         raise ValidationError(
-            "--tag may only be used alongside --issue or when"
-            "adding a card to Google Keep."
+            "--label (or --tag) can only be used with --issue or when creating"
+            "a Google Keep card."
+        )   
+
+    if not args["--issue"] and any([ v for k, v in args.items() if k in GITHUB_ISSUE_ONLY ]):
+        raise ValidationError(
+            "The following options only work when --issue is used: "
+            + ", ".join(GITHUB_ISSUE_ONLY)
         )
 
     if using_github and any([v for k, v in args.items() if k in GOOGLE_KEEP_ONLY]):
         raise ValidationError(
             "The following options are not allowed when using GitHub: "
             + ", ".join(GOOGLE_KEEP_ONLY)
-            + f"\n{args!r}"
         )
     if not using_github and any([v for k, v in args.items() if k in GITHUB_ONLY]):
         raise ValidationError(
