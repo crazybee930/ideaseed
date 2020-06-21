@@ -1,0 +1,134 @@
+.TH ideaseed 1 "21 June 2020" "0.8.2" "ideaseed man page"
+.SH NAME
+ideaseed \- Note down your ideas and get them to the right place, without switching away from your terminal 
+.SH SYNOPSIS
+.IP "ideaseed (--help | --about | --version)"
+.IP "ideaseed [options] [-t TAG...] [-l LABEL...] [-@ USERNAME...] ARGUMENTS..."
+.SH DESCRIPTION
+Do you have ideas suddenly and just wished you could catch them as fast as possible, as to not loose them, without having to interrupt what you were doing?
+.P
+As I guy without a lot of more or less stupid ideas, I use Google Keep as a centralized place to put all of my thoughts that I deem worthy of consideration.
+.P
+I recently started to use GitHub Projects for coding project ideas as a single project called "incubator" on my GitHub profile directly, and as issues or notes when the idea is related to an already-existing project and repo.
+.P
+But when I don't get to decide when this idea comes, and I often need to interrupt what am I doing to open github, get to the right page, input my idea and get back. And I find it frustrating.
+.P
+ideaseed is a CLI solution to my (and I guess also your) problem.
+.SH ARGUMENTS
+.IP
+.TS
+tab(%);
+l l
+  l l
+  l l
+  l l
+  l l
+l l
+  l
+l l
+  l.
+REPO%Select a repository
+%If not given                        Uses Google Keep instead of GitHub (or uses your user profile's projects if --project is used)
+%If --user-keyword's value is given  Creates a card on your user's project (select which project with --user-project)
+%If given in the form OWNER/REPO     Uses the repository OWNER/REPO
+%If given in the form REPO           Uses the repository "your username/REPO"
+PROJECT%Select a project by name to put your card to [default: REPO's value]
+%If creating a card on your user's project, this becomes the COLUMN
+COLUMN%Select a project's column by name [default: To do]
+%If creating a card on your user's project, this is ignored
+.TE
+.SH OPTIONS
+General remarks: Command-line options that take values can be specified as
+either '--color value', '--color=value', '-c value' or '-cvalue'.
+.HP
+\fB\-c\fR, \fB\-\-color\fR COLOR
+.IP
+Chooses which color to use for Google Keep cards. See Color names for allowed values.
+
+.HP
+\fB\-t\fR, \FB\-\-tag\fR TAG
+.IP
+Adds tags to the Google Keep card or labels to the GitHub issue (see \-\-issue). Use it multiple times to set multiple tags.
+
+.HP
+\fB\-i\fR, \FB\-\-issue\fR
+.IP
+Creates an issue for the card and link them together. IDEA becomes the issue's title, except if \-\-title is specified, in which case IDEA becomes the issue's description and \-\-title's value the issue title.
+
+.HP
+\fB\-T\fR, \FB\-\-title\fR TEXT
+.IP
+Sets the Google Keep card's title. When used with \-\-issue, sets the issue's title.
+
+.HP
+\fB\-L\fR, \FB\-\-logout\fR
+.IP
+Clears the authentification cache
+
+.HP
+\fB\-m\fR, \FB\-\-create\-missing\fR
+.IP
+Create non\-existant tags, labels, projects or columns specified, upon confirmation.
+
+.HP
+\fB\-o\fR, \FB\-\-open\fR
+.IP
+Open the relevant URL in your web browser.
+
+.HP
+\fB\-l\fR, \FB\-\-label\fR LABEL
+.IP
+Alias for \-\-tag. See \-\-tag's description.
+.HP
+\fB\-@ \fR,  \FB-\-assign\-to\fR USERNAME
+.IP
+Assigns users to the created issue. Only works when \-\-issue is used.
+
+.HP
+\fBSettings options\fR
+.P
+It's comfier to set these in your alias, e.g. alias idea="ideaseed \-\-user\-project=incubator \-\-user\-keyword=project \-\-no\-auth\-cache \-\-create\-missing"\fR
+
+.HP
+\fB\-\-pin\fR
+.IP
+Pin Google Keep cards
+
+.HP
+\fB\-\-about\fR
+.IP
+Details about ideaseed like currently\-installed version
+
+.HP
+\fB\-\-version\fR
+.IP
+Like \-\-about, without dumb and useless stuff
+
+.HP
+\fB\-\-user\-project\fR NAME
+.IP
+Name of the project to use as your user project
+
+.HP
+\fB\-\-user\-keyword\fR NAME
+.IP
+When REPO is NAME, creates a GitHub card on your user profile instead of putting it on REPO
+
+.HP
+\fB\-\-no\-auth\-cache\fR
+.IP
+Don't save credentials in a temporary file at {cache_filepath}
+
+.HP
+\fB\-\-no\-check\-for\-updates\fR
+.IP
+Don't check for updates, don't prompt to update when current version is outdated
+
+.SH SEE ALSO
+I haven't found any alternatives to this day.
+
+.SH BUGS
+Please report bugs at https://github.com/ewen-lbh/ideaseed/issues
+
+.SH AUTHOR
+Ewen Le Bihan <ewen.lebihan7@gmail.com>
