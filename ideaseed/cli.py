@@ -10,7 +10,7 @@ Examples:
     # Save a card "lorem" in your-username/ipsum > project "ipsum" > column "To-Do"
     $ ideaseed ipsum "lorem"
     # Save a card "a CLI to note down ideas named ideaseed" in your user profile > project "incubator" > column "willmake"
-    $ ideaseed --user-keyword=project --user-project=incubator project "a CLI to note down ideas named ideaseed"
+    $ ideaseed --user-keyword=project --user-project=incubator project willmake "a CLI to note down ideas named ideaseed"
 
 Arguments:
     REPO        Select a repository
