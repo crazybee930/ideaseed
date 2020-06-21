@@ -250,8 +250,12 @@ def push_to_repo(args: Dict[str, Any]) -> None:
             ):
                 # TODO: Ask for a due date
                 milestone = repo.create_milestone(title=args["--milestone"])
-        else:
-            print(dye(f"Error: milestone {milestone!r} does not exit!", fg=0xF00))
+        elif milestone is None:
+            print(
+                dye(
+                    f"Error: milestone {args['--milestone']!r} does not exit!", fg=0xF00
+                )
+            )
             return
 
     owner, repository = repo_name.split("/")
