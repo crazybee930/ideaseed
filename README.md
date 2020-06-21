@@ -1,4 +1,4 @@
-# ideaseed
+# ![ideaseed](visual-identity/ideaseed-logomark-color-transparent.svg)
 
 Do you have ideas suddenly and just wished you could catch them as fast as possible, as to not loose them, without having to interrupt what you were doing?
 
