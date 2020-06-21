@@ -16,11 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   > See it in action on the [github repo](https://github.com/ewen-lbh/ideaseed/tree/v0.8.2) and on [the pypi project page](https://pypi.org/project/ideaseed)
 
 - New flag `-@`/`--assign-to` to assign issues to one or more person. Not specifying this flag stills self-assigns you just as before
+- New flag `-M`/`--milestone` to add issues to a milestone
 
 ### Changed
 
 - Improved contrast inside cards with bold and colored text
-
+- Improved Google Keep "logging in..." messages
 
 ## [0.8.1] - 2020-06-20
 
