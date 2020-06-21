@@ -35,6 +35,7 @@ Options:
     -o --open                  Open the relevant URL in your web browser.
     -l --label LABEL           Alias for --tag. See --tag's description.
     -@ --assign-to USERNAME    Assigns users to the created issue. Only works when --issue is used.
+    -M --milestone TITLE       Assign the issue to a milestone with title TITLE.
        --pin                   Pin Google Keep cards
        --about                 Details about ideaseed like currently-installed version
        --version               Like --about, without dumb and useless stuff

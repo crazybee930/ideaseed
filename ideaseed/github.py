@@ -235,15 +235,41 @@ def push_to_repo(args: Dict[str, Any]) -> None:
         print(dye(f"Error: column {column_name!r} does not exist!", fg=0xF00))
         return
 
+    # Milestone
+    milestone = None
+    if args["--milestone"]:
+        for m in repo.get_milestones():
+            if m.title.lower() == args["--milestone"].lower():
+                milestone = m
+                break
+        if milestone is None and args["--create-missing"]:
+            if ask(
+                q.Confirm(
+                    "ans", message=f"Create missing milestone {args['--milestone']!r}?"
+                )
+            ):
+                # TODO: Ask for a due date
+                milestone = repo.create_milestone(title=args["--milestone"])
+        else:
+            print(dye(f"Error: milestone {milestone!r} does not exit!", fg=0xF00))
+            return
+
     owner, repository = repo_name.split("/")
 
     if args["--issue"]:
-        issue = repo.create_issue(
+        # Cant just use milestone=milestone because
+        # create_issue(milestone=None) does not work, linter says.
+        issue_creation_args = dict(
             title=args["--title"] or idea,
             body=idea if args["--title"] else "",
             assignees=assignees,
             labels=args["--tag"],
         )
+        if milestone is not None:
+            issue = repo.create_issue(**issue_creation_args, milestone=milestone)
+        else:
+            issue = repo.create_issue(**issue_creation_args)
+        
         card = column.create_card(content_id=issue.id, content_type="Issue")
         url = issue.html_url if args["--title"] else project.html_url
 
