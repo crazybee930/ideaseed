@@ -47,3 +47,16 @@ def ask(*questions) -> Union[List[Any], Any]:
 
 def get_token_cache_filepath(service: str) -> str:
     return path.join(path.dirname(path.dirname(__file__)), f".auth-cache--{service}")
+
+
+def english_join(items: List[str]) -> str:
+    if len(items) == 1:
+        return items[0]
+    return ", ".join(items[: len(items) - 1]) + " and " + items[len(items) - 1]
+
+
+# Smallest testing framework ever
+if __name__ == "__main__":
+    assert english_join(["a", "b", "c"]) == "a, b and c"
+    assert english_join(["a"]) == "a"
+    assert english_join(["a", "b"]) == "a and b"

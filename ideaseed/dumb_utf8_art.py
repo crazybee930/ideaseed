@@ -2,7 +2,7 @@ from ideaseed.constants import COLOR_NAME_TO_HEX_MAP, C_PRIMARY
 from typing import *
 
 from github.Repository import Repository
-from ideaseed.utils import dye
+from ideaseed.utils import dye, english_join
 from wcwidth import wcswidth
 import textwrap
 import cli_box
@@ -49,7 +49,7 @@ Opening issue in {owner} › {repository} › {project} › {column}...
 
 {issue_card}
  │
-[Ω] @{username} self-assigned this
+[Ω] @{username} {assignation_sentence}
  │
 [◫] @{username} added this to {column} in {project}
  │
@@ -185,6 +185,7 @@ def make_github_issue_art(
     labels: List[str],
     body: str,
     title: Optional[str],
+    assignees: List[str],
 ) -> str:
     card_header = make_card_header(left=title or "", right=f"#{issue_number}")
     card = cli_box.rounded(
@@ -195,6 +196,15 @@ def make_github_issue_art(
         ),
         align="left",
     )
+    assignation_sentence = (
+        "self-assigned this"
+        if assignees == [username]
+        else (
+            "assigned "
+            + english_join([dye("@" + a, style="bold") for a in assignees])
+            + " to this"
+        )
+    )
     return ISSUE_ART.format(
         owner=dye(owner, fg=C_PRIMARY, style="bold"),
         repository=dye(repository, fg=C_PRIMARY, style="bold"),
@@ -203,4 +213,5 @@ def make_github_issue_art(
         username=dye(username, style="bold"),
         url=dye(url, style="bold"),
         issue_card=card,
+        assignation_sentence=assignation_sentence,
     )

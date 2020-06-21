@@ -157,6 +157,7 @@ def push_to_repo(args: Dict[str, Any]) -> None:
     column_name = args["COLUMN"]
     repo = gh.get_repo(repo_name)
     username = github_username(gh)
+    assignees = args["--assign-to"] or [username]
 
     # Get all labels
     labels = repo.get_labels()
@@ -240,7 +241,7 @@ def push_to_repo(args: Dict[str, Any]) -> None:
         issue = repo.create_issue(
             title=args["--title"] or idea,
             body=idea if args["--title"] else "",
-            assignees=[username],
+            assignees=assignees,
             labels=args["--tag"],
         )
         card = column.create_card(content_id=issue.id, content_type="Issue")
@@ -258,6 +259,7 @@ def push_to_repo(args: Dict[str, Any]) -> None:
                 labels=args["--tag"],
                 body=issue.body,
                 title=issue.title,
+                assignees=assignees,
             )
         )
 
@@ -290,7 +292,7 @@ def push_to_user(args: Dict[str, Any]) -> None:
     column_name: str = args["PROJECT"]
     username = github_username(gh)
     print(
-        f"Saving card in {dye(github_username(gh), C_PRIMARY)} › {dye(project_name, C_PRIMARY)} › {dye(column_name, C_PRIMARY)}..."
+        f"Saving card in {dye(username, C_PRIMARY)} › {dye(project_name, C_PRIMARY)} › {dye(column_name, C_PRIMARY)}..."
     )
     project = None
     user = gh.get_user(github_username(gh))
