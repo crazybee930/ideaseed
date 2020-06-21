@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The third example in the `--help` screen was missing a COLUMN argument
+
+### Added
+
+- ideaseed now has a logo!
+  > See it in action on the [github repo](https://github.com/ewen-lbh/ideaseed/tree/v0.8.2) and on [the pypi project page](https://pypi.org/project/ideaseed)
+
+- New flag `-@`/`--assign-to` to assign issues to one or more person. Not specifying this flag stills self-assigns you just as before
+
+### Changed
+
+- Improved contrast inside cards with bold and colored text
+
+
 ## [0.8.1] - 2020-06-20
 
 ### Fixed
