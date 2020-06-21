@@ -76,12 +76,11 @@ def push_to_gkeep(args: Dict[str, Any]) -> None:
     try:
         keep = login(args)
     except APIException as error:
-        sys.stdout.write("\033[F")
         print("❌ Error with the Google Keep API")
         if error.code == 429:
             print(
-                """Too much requests per minute. Try again later.")
-Don't worry, your idea is still safe,")
+                """Too much requests per minute. Try again later.
+Don't worry, your idea is still safe,
 just up-arrow on your terminal to re-run the command :)"""
             )
         print(dye(error, style="dim"))
