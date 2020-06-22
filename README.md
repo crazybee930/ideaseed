@@ -65,6 +65,9 @@ $ ideaseed --user-keyword=project --user-project=incubator project "a CLI to not
 | -L        | --logout               | Clears the authentification cache                                                                               |
 | -m        | --create-missing       | Create non-existant tags, projects or columns specified (needs confirmation if -I is used)                      |
 | -o        | --open                 | Open the relevant URL in your web browser.                                                                      |
+| -l        | --label LABEL          | Alias for --tag. See --tag's description.                                                                       |
+| -@        | --assign-to USERNAME   | Assigns users to the created issue. Only works when --issue is used.                                            |
+| -M        | --milestone TITLE      | Assign the issue to a milestone with title TITLE.                                                               |
 |           | --pin                  | Pin the Google Keep card                                                                                        |
 |           | --about                | Details about ideaseed like currently-installed version                                                         |
 |           | --version              | Like --about, without dumb and useless stuff                                                                    |
@@ -72,6 +75,7 @@ $ ideaseed --user-keyword=project --user-project=incubator project "a CLI to not
 |           | --user-keyword NAME    | When REPO is NAME, creates a GitHub card on your user profile instead of putting it on REPO                     |
 |           | --no-auth-cache        | Don't save credentials in a temporary file                                                                      |
 |           | --no-check-for-updates | Don't check for updates, don't prompt to update when current version is outdated                                |
+|           | --no-self-assign       | Don't assign the issue to yourself                                                                              |
 
 #### Color names
 
