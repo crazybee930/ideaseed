@@ -4,9 +4,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-
-
 ## [Unreleased]
+
+### Fixed
+
+- Labels are created even if 'no' is answered in the prompt (#26)
+
+### Added
+
+- New flag `--dry-run`: Run your commands without creating new cards or issues, but see what it'd run. Mostly used by me for UI testing, but could be useful to some people. (#37)
+- New flag shorthand `-#` for `--label` (See #28)
+
+### Changed
+
+- Several UI improvements for cards
+  - Increased spacing between different sections of the cards
+  - Get rid of the ugly line separator in cards (#34)
+  - Show labels with their background colors instead of using `[label name]` (#25 and #53)
+  - Make note content stand out more for project cards created without `--issue` by dimming the card header (#59)
+  ![github issue demo](./CHANGELOG_RESOURCES/v0.10.0/github-issue-card.png)
+  ![google keep demo](CHANGELOG_RESOURCES/v0.10.0/google-keep-card.png)
+  ![github project demo](./CHANGELOG_RESOURCES/v0.10.0/github-project-card.png)
 
 ## [0.9.1] - 2020-06-23
 
