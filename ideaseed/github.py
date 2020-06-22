@@ -163,10 +163,8 @@ def push_to_repo(args: Dict[str, Any]) -> None:
     all_labels = repo.get_labels()
     labels: List[Label] = []
     for label_name in args["--tag"]:
-        if (
-            label_name.lower() not in [t.name.lower() for t in all_labels]
-            and args["--create-missing"]
-        ):
+        not_found = label_name.lower() not in [t.name.lower() for t in all_labels]
+        if not_found and args["--create-missing"]:
             if ask(
                 q.Confirm(
                     "ans", message=f"Label {label_name!r} does not exist. Create it?"
@@ -201,7 +199,11 @@ def push_to_repo(args: Dict[str, Any]) -> None:
                         name=label_name, color=f"{color:6x}", **label_data
                     )
                 ]
-
+            else:
+                return
+        elif not_found:
+            print(dye(f"Error: Label {label_name!r} not found."))
+            return
         else:
             labels += [repo.get_label(label_name)]
 
