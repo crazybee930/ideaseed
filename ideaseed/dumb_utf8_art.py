@@ -47,9 +47,7 @@ CARD_LINE_SEPARATOR = "─" * CARD_INNER_WIDTH
 ISSUE_ART = """\
 Opening issue in {owner} › {repository} › {project} › {column}...
 
-{issue_card}{timeline_item_milestone}
- │
-[Ω] @{username} {assignation_sentence}
+{issue_card}{timeline_item_milestone}{timeline_item_assignees}
  │
 [◫] @{username} added this to {column} in {project}
  │
@@ -59,6 +57,10 @@ Opening issue in {owner} › {repository} › {project} › {column}...
 GITHUB_ISSUE_TIMELINE_ITEM_MILESTONE_ART = """
  │
 [⚐] @{username} added this to the {title} milestone"""
+
+GITHUB_ISSUE_TIMELINE_ITEM_ASSIGNEES_ART = """
+ │
+[Ω] @{username} {assignation_sentence}"""
 
 GITHUB_CARD_ART = """\
 {card_header}
@@ -202,6 +204,20 @@ def make_github_issue_art(
         timeline_item_milestone = GITHUB_ISSUE_TIMELINE_ITEM_MILESTONE_ART.format(
             username=username, title=dye(milestone, style="bold")
         )
+    timeline_item_assignees = ""
+    if assignees:
+        timeline_item_assignees = GITHUB_ISSUE_TIMELINE_ITEM_ASSIGNEES_ART.format(
+            username=username,
+            assignation_sentence=(
+                "self-assigned this"
+                if assignees == [username]
+                else (
+                    "assigned "
+                    + english_join([dye("@" + a, style="bold") for a in assignees])
+                    + " to this"
+                )
+            ),
+        )
     card = cli_box.rounded(
         ISSUE_CARD_ART.format(
             card_header=card_header,
@@ -210,15 +226,7 @@ def make_github_issue_art(
         ),
         align="left",
     )
-    assignation_sentence = (
-        "self-assigned this"
-        if assignees == [username]
-        else (
-            "assigned "
-            + english_join([dye("@" + a, style="bold") for a in assignees])
-            + " to this"
-        )
-    )
+
     return ISSUE_ART.format(
         owner=dye(owner, fg=C_PRIMARY, style="bold"),
         repository=dye(repository, fg=C_PRIMARY, style="bold"),
@@ -227,7 +235,7 @@ def make_github_issue_art(
         username=username,
         url=dye(url, style="bold"),
         issue_card=card,
-        assignation_sentence=assignation_sentence,
         timeline_item_milestone=timeline_item_milestone,
+        timeline_item_assignees=timeline_item_assignees,
     )
 

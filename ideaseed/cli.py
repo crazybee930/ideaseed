@@ -45,6 +45,7 @@ Settings options: It's comfier to set these in your alias, e.g. alias idea="idea
        --user-keyword NAME     When REPO is NAME, creates a GitHub card on your user profile instead of putting it on REPO
        --no-auth-cache         Don't save credentials in a temporary file at {cache_filepath}
        --no-check-for-updates  Don't check for updates, don't prompt to update when current version is outdated
+       --no-self-assign        Don't assign the issue to yourself
 
 Color names: Try with the first letter only too
     blue, brown, darkblue, gray, green, orange, pink, purple, red, teal, white, yellow

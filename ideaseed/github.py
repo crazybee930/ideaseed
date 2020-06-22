@@ -157,7 +157,9 @@ def push_to_repo(args: Dict[str, Any]) -> None:
     column_name = args["COLUMN"]
     repo = gh.get_repo(repo_name)
     username = github_username(gh)
-    assignees = args["--assign-to"] or [username]
+    assignees = args["--assign-to"] or (
+        [username] if not args["--no-self-assign"] else []
+    )
 
     # Get all labels
     labels = repo.get_labels()
