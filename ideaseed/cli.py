@@ -2,7 +2,7 @@
 
 Usage: 
     ideaseed (--help | --about | --version)
-    ideaseed [options] [-t TAG...] [-l LABEL...] [-@ USERNAME...] ARGUMENTS...
+    ideaseed [options] [-t TAG...] [-l LABEL...] [-# LABEL...] [-@ USERNAME...] ARGUMENTS...
 
 Examples:
     # Save a card "test" in schoolsyst/webapp > project "UX" > column "To-Do"
@@ -34,6 +34,7 @@ Options:
     -m --create-missing        Create non-existant tags, labels, projects or columns specified, upon confirmation.
     -o --open                  Open the relevant URL in your web browser.
     -l --label LABEL           Alias for --tag. See --tag's description.
+    -# --label LABEL           Just another shorthand for --label.
     -@ --assign-to USERNAME    Assigns users to the created issue. Only works when --issue is used.
     -M --milestone TITLE       Assign the issue to a milestone with title TITLE.
        --pin                   Pin Google Keep cards
