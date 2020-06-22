@@ -28,7 +28,9 @@ COLOR_ALIASES = {
     "Magenta": "Purple",
 }
 
-VALID_COLOR_NAMES = flatten(list(COLOR_ALIASES.items()))
+VALID_COLOR_NAMES = list(flatten(list(COLOR_ALIASES.items()))) + list(
+    COLOR_NAME_TO_HEX_MAP.keys()
+)
 
 # colors
 C_PRIMARY = 0x268CCE
