@@ -212,7 +212,8 @@ shell(
 # create github release
 
 gh = github.Github(os.getenv("GITHUB_TOKEN"))
-release = gh.get_repo("ewen-lbh/ideaseed").create_git_release(
+repo = gh.get_repo("ewen-lbh/ideaseed")
+release = repo.create_git_release(
     tag=f"v{new}", name=new, message=release_notes
 )
 
@@ -220,6 +221,13 @@ release.upload_asset(
     f"dist/ideaseed-{new}-py3-none-any.whl", label=f"Python wheel for {new}"
 )
 release.upload_asset(f"dist/ideaseed-{new}.tar.gz", label=f"Source tarball for {new}")
+
+milestones = repo.get_milestones()
+for milestone in milestones:
+    if milestone.title == new:
+        milestone.edit(state='closed', title=new)
+else:
+    print(f"warn: No milestone with title {new!r} to close.")
 
 #     attach files dist/ideaseed-$(VERSION)*
 #     set title as $(VERSION)
