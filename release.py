@@ -206,7 +206,7 @@ shell(
     "--username",
     getenv("PYPI_USERNAME"),
     "--password",
-    getenv("PYPI_PASSWORD"),
+    "'" + getenv("PYPI_PASSWORD") + "'",
 )
 
 # create github release
