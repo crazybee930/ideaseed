@@ -1,3 +1,4 @@
+from github.Label import Label
 from ideaseed.dumb_utf8_art import (
     make_github_issue_art,
     make_github_project_art,
@@ -6,15 +7,11 @@ from ideaseed.dumb_utf8_art import (
 import os
 import re
 import webbrowser
-import pprint
 from os.path import dirname
-import github
-from github import Issue
 from github.GithubException import BadCredentialsException, TwoFactorException
 from ideaseed.utils import (
     ask,
     dye,
-    get_random_color_hexstring,
     get_token_cache_filepath,
     print_dry_run,
 )
@@ -163,10 +160,11 @@ def push_to_repo(args: Dict[str, Any]) -> None:
     )
 
     # Get all labels
-    labels = repo.get_labels()
+    all_labels = repo.get_labels()
+    labels: List[Label] = []
     for label_name in args["--tag"]:
         if (
-            label_name.lower() not in [t.name.lower() for t in labels]
+            label_name.lower() not in [t.name.lower() for t in all_labels]
             and args["--create-missing"]
         ):
             if ask(
@@ -198,7 +196,14 @@ def push_to_repo(args: Dict[str, Any]) -> None:
                     + dye(label_name, fg=color, style="reverse")
                     + " ..."
                 )
-                repo.create_label(name=label_name, color=f"{color:6x}", **label_data)
+                labels += [
+                    repo.create_label(
+                        name=label_name, color=f"{color:6x}", **label_data
+                    )
+                ]
+
+        else:
+            labels += [repo.get_label(label_name)]
 
     project = None
     for p in repo.get_projects():
@@ -306,6 +311,7 @@ def push_to_repo(args: Dict[str, Any]) -> None:
                 username=username,
                 url=url,
                 issue_number=(issue.number if issue is not None else "N/A"),
+                labels=labels,
                 body=args["IDEA"],
                 title=args["--title"],
                 assignees=assignees,

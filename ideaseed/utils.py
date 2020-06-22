@@ -22,6 +22,39 @@ def dye(
     )
 
 
+def readable_text_color_on(
+    background: int, light: int = 0xFFFFFF, dark: int = 0x000000
+) -> int:
+    """
+    Choses either ``light`` or ``dark`` based on the background color
+    the text is supposed to be written on ``background`` (also given as an hex int)
+    
+    WARN: All the color ints must be exactly 6 digits long.
+    
+    >>> readable_text_color_on(0xFEFAFE)
+    0
+    >>> readable_text_color_on(0x333333)
+    16777215
+    """
+    r, g, b = hex_to_rgb(f"{background:6x}")
+    luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+    if luminance > 0.5:
+        return dark
+    else:
+        return light
+
+
+def hex_to_rgb(hexstring: str) -> Tuple[int, int, int]:
+    """
+    Converts a hexstring (without initial '#') ``hexstring`` into a 
+    3-tuple of ints in [0, 255] representing an RGB color
+    
+    >>> hex_to_rgb('FF00AA')
+    (255, 0, 170)
+    """
+    return tuple(int(hexstring[i : i + 2], 16) for i in (0, 2, 4))  # skip '#'
+
+
 def get_random_color_hexstring() -> str:
     return f"{randint(0x0, 0xFFFFFF):6x}".upper()
 
@@ -50,6 +83,16 @@ def get_token_cache_filepath(service: str) -> str:
 
 
 def english_join(items: List[str]) -> str:
+    """
+    Joins items in a sentence-compatible way, adding "and" at the end
+    
+    >>> english_join(["a", "b", "c"])
+    'a, b and c'
+    >>> english_join(["a"])
+    'a'
+    >>> english_join(["a", "b"])
+    'a and b'
+    """
     if len(items) == 1:
         return items[0]
     return ", ".join(items[: len(items) - 1]) + " and " + items[len(items) - 1]
@@ -63,6 +106,5 @@ def print_dry_run(text: str):
     print(DRY_RUN_FMT.format(text))
 
 if __name__ == "__main__":
-    assert english_join(["a", "b", "c"]) == "a, b and c"
-    assert english_join(["a"]) == "a"
-    assert english_join(["a", "b"]) == "a and b"
+    import doctest
+    doctest.testmod()

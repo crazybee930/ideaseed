@@ -1,8 +1,8 @@
 from ideaseed.constants import COLOR_NAME_TO_HEX_MAP, C_PRIMARY
 from typing import *
-
 from github.Repository import Repository
-from ideaseed.utils import dye, english_join
+from github.Label import Label
+from ideaseed.utils import dye, english_join, readable_text_color_on
 from wcwidth import wcswidth
 import textwrap
 import cli_box
@@ -74,12 +74,14 @@ GITHUB_ART = """\
  →  Project card available at {url}
 """
 
+
 def strwidth(o: str) -> int:
     """
     Smartly calculates the actual width taken on a terminal of `o`. 
     Handles ANSI codes (using `strip-ansi`) and Unicode (using `wcwidth`)
     """
     return wcswidth(strip_ansi(o))
+
 
 def make_card_header(left: str, right: str) -> str:
     """
@@ -102,11 +104,10 @@ def make_card_header(left: str, right: str) -> str:
     return left + spaces + right
 
 
-ISSUE_CARD_ART = f"""\
-{{card_header}}
-{{content}}
-{CARD_LINE_SEPARATOR}
-{{labels}}
+ISSUE_CARD_ART = """\
+{card_header}
+
+{content}{labels}
 """
 
 TAGS_ART = "[{tag}]"
@@ -119,11 +120,10 @@ Adding card to your Google Keep account:
  →  Available at {url}
 """
 
-GOOGLE_KEEP_CARD_ART = f"""\
-{{card_header}}
-{{content}}
-{CARD_LINE_SEPARATOR}
-{{tags}}
+GOOGLE_KEEP_CARD_ART = """\
+{card_header}
+
+{content}{tags}
 """
 
 GOOGLE_KEEP_PINNED = "⚲ Pinned"
@@ -137,6 +137,7 @@ def make_google_keep_art(
     body: str,
     color: str,
 ) -> str:
+    hex_color = COLOR_NAME_TO_HEX_MAP.get(color)
     card_header = make_card_header(
         left=dye(title or "", style="bold"), right=GOOGLE_KEEP_PINNED if pinned else ""
     )
@@ -144,16 +145,14 @@ def make_google_keep_art(
         GOOGLE_KEEP_CARD_ART.format(
             card_header=card_header,
             content=body,
-            tags=" ".join([TAGS_ART.format(tag=t) for t in tags])
+            tags="\n\n" + "  ".join([format_label(t, hex_color or 0xDDD) for t in tags])
             if tags
-            else "No tags.",
+            else "",
         ),
         align="left",
     )
 
-    card = "\n".join(
-        [dye(line, fg=COLOR_NAME_TO_HEX_MAP.get(color)) for line in card.split("\n")]
-    )
+    card = "\n".join([dye(line, fg=hex_color) for line in card.split("\n")])
     return GOOGLE_KEEP_ART.format(card=card, url=url)
 
 
@@ -182,7 +181,7 @@ def make_github_user_project_art(
     card_header = make_card_header(left=f"@{username}", right=f"{column} in {project}")
     card = cli_box.rounded(
         GITHUB_CARD_ART.format(
-            content=wrap_card_content(body), card_header=card_header
+            content=wrap_card_content(body), card_header=dye(card_header, style="dim")
         ),
         align="left",
     )
@@ -196,8 +195,8 @@ def make_github_issue_art(
     column: str,
     username: str,
     url: str,
-    issue_number: int,
-    labels: List[str],
+    issue_number: Union[str, int],
+    labels: List[Label],
     body: str,
     title: Optional[str],
     assignees: List[str],
@@ -229,7 +228,10 @@ def make_github_issue_art(
         ISSUE_CARD_ART.format(
             card_header=card_header,
             content=wrap_card_content(body),
-            labels=" ".join([TAGS_ART.format(tag=t) for t in labels]),
+            labels="\n\n"
+            + "  ".join([format_label(l.name, int(l.color, 16)) for l in labels])
+            if labels
+            else "",
         ),
         align="left",
     )
@@ -246,3 +248,16 @@ def make_github_issue_art(
         timeline_item_assignees=timeline_item_assignees,
     )
 
+
+def format_label(
+    name: str, color: int = 0xDDDDDD, text_color: Optional[int] = None
+) -> str:
+    """
+    Renders a label using a color
+    
+    ``text_color`` defaults to ``readable_text_color_on(color)``
+    
+    WARN: ``color`` and ``text_color`` must be a 6-digit-long hex int representing the color.
+    """
+    text_color = readable_text_color_on(color) if text_color is None else text_color
+    return dye(f" {name} ", bg=color, fg=text_color)
