@@ -12,15 +12,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- ideaseed now has a logo! ![Woops. the logo link is broken :/ Check out the README, it should be there](https://raw.githubusercontent.com/ewen-lbh/ideaseed/master/visual-identity/ideaseed-logomark-color-transparent.png)
+- ideaseed now has a logo! ![ideaseed's logo](https://raw.githubusercontent.com/ewen-lbh/ideaseed/master/visual-identity/ideaseed-logomark-color-transparent.png)
 
 - New flag `-@`/`--assign-to` to assign issues to one or more person. Not specifying this flag stills self-assigns you just as before
 - New flag `-M`/`--milestone` to add issues to a milestone
+- Update notification: New option "What has changed?" to read release notes before upgrading
 
 ### Changed
 
 - Improved contrast inside cards with bold and colored text
-- Improved Google Keep "logging in..." messages
+- Colored Google Keep cards see their _text_ colored, not their background, which I thought looked a bit ugly.
+- Improved Google Keep "logging in..." messages:
+  before 0.9.0, the previous line was erased and "Logging in..." was replaced with "Logged in.".
+  This is pretty cool, but does not work well when there's something else that gets printed, for example when you need to enter credentials to log in. The line no longer gets replaced, but "✅ Logged in." gets printed instead.
+- Improved error messages when validating options presence
 
 ## [0.8.1] - 2020-06-20
 
