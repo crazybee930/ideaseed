@@ -92,16 +92,18 @@ just up-arrow on your terminal to re-run the command :)"""
 
     # Create the note
     note = None
-    if not args['--dry-run']:
+    if not args["--dry-run"]:
         note = keep.createNote(title=args["--title"], text=args["IDEA"])
         note.color = getattr(ColorValue, color)
         note.pinned = args["--pin"]
         url = f"https://keep.google.com/u/0/#NOTE/{note.id}"
     else:
-        print_dry_run(f"note = keep.createNote(title={args['--title']!r}, text={args['IDEA']!r})")
+        print_dry_run(
+            f"note = keep.createNote(title={args['--title']!r}, text={args['IDEA']!r})"
+        )
         print_dry_run(f"note.color = getattr(ColorValue, {color!r})")
         print_dry_run(f"note.pinned = {args['--pin']!r}")
-        url = "N/A"        
+        url = "N/A"
 
     # Announce the card created
     print(
@@ -119,14 +121,14 @@ just up-arrow on your terminal to re-run the command :)"""
     all_tags = keep.labels()
     for tag in args["--tag"]:
         label = keep.findLabel(tag)
-        if args['--dry-run']:
+        if args["--dry-run"]:
             print_dry_run(f"label = keep.findLabel({tag!r})")
         if label is None and args["--create-missing"]:
             if ask(Confirm("ans", f"Create missing tag {tag!r}?")):
                 label = keep.createLabel(tag)
         elif label is None:
             print(dye(f"Error: Tag {tag!r} not found", fg=0xF00))
-        if not args['--dry-run']:
+        if not args["--dry-run"]:
             note.labels.add(label)
         else:
             print_dry_run(f"note.labels.add({label!r})")

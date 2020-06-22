@@ -102,9 +102,11 @@ def print_dry_run(text: str):
     """
     Apply special formatting for dry-run specific messages
     """
-    DRY_RUN_FMT = dye(" DRY RUN ", bg=0x333, fg=0xFFF) + dye('  {}', style="dim")
+    DRY_RUN_FMT = dye(" DRY RUN ", bg=0x333, fg=0xFFF) + dye("  {}", style="dim")
     print(DRY_RUN_FMT.format(text))
+
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

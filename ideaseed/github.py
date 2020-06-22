@@ -397,7 +397,7 @@ def push_to_user(args: Dict[str, Any]) -> None:
         print(dye(f"Error: column {column_name!r} does not exist!", fg=0xF00))
         return
 
-    if not args['--dry-run']:
+    if not args["--dry-run"]:
         column.create_card(note=idea)
         url = project.html_url
     else:
@@ -415,5 +415,5 @@ def push_to_user(args: Dict[str, Any]) -> None:
     )
 
     # Open project URL
-    if args["--open"] and url != 'N/A':
+    if args["--open"] and url != "N/A":
         webbrowser.open(url)
