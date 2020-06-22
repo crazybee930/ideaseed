@@ -250,6 +250,8 @@ def push_to_repo(args: Dict[str, Any]) -> None:
             ):
                 # TODO: Ask for a due date
                 milestone = repo.create_milestone(title=args["--milestone"])
+            else:
+                return
         elif milestone is None:
             print(
                 dye(
