@@ -6,6 +6,7 @@ from ideaseed.utils import dye, english_join
 from wcwidth import wcswidth
 import textwrap
 import cli_box
+from strip_ansi import strip_ansi
 
 ABOUT_SCREEN = """
 
@@ -73,6 +74,12 @@ GITHUB_ART = """\
  →  Project card available at {url}
 """
 
+def strwidth(o: str) -> int:
+    """
+    Smartly calculates the actual width taken on a terminal of `o`. 
+    Handles ANSI codes (using `strip-ansi`) and Unicode (using `wcwidth`)
+    """
+    return wcswidth(strip_ansi(o))
 
 def make_card_header(left: str, right: str) -> str:
     """
@@ -86,11 +93,11 @@ def make_card_header(left: str, right: str) -> str:
     right = str(right)
     # Card width
     # Calculate max length of title
-    left_max_len = CARD_INNER_WIDTH - wcswidth(right) - 2
-    if wcswidth(left) >= left_max_len:
+    left_max_len = CARD_INNER_WIDTH - strwidth(right) - 2
+    if strwidth(left) >= left_max_len:
         left = f"{left:.{left_max_len-1}}" + "…"
 
-    spaces = " " * (CARD_INNER_WIDTH - wcswidth(left) + 2 - wcswidth(right))
+    spaces = " " * (CARD_INNER_WIDTH - strwidth(left) + 2 - strwidth(right))
 
     return left + spaces + right
 
