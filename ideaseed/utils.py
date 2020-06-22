@@ -55,7 +55,13 @@ def english_join(items: List[str]) -> str:
     return ", ".join(items[: len(items) - 1]) + " and " + items[len(items) - 1]
 
 
-# Smallest testing framework ever
+def print_dry_run(text: str):
+    """
+    Apply special formatting for dry-run specific messages
+    """
+    DRY_RUN_FMT = dye(" DRY RUN ", bg=0x333, fg=0xFFF) + dye('  {}', style="dim")
+    print(DRY_RUN_FMT.format(text))
+
 if __name__ == "__main__":
     assert english_join(["a", "b", "c"]) == "a, b and c"
     assert english_join(["a"]) == "a"

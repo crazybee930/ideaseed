@@ -37,6 +37,7 @@ Options:
     -@ --assign-to USERNAME    Assigns users to the created issue. Only works when --issue is used.
     -M --milestone TITLE       Assign the issue to a milestone with title TITLE.
        --pin                   Pin Google Keep cards
+       --dry-run               Don't actually affect websites, put print what it would've done. Still logs in. Beware, --create-missing ignores this flag and still creates missing objects.
        --about                 Details about ideaseed like currently-installed version
        --version               Like --about, without dumb and useless stuff
 
@@ -105,6 +106,14 @@ def run(argv=None):
                 subprocess.run(sys.argv)
                 return
 
+    if args["--dry-run"]:
+        print(
+            dye(
+                f"\n============ Running in {dye('dry run', style='bold', fg=0xfff)} {dye('mode ============', style='dim')}\n",
+                style="dim",
+            )
+        )
+
     if args["--about"]:
         print(ABOUT_SCREEN.format(version=VERSION))
         return
@@ -169,13 +178,15 @@ def validate_argument_presence(args: Dict[str, str]) -> None:
     GITHUB_ISSUE_ONLY = ("--milestone", "--assign-to")
     using_github = len(args["ARGUMENTS"]) > 1
 
-    if using_github and not args['--issue'] and (args['--tag'] or args['--label']):
+    if using_github and not args["--issue"] and (args["--tag"] or args["--label"]):
         raise ValidationError(
             "--label (or --tag) can only be used with --issue or when creating"
             "a Google Keep card."
-        )   
+        )
 
-    if not args["--issue"] and any([ v for k, v in args.items() if k in GITHUB_ISSUE_ONLY ]):
+    if not args["--issue"] and any(
+        [v for k, v in args.items() if k in GITHUB_ISSUE_ONLY]
+    ):
         raise ValidationError(
             "The following options only work when --issue is used: "
             + ", ".join(GITHUB_ISSUE_ONLY)

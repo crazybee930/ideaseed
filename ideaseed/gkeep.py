@@ -3,7 +3,7 @@ from ideaseed.constants import COLOR_NAME_TO_HEX_MAP, C_PRIMARY
 import json
 import webbrowser
 from os import path
-from ideaseed.utils import ask, dye, get_token_cache_filepath
+from ideaseed.utils import ask, dye, get_token_cache_filepath, print_dry_run
 from typing import *
 from inquirer import Text, Password, Confirm
 from gkeepapi import Keep
@@ -91,12 +91,17 @@ just up-arrow on your terminal to re-run the command :)"""
     color = args["--color"] or "White"
 
     # Create the note
-    note = keep.createNote(title=args["--title"], text=args["IDEA"])
-    note.color = getattr(ColorValue, color)
-    note.pinned = args["--pin"]
-
-    # Get the URL
-    url = f"https://keep.google.com/u/0/#NOTE/{note.id}"
+    note = None
+    if not args['--dry-run']:
+        note = keep.createNote(title=args["--title"], text=args["IDEA"])
+        note.color = getattr(ColorValue, color)
+        note.pinned = args["--pin"]
+        url = f"https://keep.google.com/u/0/#NOTE/{note.id}"
+    else:
+        print_dry_run(f"note = keep.createNote(title={args['--title']!r}, text={args['IDEA']!r})")
+        print_dry_run(f"note.color = getattr(ColorValue, {color!r})")
+        print_dry_run(f"note.pinned = {args['--pin']!r}")
+        url = "N/A"        
 
     # Announce the card created
     print(
@@ -114,12 +119,17 @@ just up-arrow on your terminal to re-run the command :)"""
     all_tags = keep.labels()
     for tag in args["--tag"]:
         label = keep.findLabel(tag)
+        if args['--dry-run']:
+            print_dry_run(f"label = keep.findLabel({tag!r})")
         if label is None and args["--create-missing"]:
             if ask(Confirm("ans", f"Create missing tag {tag!r}?")):
                 label = keep.createLabel(tag)
         elif label is None:
             print(dye(f"Error: Tag {tag!r} not found", fg=0xF00))
-        note.labels.add(label)
+        if not args['--dry-run']:
+            note.labels.add(label)
+        else:
+            print_dry_run(f"note.labels.add({label!r})")
 
     # Beam it up to Google's servers
     keep.sync()

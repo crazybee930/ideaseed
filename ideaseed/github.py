@@ -16,6 +16,7 @@ from ideaseed.utils import (
     dye,
     get_random_color_hexstring,
     get_token_cache_filepath,
+    print_dry_run,
 )
 from random import randint
 from ideaseed.constants import C_PRIMARY
@@ -273,13 +274,28 @@ def push_to_repo(args: Dict[str, Any]) -> None:
             assignees=assignees,
             labels=args["--tag"],
         )
-        if milestone is not None:
-            issue = repo.create_issue(**issue_creation_args, milestone=milestone)
-        else:
-            issue = repo.create_issue(**issue_creation_args)
 
-        card = column.create_card(content_id=issue.id, content_type="Issue")
-        url = issue.html_url
+        issue = None
+        if not args["--dry-run"]:
+            if milestone is not None:
+                issue = repo.create_issue(**issue_creation_args, milestone=milestone)
+            else:
+                issue = repo.create_issue(**issue_creation_args)
+
+            card = column.create_card(content_id=issue.id, content_type="Issue")
+            url = issue.html_url
+        else:
+            if milestone is not None:
+                print_dry_run(
+                    f"repo.create_issue(**{issue_creation_args!r}, milestone={milestone!r})"
+                )
+            else:
+                print_dry_run(f"repo.create_issue(**{issue_creation_args!r})")
+
+            print_dry_run(
+                f'column.create_card(content_id=issue.id, content_type="Issue")'
+            )
+            url = "N/A"
 
         print(
             make_github_issue_art(
@@ -289,20 +305,25 @@ def push_to_repo(args: Dict[str, Any]) -> None:
                 column=column.name,
                 username=username,
                 url=url,
-                issue_number=issue.number,
-                labels=args["--tag"],
-                body=issue.body,
-                title=issue.title,
+                issue_number=(issue.number if issue is not None else "N/A"),
+                body=args["IDEA"],
+                title=args["--title"],
                 assignees=assignees,
                 milestone=(milestone.title if milestone is not None else None),
             )
         )
 
-        if args["--open"]:
+        if args["--open"] and not url == "N/A":
             webbrowser.open(url)
     else:
-        card = column.create_card(note=idea)
-        url = project.html_url
+
+        card = None
+        if not args["--dry-run"]:
+            card = column.create_card(note=idea)
+            url = project.html_url
+        else:
+            print_dry_run(f"column.create_card(note={idea!r}")
+            url = "N/A"
 
         print(
             make_github_project_art(
@@ -316,7 +337,7 @@ def push_to_repo(args: Dict[str, Any]) -> None:
         )
 
         # Open project URL
-        if args["--open"]:
+        if args["--open"] and url != "N/A":
             webbrowser.open(url)
 
 
@@ -368,8 +389,12 @@ def push_to_user(args: Dict[str, Any]) -> None:
         print(dye(f"Error: column {column_name!r} does not exist!", fg=0xF00))
         return
 
-    column.create_card(note=idea)
-    url = project.html_url
+    if not args['--dry-run']:
+        column.create_card(note=idea)
+        url = project.html_url
+    else:
+        print_dry_run(f"column.create_card(note={idea!r})")
+        url = "N/A"
 
     print(
         make_github_user_project_art(
@@ -382,5 +407,5 @@ def push_to_user(args: Dict[str, Any]) -> None:
     )
 
     # Open project URL
-    if args["--open"]:
+    if args["--open"] and url != 'N/A':
         webbrowser.open(url)
