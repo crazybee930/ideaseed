@@ -14,8 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - ideaseed now has a logo! ![ideaseed's logo](https://raw.githubusercontent.com/ewen-lbh/ideaseed/master/visual-identity/ideaseed-logomark-color-transparent.png)
 
-- New flag `-@`/`--assign-to` to assign issues to one or more person. Not specifying this flag stills self-assigns you just as before
+- New flag `-@`/`--assign-to` to assign issues to one or more person. Not specifying this flag still self-assigns you just as before
 - New flag `-M`/`--milestone` to add issues to a milestone
+- New flag `--no-self-assign` to prevent self-assigning issues.
 - Update notification: New option "What has changed?" to read release notes before upgrading
 
 ### Changed
