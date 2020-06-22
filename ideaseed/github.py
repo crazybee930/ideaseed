@@ -277,7 +277,7 @@ def push_to_repo(args: Dict[str, Any]) -> None:
             issue = repo.create_issue(**issue_creation_args)
 
         card = column.create_card(content_id=issue.id, content_type="Issue")
-        url = issue.html_url if args["--title"] else project.html_url
+        url = issue.html_url
 
         print(
             make_github_issue_art(
