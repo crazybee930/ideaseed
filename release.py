@@ -30,14 +30,14 @@ def debug(txt: str = "", **kwargs):
     print(f"\033[32m{txt}\033[0m", **kwargs)
 
 
-def shell(*cmd: str, dontrun: bool = False) -> str:
-    cmd = [str(arg) for arg in cmd]
+def shell(*cmd: str, dontrun: bool = False) -> Optional[str]:
+    command = [str(arg) for arg in cmd]
     debug(f"$ " + " ".join(cmd))
     input("Press [ENTER] to continue...")
     if dontrun:
         return
     return subprocess.run(
-        " ".join(cmd), shell=True, stdout=subprocess.PIPE
+        " ".join(command), shell=True, stdout=subprocess.PIPE
     ).stdout.decode(encoding="utf8")
 
 
@@ -206,16 +206,14 @@ shell(
     "--username",
     getenv("PYPI_USERNAME"),
     "--password",
-    "'" + getenv("PYPI_PASSWORD") + "'",
+    '"' + getenv("PYPI_PASSWORD") + '"',
 )
 
 # create github release
 
 gh = github.Github(os.getenv("GITHUB_TOKEN"))
 repo = gh.get_repo("ewen-lbh/ideaseed")
-release = repo.create_git_release(
-    tag=f"v{new}", name=new, message=release_notes
-)
+release = repo.create_git_release(tag=f"v{new}", name=new, message=release_notes)
 
 release.upload_asset(
     f"dist/ideaseed-{new}-py3-none-any.whl", label=f"Python wheel for {new}"
@@ -225,7 +223,7 @@ release.upload_asset(f"dist/ideaseed-{new}.tar.gz", label=f"Source tarball for {
 milestones = repo.get_milestones()
 for milestone in milestones:
     if milestone.title == new:
-        milestone.edit(state='closed', title=new)
+        milestone.edit(state="closed", title=new)
 else:
     print(f"warn: No milestone with title {new!r} to close.")
 
