@@ -121,7 +121,7 @@ Some color have aliases:
 - grey is the same as gray
 - magenta is the same as purple
 
-#### Relax. You don't need to remember those options (Coming in v1.0.0)
+#### Relax. You don't need to remember those options (Coming in [v1.0.0])
 
 You can also use `ideaseed -I` to prompt you for some information:
 
@@ -160,3 +160,5 @@ $ pip3 --version
 pip 20.0.2 from /home/ewen/.local/lib/python3.7/site-packages/pip (python 3.7)
 $ pip3 install ideaseed
 ```
+
+[v1.0.0]: https://github.com/ewen-lbh/ideaseed/milestone/2
