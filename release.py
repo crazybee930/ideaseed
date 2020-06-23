@@ -49,6 +49,20 @@ with open("pyproject.toml", encoding="utf8") as file:
 old = pyproject["tool"]["poetry"]["version"]
 today = date.today().isoformat()
 new = sys.argv[1]
+pkgname = pyproject['tool']['poetry']['name']
+reponame: str = pyproject['tool']['poetry']['repository'].replace('https://github.com/', '')
+if reponame.endswith('/'):
+    reponame = reponame[:len(reponame)-1] # Remove end slash
+
+print(f"""\
+Releasing a new version!!!1
+
+Old version    : {old}
+New version    : {new}
+Today is       : {today}
+Package name   : {pkgname}
+Repository name: {reponame}
+""")
 
 if old == new:
     print(f"Version {new} has already been released.")
@@ -89,7 +103,7 @@ with open("CHANGELOG.md", "r", encoding="utf8") as changelog:
             in_unreleased_section = False
             in_previous_versions = True
         if line.startswith(
-            "[Unreleased]: https://github.com/ewen-lbh/ideaseed/compare/"
+            f"[Unreleased]: https://github.com/{reponame}/compare/"
         ):
             in_previous_versions = False
             in_links = True
@@ -124,8 +138,8 @@ with open("CHANGELOG.md", "r", encoding="utf8") as changelog:
     )
 
     links = (
-        f"[Unreleased]: https://github.com/ewen-lbh/ideaseed/compare/v{new}...HEAD\n"
-        + f"[{new}]: https://github.com/ewen-lbh/ideaseed/compare/v{old}...v{new}\n"
+        f"[Unreleased]: https://github.com/{reponame}/compare/v{new}...HEAD\n"
+        + f"[{new}]: https://github.com/{reponame}/compare/v{old}...v{new}\n"
         + links
     )
 
@@ -144,7 +158,7 @@ with open("CHANGELOG.md", "w", encoding="utf8") as changelog:
 
 # bump version
 
-with open("ideaseed/constants.py", encoding="utf8") as constants_py:
+with open(f"{pkgname}/constants.py", encoding="utf8") as constants_py:
     patt = re.compile(r'^VERSION = Version\(".+"\)$')
     lines = constants_py.read().split("\n")
     new_lines = lines
@@ -157,7 +171,7 @@ with open("ideaseed/constants.py", encoding="utf8") as constants_py:
         else:
             debug()
     else:
-        print("ERROR: version not replaced in ideaseed/constants.py")
+        print(f"ERROR: version not replaced in {pkgname}/constants.py")
         sys.exit()
 
 shell(
@@ -165,7 +179,7 @@ shell(
     "-i",
     "-e",
     f'"s/^VERSION = .*/VERSION = Version(\\"{new}\\")/g"',
-    "ideaseed/constants.py",
+    f"{pkgname}/constants.py",
 )
 
 shell("poetry", "version", new)
@@ -212,13 +226,13 @@ shell(
 # create github release
 
 gh = github.Github(os.getenv("GITHUB_TOKEN"))
-repo = gh.get_repo("ewen-lbh/ideaseed")
+repo = gh.get_repo(reponame)
 release = repo.create_git_release(tag=f"v{new}", name=new, message=release_notes)
 
 release.upload_asset(
-    f"dist/ideaseed-{new}-py3-none-any.whl", label=f"Python wheel for {new}"
+    f"dist/{pkgname}-{new}-py3-none-any.whl", label=f"Python wheel for {new}"
 )
-release.upload_asset(f"dist/ideaseed-{new}.tar.gz", label=f"Source tarball for {new}")
+release.upload_asset(f"dist/{pkgname}-{new}.tar.gz", label=f"Source tarball for {new}")
 
 milestones = repo.get_milestones()
 for milestone in milestones:
@@ -226,11 +240,5 @@ for milestone in milestones:
         milestone.edit(state="closed", title=new)
 else:
     print(f"warn: No milestone with title {new!r} to close.")
-
-#     attach files dist/ideaseed-$(VERSION)*
-#     set title as $(VERSION)
-#     set tag as v$(VERSION)
-#     set description to CHANGELOG.md's $(VERSION) - $(DATE)'s section
-# pop stashed changes
 
 shell("git", "stash", "pop")
