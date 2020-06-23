@@ -1,3 +1,11 @@
+* * *
+
+_Release notes_
+
+Know what changed in which version and what is upcoming in the next one by reading [the changelog](https://github.com/ewen-lbh/ideaseed/tree/master/CHANGELOG.md)
+
+* * *
+
 # ![ideaseed](visual-identity/ideaseed-logomark-color-transparent.svg)
 
 Do you have ideas suddenly and just wished you could catch them as fast as possible, as to not loose them, without having to interrupt what you were doing?
