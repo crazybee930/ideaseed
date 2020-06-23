@@ -6,7 +6,9 @@ Know what changed in which version and what is upcoming in the next one by readi
 
 * * *
 
-# ![ideaseed](visual-identity/ideaseed-logomark-color-transparent.svg)
+<center><p align="center">
+<h1><img alt="ideaseed" src="visual-identity/ideaseed-logomark-color-transparent.svg" width="550px"></h1>
+</p></center>
 
 Do you have ideas suddenly and just wished you could catch them as fast as possible, as to not loose them, without having to interrupt what you were doing?
 
@@ -162,3 +164,11 @@ $ pip3 install ideaseed
 ```
 
 [v1.0.0]: https://github.com/ewen-lbh/ideaseed/milestone/2
+
+* * *
+
+<center><p align="center">
+  <img src="visual-identity/ideaseed-logo-black-transparent.png" width="40px">
+  <br>
+  ideaseed by <a href="https://ewen.works">Ewen Le Bihan</a>
+</p></center>
