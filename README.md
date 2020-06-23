@@ -1,13 +1,5 @@
-* * *
-
-_Release notes_
-
-Know what changed in which version and what is upcoming in the next one by reading [the changelog](https://github.com/ewen-lbh/ideaseed/tree/master/CHANGELOG.md)
-
-* * *
-
 <center><p align="center">
-<h1><img alt="ideaseed" src="visual-identity/ideaseed-logomark-color-transparent.svg" width="550px"></h1>
+<img alt="ideaseed" src="visual-identity/ideaseed-logomark-color-transparent.svg" width="550px">
 </p></center>
 
 Do you have ideas suddenly and just wished you could catch them as fast as possible, as to not loose them, without having to interrupt what you were doing?
@@ -31,6 +23,14 @@ pip install ideaseed
 ```
 
 See [Installation troubleshooting](#installation-troubleshooting) if you can't install it like this.
+
+## Updating
+
+Except if you specify `--no-check-updates`, the program will automatically check for new versions and ask to upgrade for you (since [v0.4.0]). If you want to upgrade manually, simply run
+
+```sh-session
+pip install -U ideaseed
+```
 
 ## Usage
 
@@ -164,6 +164,7 @@ $ pip3 install ideaseed
 ```
 
 [v1.0.0]: https://github.com/ewen-lbh/ideaseed/milestone/2
+[v0.4.0]: https://github.com/ewen-lbh/ideaseed/tree/master/CHANGELOG.md#040---2020-06-18
 
 * * *
 
