@@ -1,2 +1,0 @@
-version:
-	./release.py $(VERSION)
