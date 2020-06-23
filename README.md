@@ -32,6 +32,8 @@ Except if you specify `--no-check-updates`, the program will automatically check
 pip install -U ideaseed
 ```
 
+To see the version history, you can read the [changelog](https://github.com/ewen-lbh/ideaseed/tree/master/CHANGELOG.md), though, since [v0.9.0], you can read the release notes straight from your terminal by choosing "What has changed?" when the "Upgrade available" notification asks you if you want to update.
+
 ## Usage
 
 ```bash
@@ -165,6 +167,7 @@ $ pip3 install ideaseed
 
 [v1.0.0]: https://github.com/ewen-lbh/ideaseed/milestone/2
 [v0.4.0]: https://github.com/ewen-lbh/ideaseed/tree/master/CHANGELOG.md#040---2020-06-18
+[v0.9.0]: https://github.com/ewen-lbh/ideaseed/blob/master/CHANGELOG.md#090---2020-06-22
 
 * * *
 
