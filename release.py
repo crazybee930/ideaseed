@@ -36,9 +36,9 @@ def shell(*cmd: str, dontrun: bool = False) -> Optional[str]:
     input("Press [ENTER] to continue...")
     if dontrun:
         return
-    return subprocess.run(
-        " ".join(command), shell=True, stdout=subprocess.PIPE
-    ).stdout.decode(encoding="utf8")
+    return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode(
+        encoding="utf8"
+    )
 
 
 # load toml files
@@ -49,12 +49,15 @@ with open("pyproject.toml", encoding="utf8") as file:
 old = pyproject["tool"]["poetry"]["version"]
 today = date.today().isoformat()
 new = sys.argv[1]
-pkgname = pyproject['tool']['poetry']['name']
-reponame: str = pyproject['tool']['poetry']['repository'].replace('https://github.com/', '')
-if reponame.endswith('/'):
-    reponame = reponame[:len(reponame)-1] # Remove end slash
+pkgname = pyproject["tool"]["poetry"]["name"]
+reponame: str = pyproject["tool"]["poetry"]["repository"].replace(
+    "https://github.com/", ""
+)
+if reponame.endswith("/"):
+    reponame = reponame[: len(reponame) - 1]  # Remove end slash
 
-print(f"""\
+print(
+    f"""\
 Releasing a new version!!!1
 
 Old version    : {old}
@@ -62,7 +65,8 @@ New version    : {new}
 Today is       : {today}
 Package name   : {pkgname}
 Repository name: {reponame}
-""")
+"""
+)
 
 if old == new:
     print(f"Version {new} has already been released.")
@@ -102,9 +106,7 @@ with open("CHANGELOG.md", "r", encoding="utf8") as changelog:
         if line.startswith(f"## [{old}]"):
             in_unreleased_section = False
             in_previous_versions = True
-        if line.startswith(
-            f"[Unreleased]: https://github.com/{reponame}/compare/"
-        ):
+        if line.startswith(f"[Unreleased]: https://github.com/{reponame}/compare/"):
             in_previous_versions = False
             in_links = True
             continue
@@ -220,7 +222,7 @@ shell(
     "--username",
     getenv("PYPI_USERNAME"),
     "--password",
-    '"' + getenv("PYPI_PASSWORD") + '"',
+    getenv("PYPI_PASSWORD"),
 )
 
 # create github release
@@ -236,8 +238,12 @@ release.upload_asset(f"dist/{pkgname}-{new}.tar.gz", label=f"Source tarball for 
 
 milestones = repo.get_milestones()
 for milestone in milestones:
+    debug(
+        f"Trying to match titles with milestone {milestone.title}: {milestone.title == new}"
+    )
     if milestone.title == new:
         milestone.edit(state="closed", title=new)
+        break
 else:
     print(f"warn: No milestone with title {new!r} to close.")
 

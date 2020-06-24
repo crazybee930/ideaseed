@@ -55,11 +55,14 @@ def get_release_notes_for_version(release_notes: str, version: Version) -> str:
         if in_target_version:
             ret += line + "\n"
     return ret
-    
+
+
 def get_versions_list_from_release_notes(release_notes: str) -> List[Version]:
     # Declarations
-    pattern = re.compile(r'\[Unreleased\]\: https\:\/\/github\.com\/ewen\-lbh\/ideaseed\/compare\/v\d+\.\d+\.\d+\.\.\.HEAD')
-    extract_version_pattern = re.compile(r'\[(\d+\.\d+\.\d+)\]: https://')
+    pattern = re.compile(
+        r"\[Unreleased\]\: https\:\/\/github\.com\/ewen\-lbh\/ideaseed\/compare\/v\d+\.\d+\.\d+\.\.\.HEAD"
+    )
+    extract_version_pattern = re.compile(r"\[(\d+\.\d+\.\d+)\]: https://")
     version_strings: List[str] = []
     # Tracking varialbe
     in_links_section = False
@@ -72,19 +75,27 @@ def get_versions_list_from_release_notes(release_notes: str) -> List[Version]:
         if in_links_section and extract_version_pattern.match(line):
             version_strings += [extract_version_pattern.search(line).group(1)]
     # Parse into SemVer Version objects
-    versions = [ Version(v) for v in version_strings ]
+    versions = [Version(v) for v in version_strings]
     # Sort them (from 0.0.0 to ∞.∞.∞)
     versions = sorted(versions, key=lambda v: v.precedence_key)
     return versions
 
-def get_release_notes_between_versions(release_notes: str, version_from: Version, version_to: Version) -> str:
+
+def get_release_notes_between_versions(
+    release_notes: str, version_from: Version, version_to: Version
+) -> str:
     # Get every version ∈ (version_from, version_to]
-    versions = [v for v in get_versions_list_from_release_notes(release_notes) if version_from < v <= version_to]
+    versions = [
+        v
+        for v in get_versions_list_from_release_notes(release_notes)
+        if version_from < v <= version_to
+    ]
     catd_release_notes = ""
     for version in versions:
         catd_release_notes += f"## {version}"
         catd_release_notes += get_release_notes_for_version(release_notes, version)
     return catd_release_notes
+
 
 def get_release_notes_link(release_notes: str, upgrade_to: Version) -> str:
     anchor = get_changelog_heading_anchor(release_notes, upgrade_to)
@@ -144,9 +155,11 @@ def prompt(upgrade_from: Version, upgrade_to: Version) -> bool:
         # eg: i'm upgrading from 0.6.0 to 0.10.0, but there has been 0.8.0 and 0.9.0 in between,
         #     i want all the changes, not just the ones from 0.9.0 to 0.10.0
         if len([v for v in all_versions if upgrade_from < v <= upgrade_to]) > 1:
-            notes = get_release_notes_between_versions(release_notes, upgrade_from, upgrade_to)
+            notes = get_release_notes_between_versions(
+                release_notes, upgrade_from, upgrade_to
+            )
         # else just get the single one.
-        # this is because doing get_release_notes_between_versions would still return 
+        # this is because doing get_release_notes_between_versions would still return
         # the version <h2>, which would be stupid to show here
         else:
             notes = get_release_notes_for_version(release_notes, upgrade_to)

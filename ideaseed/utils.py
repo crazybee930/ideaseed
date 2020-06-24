@@ -23,7 +23,7 @@ def dye(
 
 
 def readable_text_color_on(
-    background: str, light: str = 'FFFFFF', dark: str = '000000'
+    background: str, light: str = "FFFFFF", dark: str = "000000"
 ) -> str:
     """
     Choses either ``light`` or ``dark`` based on the background color

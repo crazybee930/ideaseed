@@ -107,7 +107,7 @@ just up-arrow on your terminal to re-run the command :)"""
             print(error_message_no_object_found("tag", tag))
             return
         labels += [label]
-    
+
     # Create the card
     if not args["--dry-run"]:
         note = keep.createNote(title=args["--title"], text=args["IDEA"])
@@ -142,5 +142,5 @@ just up-arrow on your terminal to re-run the command :)"""
     keep.sync()
 
     # Open the browser
-    if args["--open"] and not args['--dry-run']:
+    if args["--open"] and not args["--dry-run"]:
         webbrowser.open(url)
