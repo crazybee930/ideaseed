@@ -90,7 +90,12 @@ def get_alias_command(args_map: Dict[str, Any], shortcut_name: str) -> str:
         '--option': 'value'
     }
     """
-    return shortcut_name + "=" + shlex.quote(reverse_docopt("ideaseed", args_map))
+    return (
+        "alias "
+        + shortcut_name
+        + "="
+        + shlex.quote(reverse_docopt("ideaseed", args_map))
+    )
 
 
 def write_alias_to_rc_file(shell_name: str, alias_line: str):
@@ -141,7 +146,13 @@ def prompt_for_settings() -> Tuple[Dict[str, str], str]:
         ),
     ]
 
-    return prompt(questions), text(message="What name do you want to invoke your configured ideaseed with? (a good one is 'idea')")
+    return (
+        prompt(questions),
+        text(
+            message="What name do you want to invoke your configured ideaseed with? (a good one is 'idea')"
+        ),
+    )
+
 
 def run():
     settings, shortcut_name = prompt_for_settings()
