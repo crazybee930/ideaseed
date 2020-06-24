@@ -138,6 +138,15 @@ def github_username(gh: Github) -> str:
     return gh.get_user().login
 
 
+def error_message_no_object_found(objtype: str, objname: str) -> str:
+    return (
+        dye(f"Error: missing {objtype} {objname!r}", fg=0xF00,)
+        + """
+💡 Use --create-missing and ideaseed will ask you if you want to create missing 
+labels, issues, projects, columns, milestones..."""
+    )
+
+
 def resolve_self_repository_shorthand(gh: Github, repo: str) -> str:
     """
     Returns adds USERNAME/ to a `repo` that has no slashes
@@ -228,7 +237,7 @@ def push_to_repo(args: Dict[str, Any]) -> None:
             else:
                 return
         elif not_found:
-            print(dye(f"Error: Label {label_name!r} not found."))
+            print(error_message_no_object_found("label", label_name))
             return
         else:
             labels += [repo.get_label(label_name)]
@@ -250,7 +259,7 @@ def push_to_repo(args: Dict[str, Any]) -> None:
             return
     # Not found and not create
     elif project is None:
-        print(dye(f"Error: project {project_name!r} does not exist!", fg=0xF00))
+        print(error_message_no_object_found("project", project_name))
         return
 
     # Column
@@ -268,7 +277,7 @@ def push_to_repo(args: Dict[str, Any]) -> None:
             return
     # Not found and not create
     elif column is None:
-        print(dye(f"Error: column {column_name!r} does not exist!", fg=0xF00))
+        print(error_message_no_object_found("column", column_name))
         return
 
     # Milestone
@@ -289,11 +298,7 @@ def push_to_repo(args: Dict[str, Any]) -> None:
             else:
                 return
         elif milestone is None:
-            print(
-                dye(
-                    f"Error: milestone {args['--milestone']!r} does not exit!", fg=0xF00
-                )
-            )
+            print(error_message_no_object_found("milestone", args["--milestone"]))
             return
 
     owner, repository = repo_name.split("/")
@@ -402,7 +407,7 @@ def push_to_user(args: Dict[str, Any]) -> None:
             return
     # Not found and not create
     elif project_name is None:
-        print(dye(f"Error: project {project_name!r} does not exist!", fg=0xF00))
+        print(error_message_no_object_found("project", project_name))
         return
 
     # Column
@@ -420,7 +425,7 @@ def push_to_user(args: Dict[str, Any]) -> None:
             return
     # Not found and not create
     elif column_name is None:
-        print(dye(f"Error: column {column_name!r} does not exist!", fg=0xF00))
+        print(error_message_no_object_found("column", column_name))
         return
 
     if not args["--dry-run"]:
