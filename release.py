@@ -180,7 +180,7 @@ shell(
     "sed",
     "-i",
     "-e",
-    f'"s/^VERSION = .*/VERSION = Version(\\"{new}\\")/g"',
+    f's/^VERSION = .*/VERSION = Version(\\"{new}\\")/g',
     f"{pkgname}/constants.py",
 )
 
@@ -192,7 +192,7 @@ shell("git", "add", ".")
 
 # commit "🔖 Release $(VERSION)"
 
-commit_msg = f"'🔖 Release {new}'"
+commit_msg = f"🔖 Release {new}"
 shell("git", "commit", "-m", commit_msg)
 
 # add tag v$(VERSION) to commit
@@ -212,7 +212,7 @@ shell("git", "push", "origin", f"v{new}")
 
 # build
 
-shell("poetry build")
+shell("poetry", "build")
 
 # publish
 
@@ -248,3 +248,14 @@ else:
     print(f"warn: No milestone with title {new!r} to close.")
 
 shell("git", "stash", "pop")
+
+with open(".env", "w", encoding="utf8") as file:
+    print("Saving credentials to .env that probably got deleted:")
+    file.write(
+        f"""\
+GITHUB_TOKEN="{getenv('GITHUB_TOKEN')}"
+PYPI_USERNAME="{getenv('PYPI_USERNAME')}"
+PYPI_PASSWORD="{getenv('PYPI_PASSWORD')}"
+"""
+    )
+
