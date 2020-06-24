@@ -131,6 +131,7 @@ def run(argv=None):
     
     if args["--config"]:
         config_wizard.run()
+        return
 
     if args["--version"]:
         print(VERSION)
