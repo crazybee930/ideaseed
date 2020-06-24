@@ -174,11 +174,15 @@ def resolve_default_arguments(
 
 def push_to_repo(args: Dict[str, Any]) -> None:
     gh = login(args)
+    if args["--issue"] and args["--title"] and not args["REPO"]:
+        args["REPO"] = args["IDEA"]
+        args["IDEA"] = args["--title"]
+        args["--title"] = None
     repo_name = resolve_self_repository_shorthand(gh, args["REPO"])
     repo = gh.get_repo(repo_name)
     username = github_username(gh)
     args = resolve_default_arguments(args, repo_name, username)
-    idea = args["IDEA"]
+    idea = args["IDEA"] or args["--title"]
     project_name = args["PROJECT"]
     column_name = args["COLUMN"]
     assignees = args["--assign-to"] or (

@@ -139,7 +139,7 @@ def run(argv=None):
     if args["--logout"]:
         clear_auth_cache()
 
-    if args["REPO"]:
+    if args["REPO"] or (args["--issue"] and args["--title"] and not args["REPO"]):
         if args["REPO"] == args["--user-keyword"]:
             push_to_user(args)
         else:
@@ -186,6 +186,10 @@ def validate_argument_presence(args: Dict[str, str]) -> None:
             "--label (or --tag) can only be used with --issue or when creating"
             "a Google Keep card."
         )
+
+    # Allow github issues without a body
+    if args["--issue"] and not args["REPO"] and args["--title"]:
+        return
 
     if not args["--issue"] and any(
         [v for k, v in args.items() if k in GITHUB_ISSUE_ONLY]
