@@ -126,7 +126,7 @@ GOOGLE_KEEP_CARD_ART = """\
 {content}{tags}
 """
 
-GOOGLE_KEEP_PINNED = "⚲ Pinned"
+GOOGLE_KEEP_PINNED = "⚲"
 
 
 def make_google_keep_art(
