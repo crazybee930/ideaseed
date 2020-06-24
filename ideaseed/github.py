@@ -147,14 +147,40 @@ def resolve_self_repository_shorthand(gh: Github, repo: str) -> str:
     return repo
 
 
+def resolve_default_arguments(
+    args: Dict[str, Any], repo_name: str, username: str
+) -> Dict[str, Any]:
+    """
+    Resolves defaults for COLUMN and PROJECT using --default-* arguments
+    ``repo_name`` must be of the form ``OWNER/REPO``
+    
+    >>> resolve_default_arguments(
+    ...     { 'REPO': 'test', 'COLUMN': None, 'PROJECT': 'testy',
+    ...     '--default-project': '1', '--default-column': '%(project)s' },
+    ...     repo_name='ewen-lbh/project',
+    ...     username='ewen-lbh',
+    ... )
+    { 'OWNER': 'ewen-lbh', 'REPO': 'test', 'COLUMN': 'testy', 'PROJECT': 'testy', '--default-project': '1', '--default-column': '%(project)s' }
+    """
+    placeholders = dict()
+    placeholders["owner"], placeholders["repository"] = repo_name.split("/")
+    placeholders["username"] = username
+    args["PROJECT"] = args["PROJECT"] or (args["--default-project"] % (placeholders))
+    placeholders["project"] = args["PROJECT"]
+    args["COLUMN"] = args["COLUMN"] or (args["--default-column"] % (placeholders))
+
+    return args
+
+
 def push_to_repo(args: Dict[str, Any]) -> None:
     gh = login(args)
     repo_name = resolve_self_repository_shorthand(gh, args["REPO"])
+    repo = gh.get_repo(repo_name)
+    username = github_username(gh)
+    args = resolve_default_arguments(args, repo_name, username)
     idea = args["IDEA"]
     project_name = args["PROJECT"]
     column_name = args["COLUMN"]
-    repo = gh.get_repo(repo_name)
-    username = github_username(gh)
     assignees = args["--assign-to"] or (
         [username] if not args["--no-self-assign"] else []
     )
@@ -417,3 +443,9 @@ def push_to_user(args: Dict[str, Any]) -> None:
     # Open project URL
     if args["--open"] and url != "N/A":
         webbrowser.open(url)
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()

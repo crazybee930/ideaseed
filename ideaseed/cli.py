@@ -18,9 +18,9 @@ Arguments:
                     If --user-keyword's value is given  Creates a card on your user's project (select which project with --user-project)
                     If given in the form OWNER/REPO     Uses the repository OWNER/REPO
                     If given in the form REPO           Uses the repository "your username/REPO"
-    PROJECT     Select a project by name to put your card to [default: REPO's value]
+    PROJECT     Select a project by name to put your card to [default: --default-project's value]
                     If creating a card on your user's project, this becomes the COLUMN
-    COLUMN      Select a project's column by name [default: To do]
+    COLUMN      Select a project's column by name [default: --default-column's value]
                     If creating a card on your user's project, this is ignored
 
 Options:
@@ -48,6 +48,17 @@ Settings options: It's comfier to set these in your alias, e.g. alias idea="idea
        --no-auth-cache         Don't save credentials in a temporary file at {cache_filepath}
        --no-check-for-updates  Don't check for updates, don't prompt to update when current version is outdated
        --no-self-assign        Don't assign the issue to yourself
+    
+    Options beginning with --default can refer to some dynamic information using %(placeholder)s.
+    Available placeholders:
+        repository - the repository's name
+        owner      - the repository's owner
+        username   - the username of which account you are using ideaseed with
+        project    - the selected project's name (only available to --default-column)
+    
+       --default-column NAME   Set the default column name. [default: To Do]
+       --default-project NAME  Set the default project name. [default: %(repository)s]
+       
 
 Color names: Try with the first letter only too
     blue, brown, darkblue, gray, green, orange, pink, purple, red, teal, white, yellow
@@ -88,7 +99,6 @@ def run(argv=None):
         )
     )
     validate_argument_presence(args)
-    args = resolve_arguments_defaults(args)
 
     args["--tag"] += args["--label"]
     # Remove duplicate tags
@@ -154,14 +164,6 @@ def resolve_arguments(args: Dict[str, Any]) -> Dict[str, Any]:
     if len(positional_args) >= 4:
         repo, project, column, idea = positional_args
     return {"REPO": repo, "PROJECT": project, "COLUMN": column, "IDEA": idea, **args}
-
-
-def resolve_arguments_defaults(args: Dict[str, Any]) -> Dict[str, Any]:
-    return {
-        **args,
-        "PROJECT": args["PROJECT"] or args["REPO"],
-        "COLUMN": args["COLUMN"] or "To do",
-    }
 
 
 class ValidationError(Exception):
