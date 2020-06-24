@@ -110,7 +110,7 @@ def run(argv=None):
         latest_version = get_latest_version()
         if latest_version > VERSION:
             print(update_checker.notification(VERSION, latest_version))
-            if update_checker.prompt(latest_version):
+            if update_checker.prompt(VERSION, latest_version):
                 update_checker.upgrade(latest_version)
                 print(f"Re-running your command with ideaseed v{latest_version}...")
                 print("Running " + " ".join(sys.argv))

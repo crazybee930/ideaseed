@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   💡 Use --create-missing and ideaseed will ask you if you want to create missing 
   labels, issues, projects, columns, milestones...
   ```
+- The 'What has changed?' option now handles correctly upgrading from more than one version away: it prints all the changes that the user needs to know, and not only the latest ones. eg: I'm upgrading from 0.6.0 to 0.10.0, but there has been 0.8.0 and 0.9.0 in between, I want all the changes, not just the ones from 0.9.0 to 0.10.0
 
 ## [0.9.1] - 2020-06-23
 
@@ -153,10 +154,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2020-06-16
 
 Initial release. See <https://pypi.org/project/ideaseed/0.1.0/> for documentation.
-
-
-
-
 
 [Unreleased]: https://github.com/ewen-lbh/ideaseed/compare/v0.9.1...HEAD
 [0.9.1]: https://github.com/ewen-lbh/ideaseed/compare/v0.9.0...v0.9.1
