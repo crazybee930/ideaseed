@@ -144,7 +144,7 @@ def make_google_keep_art(
     card = cli_box.rounded(
         GOOGLE_KEEP_CARD_ART.format(
             card_header=card_header,
-            content=body,
+            content=wrap_card_content(body),
             tags="\n\n" + "  ".join([format_label(t, hex_color or 0xDDD) for t in tags])
             if tags
             else "",
