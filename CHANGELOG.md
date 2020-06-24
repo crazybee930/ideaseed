@@ -9,11 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Labels are created even if 'no' is answered in the prompt (#26)
+- Google Keep cards creation when labels were missing (#71 and #51)
+  - The card was created and its UI shown _before_ prompting to create missing labels, resulting in an internal exception raised by gkeepapi when trying to add a non-existant label (`None has no attribute 'id'`)
+  - The message to confirm creation of labels had no message (#51)
 
 ### Added
 
 - New flag `--dry-run`: Run your commands without creating new cards or issues, but see what it'd run. Mostly used by me for UI testing, but could be useful to some people. (#37)
 - New flag shorthand `-#` for `--label` (See #28)
+- New flags to change default values for the project and the column: `--default-project` and `--default-column`. Use them in your alias :) (See #30)
 
 ### Changed
 
@@ -25,6 +29,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ![github issue demo](./CHANGELOG_RESOURCES/v0.10.0/github-issue-card.png)
   ![google keep demo](CHANGELOG_RESOURCES/v0.10.0/google-keep-card.png)
   ![github project demo](./CHANGELOG_RESOURCES/v0.10.0/github-project-card.png)
+- When attempting to reference missing things without using `--create-missing`, the error message inclues a "tip" (#63):
+  ```sh-session
+  $ ideaseed -tCodingggg "test"
+  ...
+  Error: missing tag 'Codingggg'
+  💡 Use --create-missing and ideaseed will ask you if you want to create missing 
+  labels, issues, projects, columns, milestones...
+  ```
 
 ## [0.9.1] - 2020-06-23
 
