@@ -146,8 +146,13 @@ def prompt_for_settings() -> Tuple[Dict[str, str], str]:
         ),
     ]
 
+    settings: Dict[str, Any] = prompt(questions)
+
+    # Reverse bool values for --no- flags
+    settings = {k: (not v if k.startswith("--no-") else v) for k, v in settings.items()}
+
     return (
-        prompt(questions),
+        settings,
         text(
             message="What name do you want to invoke your configured ideaseed with? (a good one is 'idea')"
         ),
