@@ -1,7 +1,7 @@
 """Note down your ideas and get them to the right place, without switching away from your terminal
 
 Usage: 
-    ideaseed (--help | --about | --version)
+    ideaseed (--help | --about | --version | --config)
     ideaseed [options] [-t TAG...] [-l LABEL...] [-# LABEL...] [-@ USERNAME...] ARGUMENTS...
 
 Examples:
@@ -70,7 +70,7 @@ Color names: Try with the first letter only too
 """
 
 from ideaseed.update_checker import get_latest_version
-from ideaseed import update_checker
+from ideaseed import update_checker, config_wizard
 from ideaseed.gkeep import push_to_gkeep
 from ideaseed.github import clear_auth_cache, push_to_repo, push_to_user
 from typing import *
@@ -128,6 +128,9 @@ def run(argv=None):
     if args["--about"]:
         print(ABOUT_SCREEN.format(version=VERSION))
         return
+    
+    if args["--config"]:
+        config_wizard.run()
 
     if args["--version"]:
         print(VERSION)
