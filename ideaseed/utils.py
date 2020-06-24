@@ -106,6 +106,15 @@ def print_dry_run(text: str):
     print(DRY_RUN_FMT.format(text))
 
 
+def error_message_no_object_found(objtype: str, objname: str) -> str:
+    return (
+        dye(f"Error: missing {objtype} {objname!r}", fg=0xF00,)
+        + """
+💡 Use --create-missing and ideaseed will ask you if you want to create missing 
+labels, issues, projects, columns, milestones..."""
+    )
+
+
 if __name__ == "__main__":
     import doctest
 

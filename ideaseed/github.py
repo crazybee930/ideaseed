@@ -14,6 +14,7 @@ from ideaseed.utils import (
     dye,
     get_token_cache_filepath,
     print_dry_run,
+    error_message_no_object_found,
 )
 from random import randint
 from ideaseed.constants import C_PRIMARY
@@ -136,15 +137,6 @@ def login(args: Dict[str, Any], method: Optional[str] = None) -> Github:
 
 def github_username(gh: Github) -> str:
     return gh.get_user().login
-
-
-def error_message_no_object_found(objtype: str, objname: str) -> str:
-    return (
-        dye(f"Error: missing {objtype} {objname!r}", fg=0xF00,)
-        + """
-💡 Use --create-missing and ideaseed will ask you if you want to create missing 
-labels, issues, projects, columns, milestones..."""
-    )
 
 
 def resolve_self_repository_shorthand(gh: Github, repo: str) -> str:
