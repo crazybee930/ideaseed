@@ -8,35 +8,35 @@ from random import randint
 
 def dye(
     text: str,
-    fg: Optional[int] = None,
-    bg: Optional[int] = None,
+    fg: Union[int, str, None] = None,
+    bg: Union[int, str, None] = None,
     style: Optional[str] = None,
     no_closing: bool = False,
 ):
     return colr.color(
         text=text,
-        fore=f"{fg:x}" if fg is not None else None,
-        back=f"{bg:x}" if bg is not None else None,
+        fore=f"{fg:x}" if type(fg) is int else fg,
+        back=f"{bg:x}" if type(bg) is int else bg,
         style=style,
         no_closing=no_closing,
     )
 
 
 def readable_text_color_on(
-    background: int, light: int = 0xFFFFFF, dark: int = 0x000000
-) -> int:
+    background: str, light: str = 'FFFFFF', dark: str = '000000'
+) -> str:
     """
     Choses either ``light`` or ``dark`` based on the background color
     the text is supposed to be written on ``background`` (also given as an hex int)
     
-    WARN: All the color ints must be exactly 6 digits long.
+    WARN: All the color strings must be exactly 6 digits long.
     
-    >>> readable_text_color_on(0xFEFAFE)
-    0
-    >>> readable_text_color_on(0x333333)
-    16777215
+    >>> readable_text_color_on('FEFAFE')
+    '000000'
+    >>> readable_text_color_on('333333')
+    'FFFFFF'
     """
-    r, g, b = hex_to_rgb(f"{background:6x}")
+    r, g, b = hex_to_rgb(background)
     luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
     if luminance > 0.5:
         return dark
@@ -52,7 +52,7 @@ def hex_to_rgb(hexstring: str) -> Tuple[int, int, int]:
     >>> hex_to_rgb('FF00AA')
     (255, 0, 170)
     """
-    return tuple(int(hexstring[i : i + 2], 16) for i in (0, 2, 4))  # skip '#'
+    return tuple(int(hexstring[i : i + 2], 16) for i in (0, 2, 4))
 
 
 def get_random_color_hexstring() -> str:

@@ -224,12 +224,12 @@ def make_github_issue_art(
                 )
             ),
         )
+    print(*[f"{l.name} is {l.color}  " for l in labels])
     card = cli_box.rounded(
         ISSUE_CARD_ART.format(
             card_header=card_header,
             content=wrap_card_content(body),
-            labels="\n\n"
-            + "  ".join([format_label(l.name, int(l.color, 16)) for l in labels])
+            labels="\n\n" + "  ".join([format_label(l.name, l.color) for l in labels])
             if labels
             else "",
         ),
@@ -250,14 +250,14 @@ def make_github_issue_art(
 
 
 def format_label(
-    name: str, color: int = 0xDDDDDD, text_color: Optional[int] = None
+    name: str, color: str = "DDDDDD", text_color: Optional[str] = None
 ) -> str:
     """
     Renders a label using a color
     
     ``text_color`` defaults to ``readable_text_color_on(color)``
     
-    WARN: ``color`` and ``text_color`` must be a 6-digit-long hex int representing the color.
+    WARN: ``color`` and ``text_color`` must be a 6-digit-long hexstring representing the color.
     """
     text_color = readable_text_color_on(color) if text_color is None else text_color
     return dye(f" {name} ", bg=color, fg=text_color)
