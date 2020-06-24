@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Prevent update notification from appearing again after an update
+- Fix wrong version appearing in:
+  - update notification message
+  - --about screen
+  - --version
+
 ## [0.10.1] - 2020-06-24
 
 ### Fixed
