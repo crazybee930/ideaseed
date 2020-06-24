@@ -90,7 +90,7 @@ def login(args: Dict[str, Any], method: Optional[str] = None) -> Github:
             choices=["Personal Access Token", "Username and password"],
             ignore=lambda _: method is not None,
         ),
-        q.Text(
+        q.Password(
             name="pat",
             message="Personal Access Token",
             ignore=lambda ans: (method or ans["method"]) != "Personal Access Token",
