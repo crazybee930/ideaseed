@@ -1,5 +1,5 @@
 <center><p align="center">
-<img alt="ideaseed" src="visual-identity/ideaseed-logomark-color-transparent.svg" width="550px">
+<img alt="ideaseed" src="https://raw.githubusercontent.com/ewen-lbh/ideaseed/master/visual-identity/ideaseed-logomark-color-transparent.svg" width="550px">
 </p></center>
 
 Do you have ideas suddenly and just wished you could catch them as fast as possible, as to not loose them, without having to interrupt what you were doing?
@@ -183,7 +183,7 @@ $ pip3 install ideaseed
 * * *
 
 <center><p align="center">
-  <img src="visual-identity/ideaseed-logo-black-transparent.png" width="40px">
+  <img src="https://raw.githubusercontent.com/ewen-lbh/ideaseed/master/visual-identity/ideaseed-logo-black-transparent.png" width="40px">
   <br>
   ideaseed by <a href="https://ewen.works">Ewen Le Bihan</a>
 </p></center>
