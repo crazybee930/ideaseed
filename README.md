@@ -87,6 +87,17 @@ $ ideaseed --user-keyword=project --user-project=incubator project "a CLI to not
 |           | `--no-auth-cache`        | Don't save credentials in a temporary file                                                                      |
 |           | `--no-check-for-updates` | Don't check for updates, don't prompt to update when current version is outdated                                |
 |           | `--no-self-assign`       | Don't assign the issue to yourself                                                                              |
+|           | `--default-column NAME`  | Set the default column name. [default: To Do]                                                                   |
+|           | `--default-project NAME` | Set the default project name. [default: %(repository)s]                                                         |
+
+#### Available placeholders for `--default-*`-options
+
+| Placeholder      | Description                                                      |
+| ---------------- | ---------------------------------------------------------------- |
+| `%(repository)s` | the repository's name                                            |
+| `%(owner)s`      | the repository's owner                                           |
+| `%(username)s`   | the username of which account you are using ideaseed with        |
+| `%(project)s`    | the selected project's name (only available to --default-column) |
 
 #### Color names
 
