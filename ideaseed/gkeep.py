@@ -3,7 +3,13 @@ from ideaseed.constants import COLOR_NAME_TO_HEX_MAP, C_PRIMARY
 import json
 import webbrowser
 from os import path
-from ideaseed.utils import ask, dye, get_token_cache_filepath, print_dry_run
+from ideaseed.utils import (
+    ask,
+    dye,
+    error_message_no_object_found,
+    get_token_cache_filepath,
+    print_dry_run,
+)
 from typing import *
 from inquirer import Text, Password, Confirm
 from gkeepapi import Keep
@@ -87,16 +93,29 @@ just up-arrow on your terminal to re-run the command :)"""
         return
     print("✅ Logged in.")
 
-    # Announce what we'll do
     color = args["--color"] or "White"
-
-    # Create the note
     note = None
+
+    # Find/create all the labels
+    labels = []
+    for tag in args["--tag"]:
+        label = keep.findLabel(tag)
+        if label is None and args["--create-missing"]:
+            if ask(Confirm("ans", message=f"Create missing tag {tag!r}?")):
+                label = keep.createLabel(tag)
+        elif label is None:
+            print(error_message_no_object_found("tag", tag))
+            return
+        labels += [label]
+    
+    # Create the card
     if not args["--dry-run"]:
         note = keep.createNote(title=args["--title"], text=args["IDEA"])
         note.color = getattr(ColorValue, color)
         note.pinned = args["--pin"]
         url = f"https://keep.google.com/u/0/#NOTE/{note.id}"
+        for label in labels:
+            note.labels.add(label)
     else:
         print_dry_run(
             f"note = keep.createNote(title={args['--title']!r}, text={args['IDEA']!r})"
@@ -104,8 +123,10 @@ just up-arrow on your terminal to re-run the command :)"""
         print_dry_run(f"note.color = getattr(ColorValue, {color!r})")
         print_dry_run(f"note.pinned = {args['--pin']!r}")
         url = "N/A"
+        for label in labels:
+            print_dry_run(f"note.labels.add({label!r})")
 
-    # Announce the card created
+    # Announce created card
     print(
         make_google_keep_art(
             url=url,
@@ -117,25 +138,9 @@ just up-arrow on your terminal to re-run the command :)"""
         )
     )
 
-    # Find/create all the labels
-    all_tags = keep.labels()
-    for tag in args["--tag"]:
-        label = keep.findLabel(tag)
-        if args["--dry-run"]:
-            print_dry_run(f"label = keep.findLabel({tag!r})")
-        if label is None and args["--create-missing"]:
-            if ask(Confirm("ans", f"Create missing tag {tag!r}?")):
-                label = keep.createLabel(tag)
-        elif label is None:
-            print(dye(f"Error: Tag {tag!r} not found", fg=0xF00))
-        if not args["--dry-run"]:
-            note.labels.add(label)
-        else:
-            print_dry_run(f"note.labels.add({label!r})")
-
     # Beam it up to Google's servers
     keep.sync()
 
     # Open the browser
-    if args["--open"]:
+    if args["--open"] and not args['--dry-run']:
         webbrowser.open(url)
