@@ -28,8 +28,6 @@ SHELL_NAMES_TO_RC_PATHS = {
     "csh": "~/.cshrc",
     "ksh": "~/.kshrc",
     "tcsh": "~/.tcshrc",
-    "powershell": "$profile",
-    "cmd": None,
 }
 
 
