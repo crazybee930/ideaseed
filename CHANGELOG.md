@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - A debug `print()` managed to slip through and get into the previous releases (it looked like `bug is ff0000`, and was printing the label name and its color hex code)
+- Crash when the `--user-project` was not found or the column of a user project was not found
 
 ### Added
 
