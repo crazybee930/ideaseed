@@ -224,7 +224,6 @@ def make_github_issue_art(
                 )
             ),
         )
-    print(*[f"{l.name} is {l.color}  " for l in labels])
     card = cli_box.rounded(
         ISSUE_CARD_ART.format(
             card_header=card_header,
