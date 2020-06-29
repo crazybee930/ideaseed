@@ -2,7 +2,7 @@ from ideaseed.constants import COLOR_NAME_TO_HEX_MAP, C_PRIMARY
 from typing import *
 from github.Repository import Repository
 from github.Label import Label
-from ideaseed.utils import dye, english_join, readable_text_color_on
+from ideaseed.utils import dye, english_join, readable_text_color_on, render_markdown
 from wcwidth import wcswidth
 import textwrap
 import cli_box
@@ -144,7 +144,7 @@ def make_google_keep_art(
     card = cli_box.rounded(
         GOOGLE_KEEP_CARD_ART.format(
             card_header=card_header,
-            content=wrap_card_content(body),
+            content=render_markdown(wrap_card_content(body)),
             tags="\n\n" + "  ".join([format_label(t, hex_color or 0xDDD) for t in tags])
             if tags
             else "",
@@ -168,7 +168,7 @@ def make_github_project_art(
     )
     card = cli_box.rounded(
         GITHUB_CARD_ART.format(
-            content=wrap_card_content(body), card_header=dye(card_header, style="dim")
+            content=render_markdown(wrap_card_content(body)), card_header=dye(card_header, style="dim")
         ),
         align="left",
     )
@@ -181,7 +181,7 @@ def make_github_user_project_art(
     card_header = make_card_header(left=f"@{username}", right=f"{column} in {project}")
     card = cli_box.rounded(
         GITHUB_CARD_ART.format(
-            content=wrap_card_content(body), card_header=dye(card_header, style="dim")
+            content=render_markdown(wrap_card_content(body)), card_header=dye(card_header, style="dim")
         ),
         align="left",
     )
@@ -227,7 +227,7 @@ def make_github_issue_art(
     card = cli_box.rounded(
         ISSUE_CARD_ART.format(
             card_header=card_header,
-            content=wrap_card_content(body),
+            content=render_markdown(wrap_card_content(body)),
             labels="\n\n" + "  ".join([format_label(l.name, l.color) for l in labels])
             if labels
             else "",

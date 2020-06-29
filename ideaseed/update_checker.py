@@ -3,7 +3,7 @@ from ideaseed.constants import C_PRIMARY, RELEASES_RSS_URL
 from xml.dom.minidom import parseString as parse_xml
 import cli_box
 import requests
-from ideaseed.utils import ask, dye
+from ideaseed.utils import ask, dye, render_markdown
 import inquirer as q
 from semantic_version import Version
 import subprocess
@@ -111,28 +111,6 @@ A new version of ideaseed is available for download:
 """
     )
 
-
-def render_markdown(text: str) -> str:
-    heading = re.compile(r"(#+)\s*(.+)")
-    list_item = re.compile(r"(\s*)-\s*(.+)")
-    image = re.compile(r"!\[(.+)\]\((.+)\)")
-    code = re.compile(r"`([^`]+)`")
-    # link = re.compile(r'\[(.+)\]\((.+)\)')
-    rendered = ""
-    for line in text.splitlines():
-        if heading.match(line):
-            match = heading.search(line)
-            rendered_line = dye(match.group(2), style="bold")
-        elif list_item.match(line):
-            match = list_item.search(line)
-            rendered_line = match.group(1) + dye("• ", style="dim") + match.group(2)
-        else:
-            rendered_line = line
-        rendered_line = image.sub(dye(r"(image: \1)", style="dim"), rendered_line)
-        rendered_line = code.sub(dye(r" \1 ", bg=0xDEDEDE), rendered_line)
-        # rendered_line = link.sub(dye(r' (link: \1)', style="dim"), rendered_line)
-        rendered += rendered_line + "\n"
-    return rendered
 
 
 def prompt(upgrade_from: Version, upgrade_to: Version) -> bool:
