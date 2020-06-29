@@ -4,9 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-
-
 ## [Unreleased]
+
+### Changed
+
+- Made the "this option cannot be used with Google Keep" more helpful by suggesting to specify a repository
+- When you decide to update via the notification, if your upgrade includes a _major_ version bump (i.e. potentially breaking changes happen), the script won't re-run your command automatically to prevent potential problems (eg. you did `ideaseed -ttagname`, then decided to upgrade to `v1.0.0`, but with this new version `-t` is now a shorthand for `--title` instead of `--tag`. `ideaseed -ttagname` won't be run again automatically with the new version to prevent potentially "dangerous" actions)
+- The blue accent color used at multiple places was a fixed color, `#268CCE`. It now uses the `blue` ANSI color so that the program uses _your_ blue and conforms to _your_ terminal color scheme.
+- Markdown _italic text_, **bold text** and emojis (eg. :penguin:) are rendered in the changelog
+- All markdown is rendered in cards (issues, projects and also Google Keep cards), including _italics_, **bold** and emojis.
+
+### Fixed
+
+- A debug `print()` managed to slip through and get into the previous releases (it looked like `bug is ff0000`, and was printing the label name and its color hex code)
 
 ## [0.10.2] - 2020-06-24
 
