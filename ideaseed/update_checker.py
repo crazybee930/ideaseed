@@ -90,6 +90,8 @@ def get_release_notes_between_versions(
         for v in get_versions_list_from_release_notes(release_notes)
         if version_from < v <= version_to
     ]
+    # Order by most recent first
+    versions = reversed(versions)
     catd_release_notes = ""
     for version in versions:
         catd_release_notes += f"## {version}"
