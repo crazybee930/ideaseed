@@ -94,7 +94,7 @@ def get_alias_command(args_map: Dict[str, Any], shortcut_name: str) -> str:
         "alias "
         + shortcut_name
         + "="
-        + shlex.quote(reverse_docopt("ideaseed", args_map))
+        + "'" + reverse_docopt("ideaseed", args_map).replace("'", "\\'") + "'"
     )
 
 
