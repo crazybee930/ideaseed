@@ -1,7 +1,7 @@
 """Note down your ideas and get them to the right place, without switching away from your terminal
 
 Usage: 
-    ideaseed (--help | --about | --version)
+    ideaseed (--help | --about | --version | --config)
     ideaseed [options] [-t TAG...] [-l LABEL...] [-# LABEL...] [-@ USERNAME...] ARGUMENTS...
 
 Examples:
@@ -40,9 +40,10 @@ Options:
        --pin                   Pin Google Keep cards
        --dry-run               Don't actually affect websites, put print what it would've done. Still logs in. Beware, --create-missing ignores this flag and still creates missing objects.
        --about                 Details about ideaseed like currently-installed version
+       --config                Easily configure your ideaseed and create your alias.
        --version               Like --about, without dumb and useless stuff
 
-Settings options: It's comfier to set these in your alias, e.g. alias idea="ideaseed --user-project=incubator --user-keyword=project --no-auth-cache --create-missing"
+Settings options: It's comfier to set these in your alias (run `ideaseed --config`)
        --user-project NAME     Name of the project to use as your user project
        --user-keyword NAME     When REPO is NAME, creates a GitHub card on your user profile instead of putting it on REPO
        --no-auth-cache         Don't save credentials in a temporary file at {cache_filepath}
@@ -70,7 +71,7 @@ Color names: Try with the first letter only too
 """
 
 from ideaseed.update_checker import get_latest_version
-from ideaseed import update_checker
+from ideaseed import update_checker, config_wizard
 from ideaseed.gkeep import push_to_gkeep
 from ideaseed.github import clear_auth_cache, push_to_repo, push_to_user
 from typing import *
@@ -127,6 +128,10 @@ def run(argv=None):
 
     if args["--about"]:
         print(ABOUT_SCREEN.format(version=VERSION))
+        return
+
+    if args["--config"]:
+        config_wizard.run()
         return
 
     if args["--version"]:

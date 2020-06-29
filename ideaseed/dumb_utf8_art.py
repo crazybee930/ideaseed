@@ -1,3 +1,4 @@
+from os import get_terminal_size
 from ideaseed.constants import COLOR_NAME_TO_HEX_MAP, C_PRIMARY
 from typing import *
 from github.Repository import Repository
@@ -168,7 +169,8 @@ def make_github_project_art(
     )
     card = cli_box.rounded(
         GITHUB_CARD_ART.format(
-            content=render_markdown(wrap_card_content(body)), card_header=dye(card_header, style="dim")
+            content=render_markdown(wrap_card_content(body)),
+            card_header=dye(card_header, style="dim"),
         ),
         align="left",
     )
@@ -181,7 +183,8 @@ def make_github_user_project_art(
     card_header = make_card_header(left=f"@{username}", right=f"{column} in {project}")
     card = cli_box.rounded(
         GITHUB_CARD_ART.format(
-            content=render_markdown(wrap_card_content(body)), card_header=dye(card_header, style="dim")
+            content=render_markdown(wrap_card_content(body)),
+            card_header=dye(card_header, style="dim"),
         ),
         align="left",
     )
@@ -260,3 +263,16 @@ def format_label(
     """
     text_color = readable_text_color_on(color) if text_color is None else text_color
     return dye(f" {name} ", bg=color, fg=text_color)
+
+
+def ask_text(message: str, input_indicator: str = "=> ") -> str:
+    # mimicking pyinquirer's style so it's consistent...
+    icon = "[" + dye("?", fg="yellow") + "] "
+    # width: the terminal's width, up to 200 (a paragraph too wide is ugly)
+    max_width = min(200, get_terminal_size().columns)
+    ans = input(
+        textwrap.fill(icon + message, max_width, subsequent_indent=" " * strwidth(icon))
+        + f"\n\n{input_indicator}"
+    )
+    print()
+    return ans
