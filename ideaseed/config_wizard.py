@@ -39,7 +39,7 @@ def reverse_docopt(program_name: str, args_map: Dict[str, Any]) -> str:
     >>> reverse_docopt('prog', { '--ab': 4, '--bb': 'yes', '--cb': True, '--db': False, '--eb' ['5', 'fefez$$/./!**fe'], 'thingie': True, 'nothingie': False, 'SHOUT': ':thinking:' })
     'prog --ab --ab --ab --ab --bb=yes --cb --eb=5 --eb=5 --eb="fefez\\$\\$/./\\!\\*\\*fe" thingie :thinking:'
     """
-    line: str = program_name
+    line = program_name
 
     for key, value in args_map.items():
         # Arguments
