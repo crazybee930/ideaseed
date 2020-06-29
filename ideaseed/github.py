@@ -389,7 +389,7 @@ def push_to_user(args: Dict[str, Any]) -> None:
             break
 
     # Project not found
-    if project_name is None and args["--create-missing"]:
+    if project is None and args["--create-missing"]:
         if ask(q.Confirm("ans", message=f"Create missing project {project_name!r}?")):
             description = ask(
                 q.Editor("ans", message="Enter the project's description...")
@@ -398,7 +398,7 @@ def push_to_user(args: Dict[str, Any]) -> None:
         else:
             return
     # Not found and not create
-    elif project_name is None:
+    elif project is None:
         print(error_message_no_object_found("project", project_name))
         return
 
@@ -410,13 +410,13 @@ def push_to_user(args: Dict[str, Any]) -> None:
             break
 
     # Column not found
-    if column_name is None and args["--create-missing"]:
+    if column is None and args["--create-missing"]:
         if ask(q.Confirm("ans", message=f"Create missing column {column_name!r}?")):
             column = project.create_column(column_name)
         else:
             return
     # Not found and not create
-    elif column_name is None:
+    elif column is None:
         print(error_message_no_object_found("column", column_name))
         return
 
