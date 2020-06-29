@@ -15,6 +15,8 @@ def get_shell_name() -> str:
     Gets the shell name.
     """
     executable_path = getenv("SHELL")
+    if not executable_path:
+        return ""
     shell_name = path.split(executable_path)[1]
     return shell_name
 
