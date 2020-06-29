@@ -169,7 +169,8 @@ def make_github_project_art(
     )
     card = cli_box.rounded(
         GITHUB_CARD_ART.format(
-            content=render_markdown(wrap_card_content(body)), card_header=dye(card_header, style="dim")
+            content=render_markdown(wrap_card_content(body)),
+            card_header=dye(card_header, style="dim"),
         ),
         align="left",
     )
@@ -182,7 +183,8 @@ def make_github_user_project_art(
     card_header = make_card_header(left=f"@{username}", right=f"{column} in {project}")
     card = cli_box.rounded(
         GITHUB_CARD_ART.format(
-            content=render_markdown(wrap_card_content(body)), card_header=dye(card_header, style="dim")
+            content=render_markdown(wrap_card_content(body)),
+            card_header=dye(card_header, style="dim"),
         ),
         align="left",
     )
@@ -274,4 +276,3 @@ def ask_text(message: str, input_indicator: str = "=> ") -> str:
     )
     print()
     return ans
-

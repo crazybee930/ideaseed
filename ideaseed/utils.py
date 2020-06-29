@@ -116,6 +116,7 @@ def error_message_no_object_found(objtype: str, objname: str) -> str:
 labels, issues, projects, columns, milestones..."""
     )
 
+
 def render_markdown(text: str) -> str:
     heading = re.compile(r"(#+)\s*(.+)")
     list_item = re.compile(r"(\s*)-\s*(.+)")
@@ -126,12 +127,12 @@ def render_markdown(text: str) -> str:
     rendered = ""
     in_code_block = False
     for line in text.splitlines():
-        if line.strip().startswith('```'):
+        if line.strip().startswith("```"):
             in_code_block = not in_code_block
-            rendered += '\n'
+            rendered += "\n"
             continue
         if in_code_block:
-            rendered += ' ' * 2 + line + '\n'
+            rendered += " " * 2 + line + "\n"
             continue
         if heading.match(line):
             match = heading.search(line)

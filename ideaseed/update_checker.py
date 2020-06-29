@@ -114,7 +114,6 @@ A new version of ideaseed is available for download:
     )
 
 
-
 def prompt(upgrade_from: Version, upgrade_to: Version) -> bool:
     """
     Returns ``True`` if the user wants to upgrade, ``False`` otherwise.
@@ -163,11 +162,13 @@ To see images, you can also read this online:
 def upgrade(upgrade_from: Version, upgrade_to: Version):
     cmd = ["pip", "install", "--upgrade", f"ideaseed=={upgrade_to}"]
     if upgrade_from.major != upgrade_to.major:
-        print(f"""\
+        print(
+            f"""\
 You are upgrading to another major version (from {upgrade_from.major}.x.y to {upgrade_to.major}.x.y).
 To prevent issues, the command you initially entered will not be run again automatically.
 
-Please check for breaking changes that might affect the result of your command before running it again.""")
+Please check for breaking changes that might affect the result of your command before running it again."""
+        )
     else:
         print(f"Running {' '.join(cmd)}...")
         subprocess.run(cmd)

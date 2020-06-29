@@ -128,7 +128,7 @@ def run(argv=None):
     if args["--about"]:
         print(ABOUT_SCREEN.format(version=VERSION))
         return
-    
+
     if args["--config"]:
         config_wizard.run()
         return
