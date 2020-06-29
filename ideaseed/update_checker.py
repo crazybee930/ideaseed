@@ -160,7 +160,14 @@ To see images, you can also read this online:
         return answer == "Yes"
 
 
-def upgrade(upgrade_to: Version):
+def upgrade(upgrade_from: Version, upgrade_to: Version):
     cmd = ["pip", "install", "--upgrade", f"ideaseed=={upgrade_to}"]
-    print(f"Running {' '.join(cmd)}...")
-    subprocess.run(cmd)
+    if upgrade_from.major != upgrade_to.major:
+        print(f"""\
+You are upgrading to another major version (from {upgrade_from.major}.x.y to {upgrade_to.major}.x.y).
+To prevent issues, the command you initially entered will not be run again automatically.
+
+Please check for breaking changes that might affect the result of your command before running it again.""")
+    else:
+        print(f"Running {' '.join(cmd)}...")
+        subprocess.run(cmd)
