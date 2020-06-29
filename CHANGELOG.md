@@ -18,6 +18,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - A debug `print()` managed to slip through and get into the previous releases (it looked like `bug is ff0000`, and was printing the label name and its color hex code)
 
+### Added
+
+- `--config`: A configuration wizard that asks you some questions and sets up the alias for you. The alias is automatically added to the shell's rc file, provided that your login shell is either:
+  - fish
+  - bash
+  - zsh
+  - csh (not tested)
+  - ksh (not tested)
+  - tcsh (not tested)
+
 ## [0.10.2] - 2020-06-24
 
 ### Fixed
