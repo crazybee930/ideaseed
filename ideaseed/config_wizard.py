@@ -7,21 +7,12 @@ import shlex
 
 
 class UnknownShellError(Exception):
-    pass
+    """The current login shell is not known"""
 
 
 def get_shell_name() -> str:
     """
     Gets the shell name.
-    Values are:
-    - fish
-    - bash
-    - zsh
-    - csh
-    - ksh
-    - tcsh
-    - powershell
-    - cmd
     """
     executable_path = getenv("SHELL")
     shell_name = path.split(executable_path)[1]
@@ -105,15 +96,16 @@ def write_alias_to_rc_file(shell_name: str, alias_line: str):
     if shell_name not in supported_shells:
         raise UnknownShellError()
 
-    rcfile_path = SHELL_NAMES_TO_RC_PATHS[shell_name]
+    rcfile_path = path.expandvars(path.expanduser(SHELL_NAMES_TO_RC_PATHS[shell_name]))
     if not isfile(rcfile_path):
         err = FileNotFoundError()
         err.filename = rcfile_path
         raise err
 
     with open(rcfile_path, "a") as file:
-        print(f"Appending the following to {rcfile_path}: {alias_line}")
-        file.writelines([alias_line])
+        print(f"Appending the following to {rcfile_path}:\n\n  {alias_line}\n")
+        file.writelines([alias_line+'\n'])
+        print("Restart your shell or source the file for the new alias to take effect, or execute the 'alias' line above")
 
 
 def prompt_for_settings() -> Tuple[Dict[str, str], str]:
