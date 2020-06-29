@@ -156,6 +156,17 @@ version = "0.6.2"
 
 [[package]]
 category = "main"
+description = "Emoji for Python"
+name = "emoji"
+optional = false
+python-versions = "*"
+version = "0.5.4"
+
+[package.extras]
+dev = ["nose", "coverage", "coveralls"]
+
+[[package]]
+category = "main"
 description = "Flatten Irregular Nested Lists"
 name = "flatten-list"
 optional = false
@@ -452,7 +463,7 @@ python-versions = "*"
 version = "1.12.1"
 
 [metadata]
-content-hash = "d832de807d836d280414921d03a69d26fce7b481bab04811d7245a2409cff2e2"
+content-hash = "5baeafef72753242290f6a36b82bc7ed8e4f15f0f1097643f0cc2b681a011fb5"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -509,6 +520,9 @@ deprecated = [
 ]
 docopt = [
     {file = "docopt-0.6.2.tar.gz", hash = "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491"},
+]
+emoji = [
+    {file = "emoji-0.5.4.tar.gz", hash = "sha256:60652d3a2dcee5b8af8acb097c31776fb6d808027aeb7221830f72cdafefc174"},
 ]
 flatten-list = [
     {file = "flatten-list-0.2.0.tar.gz", hash = "sha256:885f960f06c17f7ee78417bb1d41c4ea56d01c9e7702ced985786f5164137c63"},
