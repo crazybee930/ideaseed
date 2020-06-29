@@ -1,8 +1,8 @@
+from ideaseed.dumb_utf8_art import ask_text
 from os import getenv
 from os import path
 from os.path import isfile
 from typing import *
-from inquirer import Text, List, Confirm, prompt, text
 import shlex
 
 
@@ -118,43 +118,58 @@ def prompt_for_settings() -> Tuple[Dict[str, str], str]:
     """
     Return type: (settings, shortcut_name)
     """
-    questions = [
-        Text(
-            "--user-project",
-            message="What GitHub project do you use on your GitHub profile?",
-        ),
-        Text(
-            "--user-keword",
-            message="What 'repository' name do you want to type to tell ideaseed to use your GitHub user profile's project instead?",
-        ),
-        Confirm(
-            "--no-auth-cache",
-            message="Cache credentials?",  # TODO: store creds cache files in ~/.cache/ideaseed/auth instead
-        ),
-        Confirm("--no-check-for-updates", message="Check for updates?"),
-        Confirm(
-            "--no-self-assign",
-            message="Assign yourself to issues if you don't assign anyone with -@ ?",
-        ),
-        Text(
-            "--default-project",
-            message="Enter the default value for the project name (You can use %(placeholders)s, see https://github.com/ewen-lbh/ideaseed#available-placeholders-for---default--options for the full list",
-        ),
-        Text(
-            "--default-column",
-            message="Enter the default value for the column name (You can use %(placeholders)s, see https://github.com/ewen-lbh/ideaseed#available-placeholders-for---default--options for the full list",
-        ),
-    ]
 
-    settings: Dict[str, Any] = prompt(questions)
+    settings: Dict[str, Any] = {}
 
-    # Reverse bool values for --no- flags
-    settings = {k: (not v if k.startswith("--no-") else v) for k, v in settings.items()}
+    settings["--user-project"] = ask_text(
+        "What GitHub project do you use on your GitHub profile?", "--user-project="
+    )
+    settings["--user-keyword"] = ask_text(
+        "What 'repository' name do you want to type to tell ideaseed to use your GitHub user profile's project instead?",
+        "--user-keyword=",
+    )
+    settings["--no-auth-cache"] = (
+        not ask_text("Cache credentials? (y/N)").lower().strip().startswith("y")
+    )
+    settings["--no-check-for-updates"] = (
+        not ask_text("Check for updates? (y/N)").lower().strip().startswith("y")
+    )
+    settings["--no-self-assign"] = (
+        not ask_text(
+            "Assign yourself to issues if you don't assign anyone with -@ ? (y/N)"
+        )
+        .lower()
+        .strip()
+        .startswith("y")
+    )
+    print(
+        """\
+
+For the two following questions, you can use %(placeholders)s.
+See https://github.com/ewen-lbh/ideaseed#available-placeholders-for---default--options
+for the full list of available placeholders.
+
+"""
+    )
+    settings["--default-project"] = (
+        ask_text(
+            "Enter the default value for the project name (default: %(repository)s)",
+            "--default-project=",
+        )
+        or "%(repository)s"
+    )
+    settings["--default-column"] = (
+        ask_text(
+            "Enter the default value for the column name (default: To Do)",
+            "--default-column=",
+        )
+        or "To Do"
+    )
 
     return (
         settings,
-        text(
-            message="What name do you want to invoke your configured ideaseed with? (a good one is 'idea')"
+        ask_text(
+            "What name do you want to invoke your configured ideaseed with? (a good one is 'idea')"
         ),
     )
 
