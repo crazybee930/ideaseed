@@ -33,4 +33,4 @@ VALID_COLOR_NAMES = list(flatten(list(COLOR_ALIASES.items()))) + list(
 )
 
 # colors
-C_PRIMARY = 0x268CCE
+C_PRIMARY = "blue"

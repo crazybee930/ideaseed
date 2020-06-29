@@ -208,6 +208,8 @@ def validate_argument_presence(args: Dict[str, str]) -> None:
         raise ValidationError(
             "The following options are not allowed when using Google Keep: "
             + ", ".join(GITHUB_ONLY)
+            + "\n"
+            + "Maybe you've forgotten to specify a repository? (see ideaseed --help)"
         )
 
 
