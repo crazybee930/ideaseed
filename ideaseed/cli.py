@@ -40,9 +40,10 @@ Options:
        --pin                   Pin Google Keep cards
        --dry-run               Don't actually affect websites, put print what it would've done. Still logs in. Beware, --create-missing ignores this flag and still creates missing objects.
        --about                 Details about ideaseed like currently-installed version
+       --config                Easily configure your ideaseed and create your alias.
        --version               Like --about, without dumb and useless stuff
 
-Settings options: It's comfier to set these in your alias, e.g. alias idea="ideaseed --user-project=incubator --user-keyword=project --no-auth-cache --create-missing"
+Settings options: It's comfier to set these in your alias (run `ideaseed --config`)
        --user-project NAME     Name of the project to use as your user project
        --user-keyword NAME     When REPO is NAME, creates a GitHub card on your user profile instead of putting it on REPO
        --no-auth-cache         Don't save credentials in a temporary file at {cache_filepath}
