@@ -72,7 +72,8 @@ $ ideaseed --user-keyword=project --user-project=incubator project "a CLI to not
 | --------- | ---------------------- | --------------------------------------------------------------------------------------------------------------- |
 | `-c`      | `--color COLOR`        | Chooses which color to use for Google Keep cards. See [Color names](#color-names) for a list of valid values    |
 | `-t`      | `--tag TAG`            | Adds tags to the Google Keep card. Can also be used on GitHub together with --issue to add labels to the issue. |
-| `-i`      | `--issue TITLE`        | Creates an issue with title TITLE.                                                                              |
+| `-i`      | `--issue`              | Creates an issue. A title can be set with `--title`. If no title is given, `IDEA` is considered to be the title, and the issue's body becomes empty. |
+| `-T`      | `--title TITLE`        | Specifies a title. Can only be used with Google Keep or with `--issue`.                                         |
 | `-L`      | `--logout`             | Clears the authentification cache                                                                               |
 | `-m`      | `--create-missing`     | Create non-existant tags, projects or columns specified (needs confirmation if -I is used)                      |
 | `-o`      | `--open`               | Open the relevant URL in your web browser.                                                                      |
