@@ -46,7 +46,7 @@ def readable_text_color_on(
         return light
 
 
-def hex_to_rgb(hexstring: str) -> Tuple[int, int, int]:
+def hex_to_rgb(hexstring: Union[str, int]) -> Tuple[int, int, int]:
     """
     Converts a hexstring (without initial '#') ``hexstring`` into a 
     3-tuple of ints in [0, 255] representing an RGB color
@@ -54,6 +54,8 @@ def hex_to_rgb(hexstring: str) -> Tuple[int, int, int]:
     >>> hex_to_rgb('FF00AA')
     (255, 0, 170)
     """
+    if type(hexstring) is int:
+        hexstring = f"{hexstring:6x}"
     return tuple(int(hexstring[i : i + 2], 16) for i in (0, 2, 4))
 
 
