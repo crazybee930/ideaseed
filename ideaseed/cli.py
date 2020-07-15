@@ -183,7 +183,7 @@ def validate_argument_presence(args: Dict[str, str]) -> None:
 
     GOOGLE_KEEP_ONLY = ("--color",)
     GITHUB_ONLY = ("--issue",)
-    GITHUB_ISSUE_ONLY = ("--milestone", "--assign-to")
+    GITHUB_ISSUE_ONLY = ("--milestone",)
     using_github = len(args["ARGUMENTS"]) > 1
 
     if using_github and not args["--issue"] and (args["--tag"] or args["--label"]):
