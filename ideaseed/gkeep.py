@@ -16,7 +16,6 @@ from gkeepapi import Keep
 from gkeepapi.exception import LoginException, APIException
 from gkeepapi.node import ColorValue
 import sys
-import cli_box
 
 
 def write_to_cache(keep: Keep, email: str) -> None:
@@ -118,6 +117,8 @@ just up-arrow on your terminal to re-run the command :)"""
         url = f"https://keep.google.com/u/0/#NOTE/{note.id}"
         for label in labels:
             note.labels.add(label)
+        for email in args["--assign-to"]:
+            note.collaborators.add(email)
     else:
         print_dry_run(
             f"note = keep.createNote(title={args['--title']!r}, text={args['IDEA']!r})"
@@ -137,6 +138,7 @@ just up-arrow on your terminal to re-run the command :)"""
             tags=args["--tag"],
             body=args["IDEA"],
             color=args["--color"],
+            collaborators=args["--assign-to"]
         )
     )
 

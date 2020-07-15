@@ -113,10 +113,14 @@ ISSUE_CARD_ART = """\
 
 TAGS_ART = "[{tag}]"
 
+GOOGLE_KEEP_ADDED_COLLABORATORS_ART = """
+ │
+[Ω] Shared with {emails}"""
+
 GOOGLE_KEEP_ART = """\
 Adding card to your Google Keep account:
 
-{card}
+{card}{collaborators_art}
  │
  →  Available at {url}
 """
@@ -137,6 +141,7 @@ def make_google_keep_art(
     url: str,
     body: str,
     color: str,
+    collaborators: List[str]
 ) -> str:
     hex_color = COLOR_NAME_TO_HEX_MAP.get(color)
     card_header = make_card_header(
@@ -153,8 +158,9 @@ def make_google_keep_art(
         align="left",
     )
 
+    collaborators_art = GOOGLE_KEEP_ADDED_COLLABORATORS_ART.format(emails=english_join(collaborators))
     card = "\n".join([dye(line, fg=hex_color) for line in card.split("\n")])
-    return GOOGLE_KEEP_ART.format(card=card, url=url)
+    return GOOGLE_KEEP_ART.format(card=card, url=url, collaborators_art=collaborators_art)
 
 
 def wrap_card_content(body: str) -> str:
