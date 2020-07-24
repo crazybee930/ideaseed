@@ -53,7 +53,8 @@ def login(args: Dict[str, Any], username: Optional[str] = None, password: Option
     keep = Keep()
     try:
         keep.login(username, password)
-        write_to_cache(keep, username)
+        if not args["--no-auth-cache"]:
+            write_to_cache(keep, username)
     except LoginException as error:
         # Handle errors...
         (topic, message) = error.args
