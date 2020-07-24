@@ -104,8 +104,10 @@ def write_alias_to_rc_file(shell_name: str, alias_line: str):
 
     with open(rcfile_path, "a") as file:
         print(f"Appending the following to {rcfile_path}:\n\n  {alias_line}\n")
-        file.writelines([alias_line+'\n'])
-        print("Restart your shell or source the file for the new alias to take effect, or execute the 'alias' line above")
+        file.writelines([alias_line + "\n"])
+        print(
+            "Restart your shell or source the file for the new alias to take effect, or execute the 'alias' line above"
+        )
 
 
 def prompt_for_settings() -> Tuple[Dict[str, str], str]:

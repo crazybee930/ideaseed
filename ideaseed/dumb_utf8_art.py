@@ -141,7 +141,7 @@ def make_google_keep_art(
     url: str,
     body: str,
     color: str,
-    collaborators: List[str]
+    collaborators: List[str],
 ) -> str:
     hex_color = COLOR_NAME_TO_HEX_MAP.get(color)
     card_header = make_card_header(
@@ -151,20 +151,27 @@ def make_google_keep_art(
         GOOGLE_KEEP_CARD_ART.format(
             card_header=card_header,
             content=render_markdown(wrap_card_content(body)),
-            tags="\n\n" + "  ".join([format_label(t, hex_color or "DDDDDD") for t in tags])
+            tags="\n\n"
+            + "  ".join([format_label(t, hex_color or "DDDDDD") for t in tags])
             if tags
             else "",
         ),
         align="left",
     )
     if collaborators:
-        collaborators_art = GOOGLE_KEEP_ADDED_COLLABORATORS_ART.format(emails=english_join(collaborators))
+        collaborators_art = GOOGLE_KEEP_ADDED_COLLABORATORS_ART.format(
+            emails=english_join(collaborators)
+        )
     else:
         collaborators_art = ""
 
-    collaborators_art = GOOGLE_KEEP_ADDED_COLLABORATORS_ART.format(emails=english_join(collaborators))
+    collaborators_art = GOOGLE_KEEP_ADDED_COLLABORATORS_ART.format(
+        emails=english_join(collaborators)
+    )
     card = "\n".join([dye(line, fg=hex_color) for line in card.split("\n")])
-    return GOOGLE_KEEP_ART.format(card=card, url=url, collaborators_art=collaborators_art)
+    return GOOGLE_KEEP_ART.format(
+        card=card, url=url, collaborators_art=collaborators_art
+    )
 
 
 def wrap_card_content(body: str) -> str:

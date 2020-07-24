@@ -35,7 +35,12 @@ def login_from_cache() -> Optional[Keep]:
     return keep
 
 
-def login(args: Dict[str, Any], username: Optional[str] = None, password: Optional[str] = None, entering_app_password: bool = False) -> Keep:
+def login(
+    args: Dict[str, Any],
+    username: Optional[str] = None,
+    password: Optional[str] = None,
+    entering_app_password: bool = False,
+) -> Keep:
     # Try to log in from cache
     keep = login_from_cache()
     if keep is not None:
@@ -47,7 +52,9 @@ def login(args: Dict[str, Any], username: Optional[str] = None, password: Option
     if not username:
         username = inquirer.text("E-mail")
     if not password:
-        password = inquirer.password("App password" if entering_app_password else "Password")
+        password = inquirer.password(
+            "App password" if entering_app_password else "Password"
+        )
 
     # Log in
     keep = Keep()
@@ -139,7 +146,7 @@ just up-arrow on your terminal to re-run the command :)"""
             tags=args["--tag"],
             body=args["IDEA"],
             color=args["--color"],
-            collaborators=args["--assign-to"]
+            collaborators=args["--assign-to"],
         )
     )
 
