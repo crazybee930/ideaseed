@@ -89,7 +89,7 @@ def get_token_cache_filepath(service: str) -> str:
 def english_join(items: List[str]) -> str:
     """
     Joins items in a sentence-compatible way, adding "and" at the end
-    
+
     >>> english_join(["a", "b", "c"])
     'a, b and c'
     >>> english_join(["a"])
@@ -121,7 +121,7 @@ labels, issues, projects, columns, milestones..."""
 
 def render_markdown(text: str) -> str:
     heading = re.compile(r"(#+)\s*(.+)")
-    list_item = re.compile(r"(\s*)-\s*(.+)")
+    list_item = re.compile(r"(\s*)-\s+(.+)")
     image = re.compile(r"!\[(.+)\]\((.+)\)")
     code = re.compile(r"`([^`]+)`")
     em = re.compile(r"(?:_([^_].+[^_])_)|(?:\*([^*].+[^*])\*)")
