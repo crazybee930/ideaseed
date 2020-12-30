@@ -11,12 +11,11 @@ from ideaseed.utils import (
     print_dry_run,
 )
 from typing import *
-from inquirer import Text, Password, Confirm
+import inquirer
 from gkeepapi import Keep
 from gkeepapi.exception import LoginException, APIException
 from gkeepapi.node import ColorValue
 import sys
-import cli_box
 
 
 def write_to_cache(keep: Keep, email: str) -> None:
@@ -36,7 +35,7 @@ def login_from_cache() -> Optional[Keep]:
     return keep
 
 
-def login(args: Dict[str, Any]) -> Keep:
+def login(args: Dict[str, Any], username: Optional[str] = None, password: Optional[str] = None, entering_app_password: bool = False) -> Keep:
     # Try to log in from cache
     keep = login_from_cache()
     if keep is not None:
@@ -45,15 +44,17 @@ def login(args: Dict[str, Any]) -> Keep:
         del keep
 
     # Ask for creds
-    username, password = ask(
-        Text("u", message="E-mail"), Password("p", message="Password")
-    )
+    if not username:
+        username = inquirer.text("E-mail")
+    if not password:
+        password = inquirer.password("App password" if entering_app_password else "Password")
 
     # Log in
     keep = Keep()
     try:
         keep.login(username, password)
-        write_to_cache(keep, username)
+        if not args["--no-auth-cache"]:
+            write_to_cache(keep, username)
     except LoginException as error:
         # Handle errors...
         (topic, message) = error.args
@@ -64,19 +65,20 @@ def login(args: Dict[str, Any]) -> Keep:
             print(
                 dye(
                     """You have two-step authentification set up, please add an App Password.
-Go to https://myaccount.google.com/apppasswords,
-Click on 'Generate', Choose a name and a device, then copy the code
-and use it as your password.""",
+Go to https://myaccount.google.com/apppasswords (a tab should've been opened)""",
                     fg=0xF00,
                 )
             )
-            sys.exit()
+            webbrowser.open("https://myaccount.google.com/apppasswords")
+            try:
+                return login(args, username=username, entering_app_password=True)
+            except RecursionError:
+                sys.exit()
     return keep
 
 
 def push_to_gkeep(args: Dict[str, Any]) -> None:
     # Log in
-    print("🔑 Logging in...")
     sys.stdout.flush()
     # Handle API errors
     try:
@@ -116,6 +118,8 @@ just up-arrow on your terminal to re-run the command :)"""
         url = f"https://keep.google.com/u/0/#NOTE/{note.id}"
         for label in labels:
             note.labels.add(label)
+        for email in args["--assign-to"]:
+            note.collaborators.add(email)
     else:
         print_dry_run(
             f"note = keep.createNote(title={args['--title']!r}, text={args['IDEA']!r})"
@@ -135,6 +139,7 @@ just up-arrow on your terminal to re-run the command :)"""
             tags=args["--tag"],
             body=args["IDEA"],
             color=args["--color"],
+            collaborators=args["--assign-to"]
         )
     )
 

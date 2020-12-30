@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ideaseed"
-version = "0.10.2"
+version = "0.11.0"
 description = "Note down your ideas and get them to the right place, without switching away from your terminal"
 authors = ["Ewen Le Bihan <ewen.lebihan7@gmail.com>"]
 license = "MIT"
@@ -21,6 +21,7 @@ flatten-list = "^0.2.0"
 cli-box = "^0.2.0"
 semantic-version = "^2.8.5"
 strip-ansi = "^0.1.1"
+emoji = "^0.5.4"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"

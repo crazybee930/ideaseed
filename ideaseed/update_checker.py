@@ -3,7 +3,7 @@ from ideaseed.constants import C_PRIMARY, RELEASES_RSS_URL
 from xml.dom.minidom import parseString as parse_xml
 import cli_box
 import requests
-from ideaseed.utils import ask, dye
+from ideaseed.utils import ask, dye, render_markdown
 import inquirer as q
 from semantic_version import Version
 import subprocess
@@ -90,6 +90,8 @@ def get_release_notes_between_versions(
         for v in get_versions_list_from_release_notes(release_notes)
         if version_from < v <= version_to
     ]
+    # Order by most recent first
+    versions = reversed(versions)
     catd_release_notes = ""
     for version in versions:
         catd_release_notes += f"## {version}"
@@ -110,29 +112,6 @@ A new version of ideaseed is available for download:
 {upgrade_from} -> {upgrade_to}
 """
     )
-
-
-def render_markdown(text: str) -> str:
-    heading = re.compile(r"(#+)\s*(.+)")
-    list_item = re.compile(r"(\s*)-\s*(.+)")
-    image = re.compile(r"!\[(.+)\]\((.+)\)")
-    code = re.compile(r"`([^`]+)`")
-    # link = re.compile(r'\[(.+)\]\((.+)\)')
-    rendered = ""
-    for line in text.splitlines():
-        if heading.match(line):
-            match = heading.search(line)
-            rendered_line = dye(match.group(2), style="bold")
-        elif list_item.match(line):
-            match = list_item.search(line)
-            rendered_line = match.group(1) + dye("• ", style="dim") + match.group(2)
-        else:
-            rendered_line = line
-        rendered_line = image.sub(dye(r"(image: \1)", style="dim"), rendered_line)
-        rendered_line = code.sub(dye(r" \1 ", bg=0xDEDEDE), rendered_line)
-        # rendered_line = link.sub(dye(r' (link: \1)', style="dim"), rendered_line)
-        rendered += rendered_line + "\n"
-    return rendered
 
 
 def prompt(upgrade_from: Version, upgrade_to: Version) -> bool:
@@ -180,7 +159,16 @@ To see images, you can also read this online:
         return answer == "Yes"
 
 
-def upgrade(upgrade_to: Version):
+def upgrade(upgrade_from: Version, upgrade_to: Version):
     cmd = ["pip", "install", "--upgrade", f"ideaseed=={upgrade_to}"]
-    print(f"Running {' '.join(cmd)}...")
-    subprocess.run(cmd)
+    if upgrade_from.major != upgrade_to.major:
+        print(
+            f"""\
+You are upgrading to another major version (from {upgrade_from.major}.x.y to {upgrade_to.major}.x.y).
+To prevent issues, the command you initially entered will not be run again automatically.
+
+Please check for breaking changes that might affect the result of your command before running it again."""
+        )
+    else:
+        print(f"Running {' '.join(cmd)}...")
+        subprocess.run(cmd)

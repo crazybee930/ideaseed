@@ -1,9 +1,11 @@
 from typing import Optional
 from typing import *
 import colr
+from emoji import emojize
 import inquirer
 from os import path
 from random import randint
+import re
 
 
 def dye(
@@ -44,7 +46,7 @@ def readable_text_color_on(
         return light
 
 
-def hex_to_rgb(hexstring: str) -> Tuple[int, int, int]:
+def hex_to_rgb(hexstring: Union[str, int]) -> Tuple[int, int, int]:
     """
     Converts a hexstring (without initial '#') ``hexstring`` into a 
     3-tuple of ints in [0, 255] representing an RGB color
@@ -52,6 +54,8 @@ def hex_to_rgb(hexstring: str) -> Tuple[int, int, int]:
     >>> hex_to_rgb('FF00AA')
     (255, 0, 170)
     """
+    if type(hexstring) is int:
+        hexstring = f"{hexstring:6x}"
     return tuple(int(hexstring[i : i + 2], 16) for i in (0, 2, 4))
 
 
@@ -85,7 +89,7 @@ def get_token_cache_filepath(service: str) -> str:
 def english_join(items: List[str]) -> str:
     """
     Joins items in a sentence-compatible way, adding "and" at the end
-    
+
     >>> english_join(["a", "b", "c"])
     'a, b and c'
     >>> english_join(["a"])
@@ -113,6 +117,41 @@ def error_message_no_object_found(objtype: str, objname: str) -> str:
 💡 Use --create-missing and ideaseed will ask you if you want to create missing 
 labels, issues, projects, columns, milestones..."""
     )
+
+
+def render_markdown(text: str) -> str:
+    heading = re.compile(r"(#+)\s*(.+)")
+    list_item = re.compile(r"(\s*)-\s+(.+)")
+    image = re.compile(r"!\[(.+)\]\((.+)\)")
+    code = re.compile(r"`([^`]+)`")
+    em = re.compile(r"(?:_([^_].+[^_])_)|(?:\*([^*].+[^*])\*)")
+    strong = re.compile(r"(?:__(.+)__)|(?:\*\*(.+)\*\*)")
+    rendered = ""
+    in_code_block = False
+    for line in text.splitlines():
+        if line.strip().startswith("```"):
+            in_code_block = not in_code_block
+            rendered += "\n"
+            continue
+        if in_code_block:
+            rendered += " " * 2 + line + "\n"
+            continue
+        if heading.match(line):
+            match = heading.search(line)
+            rendered_line = dye(match.group(2), style="bold")
+        elif list_item.match(line):
+            match = list_item.search(line)
+            rendered_line = match.group(1) + dye("• ", style="dim") + match.group(2)
+        else:
+            rendered_line = line
+        rendered_line = image.sub(dye(r"(image: \1)", style="dim"), rendered_line)
+        rendered_line = code.sub(dye(r" \1 ", bg=0xDEDEDE), rendered_line)
+        rendered_line = emojize(rendered_line, use_aliases=True)
+        rendered_line = strong.sub(dye(r"\1\2", style="bold"), rendered_line)
+        rendered_line = em.sub(dye(r"\1\2", style="italic"), rendered_line)
+        # rendered_line = link.sub(dye(r' (link: \1)', style="dim"), rendered_line)
+        rendered += rendered_line + "\n"
+    return rendered
 
 
 if __name__ == "__main__":

@@ -1,8 +1,9 @@
+from os import get_terminal_size
 from ideaseed.constants import COLOR_NAME_TO_HEX_MAP, C_PRIMARY
 from typing import *
 from github.Repository import Repository
 from github.Label import Label
-from ideaseed.utils import dye, english_join, readable_text_color_on
+from ideaseed.utils import dye, english_join, readable_text_color_on, render_markdown
 from wcwidth import wcswidth
 import textwrap
 import cli_box
@@ -112,10 +113,14 @@ ISSUE_CARD_ART = """\
 
 TAGS_ART = "[{tag}]"
 
+GOOGLE_KEEP_ADDED_COLLABORATORS_ART = """
+ │
+[Ω] Shared with {emails}"""
+
 GOOGLE_KEEP_ART = """\
 Adding card to your Google Keep account:
 
-{card}
+{card}{collaborators_art}
  │
  →  Available at {url}
 """
@@ -136,6 +141,7 @@ def make_google_keep_art(
     url: str,
     body: str,
     color: str,
+    collaborators: List[str]
 ) -> str:
     hex_color = COLOR_NAME_TO_HEX_MAP.get(color)
     card_header = make_card_header(
@@ -144,7 +150,7 @@ def make_google_keep_art(
     card = cli_box.rounded(
         GOOGLE_KEEP_CARD_ART.format(
             card_header=card_header,
-            content=wrap_card_content(body),
+            content=render_markdown(wrap_card_content(body)),
             tags="\n\n" + "  ".join([format_label(t, hex_color or 0xDDD) for t in tags])
             if tags
             else "",
@@ -152,8 +158,9 @@ def make_google_keep_art(
         align="left",
     )
 
+    collaborators_art = GOOGLE_KEEP_ADDED_COLLABORATORS_ART.format(emails=english_join(collaborators))
     card = "\n".join([dye(line, fg=hex_color) for line in card.split("\n")])
-    return GOOGLE_KEEP_ART.format(card=card, url=url)
+    return GOOGLE_KEEP_ART.format(card=card, url=url, collaborators_art=collaborators_art)
 
 
 def wrap_card_content(body: str) -> str:
@@ -168,7 +175,8 @@ def make_github_project_art(
     )
     card = cli_box.rounded(
         GITHUB_CARD_ART.format(
-            content=wrap_card_content(body), card_header=dye(card_header, style="dim")
+            content=render_markdown(wrap_card_content(body)),
+            card_header=dye(card_header, style="dim"),
         ),
         align="left",
     )
@@ -181,7 +189,8 @@ def make_github_user_project_art(
     card_header = make_card_header(left=f"@{username}", right=f"{column} in {project}")
     card = cli_box.rounded(
         GITHUB_CARD_ART.format(
-            content=wrap_card_content(body), card_header=dye(card_header, style="dim")
+            content=render_markdown(wrap_card_content(body)),
+            card_header=dye(card_header, style="dim"),
         ),
         align="left",
     )
@@ -224,11 +233,10 @@ def make_github_issue_art(
                 )
             ),
         )
-    print(*[f"{l.name} is {l.color}  " for l in labels])
     card = cli_box.rounded(
         ISSUE_CARD_ART.format(
             card_header=card_header,
-            content=wrap_card_content(body),
+            content=render_markdown(wrap_card_content(body)),
             labels="\n\n" + "  ".join([format_label(l.name, l.color) for l in labels])
             if labels
             else "",
@@ -261,3 +269,16 @@ def format_label(
     """
     text_color = readable_text_color_on(color) if text_color is None else text_color
     return dye(f" {name} ", bg=color, fg=text_color)
+
+
+def ask_text(message: str, input_indicator: str = "=> ") -> str:
+    # mimicking pyinquirer's style so it's consistent...
+    icon = "[" + dye("?", fg="yellow") + "] "
+    # width: the terminal's width, up to 200 (a paragraph too wide is ugly)
+    max_width = min(200, get_terminal_size().columns)
+    ans = input(
+        textwrap.fill(icon + message, max_width, subsequent_indent=" " * strwidth(icon))
+        + f"\n\n{input_indicator}"
+    )
+    print()
+    return ans
