@@ -142,3 +142,6 @@ dmypy.json
 .vscode
 .auth-cache--*
 **.ai
+
+# Symlinked .interpreter
+.interpreter
