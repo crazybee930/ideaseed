@@ -2,7 +2,8 @@
 import os
 from os import getenv
 from os.path import abspath
-from typing import *
+from __future__ import annotations
+from typing import Union, Optional, Any
 from datetime import date
 import sys
 import re

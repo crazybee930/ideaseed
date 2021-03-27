@@ -10,7 +10,8 @@ from ideaseed.utils import (
     get_token_cache_filepath,
     print_dry_run,
 )
-from typing import *
+from __future__ import annotations
+from typing import Union, Optional, Any
 import inquirer
 from gkeepapi import Keep
 from gkeepapi.exception import LoginException, APIException
@@ -36,7 +37,7 @@ def login_from_cache() -> Optional[Keep]:
 
 
 def login(
-    args: Dict[str, Any],
+    args: dict[str, Any],
     username: Optional[str] = None,
     password: Optional[str] = None,
     entering_app_password: bool = False,
@@ -84,7 +85,7 @@ Go to https://myaccount.google.com/apppasswords (a tab should've been opened)"""
     return keep
 
 
-def push_to_gkeep(args: Dict[str, Any]) -> None:
+def push_to_gkeep(args: dict[str, Any]) -> None:
     # Log in
     sys.stdout.flush()
     # Handle API errors

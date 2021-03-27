@@ -18,7 +18,8 @@ from ideaseed.utils import (
 )
 from random import randint
 from ideaseed.constants import C_PRIMARY
-from typing import *
+from __future__ import annotations
+from typing import Union, Optional, Any
 from github import Github
 import json
 from github.GithubException import TwoFactorException
@@ -72,7 +73,7 @@ def write_auth_cache(auth):
         json.dump(auth, file)
 
 
-def login(args: Dict[str, Any], method: Optional[str] = None) -> Github:
+def login(args: dict[str, Any], method: Optional[str] = None) -> Github:
     """
     Returns a `Github` instance to interact with.
     Prompts the user to login, either via username/password
@@ -85,7 +86,7 @@ def login(args: Dict[str, Any], method: Optional[str] = None) -> Github:
         del gh
 
     questions = [
-        q.List(
+        q.list(
             name="method",
             message="Log in using",
             choices=["Personal Access Token", "Username and password"],
@@ -149,8 +150,8 @@ def resolve_self_repository_shorthand(gh: Github, repo: str) -> str:
 
 
 def resolve_default_arguments(
-    args: Dict[str, Any], repo_name: str, username: str
-) -> Dict[str, Any]:
+    args: dict[str, Any], repo_name: str, username: str
+) -> dict[str, Any]:
     """
     Resolves defaults for COLUMN and PROJECT using --default-* arguments
     ``repo_name`` must be of the form ``OWNER/REPO``
@@ -173,7 +174,7 @@ def resolve_default_arguments(
     return args
 
 
-def push_to_repo(args: Dict[str, Any]) -> None:
+def push_to_repo(args: dict[str, Any]) -> None:
     gh = login(args)
     repo_name = resolve_self_repository_shorthand(gh, args["REPO"])
     repo = gh.get_repo(repo_name)
@@ -188,7 +189,7 @@ def push_to_repo(args: Dict[str, Any]) -> None:
 
     # Get all labels
     all_labels = repo.get_labels()
-    labels: List[Label] = []
+    labels: list[Label] = []
     for label_name in args["--tag"]:
         not_found = label_name.lower() not in [t.name.lower() for t in all_labels]
         if not_found and args["--create-missing"]:
@@ -372,7 +373,7 @@ def push_to_repo(args: Dict[str, Any]) -> None:
             webbrowser.open(url)
 
 
-def push_to_user(args: Dict[str, Any]) -> None:
+def push_to_user(args: dict[str, Any]) -> None:
     gh = login(args)
     idea = args["IDEA"]
     project_name: str = args["--user-project"]

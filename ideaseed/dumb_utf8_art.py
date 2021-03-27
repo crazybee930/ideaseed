@@ -1,13 +1,18 @@
-from os import get_terminal_size
-from ideaseed.constants import COLOR_NAME_TO_HEX_MAP, C_PRIMARY
-from typing import *
-from github.Repository import Repository
-from github.Label import Label
-from ideaseed.utils import dye, english_join, readable_text_color_on, render_markdown
-from wcwidth import wcswidth
+from __future__ import annotations
+
 import textwrap
+from os import get_terminal_size
+from typing import Any, Optional, Union
+
 import cli_box
 from strip_ansi import strip_ansi
+from wcwidth import wcswidth
+
+from github.Label import Label
+from github.Repository import Repository
+from ideaseed.constants import C_PRIMARY, COLOR_NAME_TO_HEX_MAP
+from ideaseed.utils import (dye, english_join, readable_text_color_on,
+                            render_markdown)
 
 ABOUT_SCREEN = """
 
@@ -137,11 +142,11 @@ GOOGLE_KEEP_PINNED = "⚲"
 def make_google_keep_art(
     title: Optional[str],
     pinned: bool,
-    tags: List[str],
+    tags: list[str],
     url: str,
     body: str,
     color: str,
-    collaborators: List[str],
+    collaborators: list[str],
 ) -> str:
     hex_color = COLOR_NAME_TO_HEX_MAP.get(color)
     card_header = make_card_header(
@@ -216,10 +221,10 @@ def make_github_issue_art(
     username: str,
     url: str,
     issue_number: Union[str, int],
-    labels: List[Label],
+    labels: list[Label],
     body: str,
     title: Optional[str],
-    assignees: List[str],
+    assignees: list[str],
     milestone: Optional[str],
 ) -> str:
     card_header = make_card_header(

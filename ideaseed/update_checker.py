@@ -1,4 +1,5 @@
-from typing import *
+from __future__ import annotations
+from typing import Union, Optional, Any
 from ideaseed.constants import C_PRIMARY, RELEASES_RSS_URL
 from xml.dom.minidom import parseString as parse_xml
 import cli_box
@@ -57,13 +58,13 @@ def get_release_notes_for_version(release_notes: str, version: Version) -> str:
     return ret
 
 
-def get_versions_list_from_release_notes(release_notes: str) -> List[Version]:
+def get_versions_list_from_release_notes(release_notes: str) -> list[Version]:
     # Declarations
     pattern = re.compile(
         r"\[Unreleased\]\: https\:\/\/github\.com\/ewen\-lbh\/ideaseed\/compare\/v\d+\.\d+\.\d+\.\.\.HEAD"
     )
     extract_version_pattern = re.compile(r"\[(\d+\.\d+\.\d+)\]: https://")
-    version_strings: List[str] = []
+    version_strings: list[str] = []
     # Tracking varialbe
     in_links_section = False
     for line in release_notes.splitlines():
@@ -119,7 +120,7 @@ def prompt(upgrade_from: Version, upgrade_to: Version) -> bool:
     Returns ``True`` if the user wants to upgrade, ``False`` otherwise.
     """
     answer = ask(
-        q.List(
+        q.list(
             "ans",
             message=f"Upgrade to v{upgrade_to} now?",
             choices=["Yes", "What has changed?", "No"],

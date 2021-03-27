@@ -1,5 +1,6 @@
 from typing import Optional
-from typing import *
+from __future__ import annotations
+from typing import Union, Optional, Any
 import colr
 from emoji import emojize
 import inquirer
@@ -46,7 +47,7 @@ def readable_text_color_on(
         return light
 
 
-def hex_to_rgb(hexstring: Union[str, int]) -> Tuple[int, int, int]:
+def hex_to_rgb(hexstring: Union[str, int]) -> tuple[int, int, int]:
     """
     Converts a hexstring (without initial '#') ``hexstring`` into a 
     3-tuple of ints in [0, 255] representing an RGB color
@@ -63,7 +64,7 @@ def get_random_color_hexstring() -> str:
     return f"{randint(0x0, 0xFFFFFF):6x}".upper()
 
 
-def ask(*questions) -> Union[List[Any], Any]:
+def ask(*questions) -> Union[list[Any], Any]:
     if len(questions) == 1:
         # No need to turn the hash into a tuple, just return the only value
         questions[0].name = "ans"
@@ -86,7 +87,7 @@ def get_token_cache_filepath(service: str) -> str:
     return path.join(path.dirname(path.dirname(__file__)), f".auth-cache--{service}")
 
 
-def english_join(items: List[str]) -> str:
+def english_join(items: list[str]) -> str:
     """
     Joins items in a sentence-compatible way, adding "and" at the end
 

@@ -74,7 +74,8 @@ from ideaseed.update_checker import get_latest_version
 from ideaseed import update_checker, config_wizard
 from ideaseed.gkeep import push_to_gkeep
 from ideaseed.github import clear_auth_cache, push_to_repo, push_to_user
-from typing import *
+from __future__ import annotations
+from typing import Union, Optional, Any
 from colr import docopt
 from pprint import pprint
 from ideaseed.utils import ask, dye, get_token_cache_filepath
@@ -153,7 +154,7 @@ def run(argv=None):
         push_to_gkeep(args)
 
 
-def resolve_arguments(args: Dict[str, Any]) -> Dict[str, Any]:
+def resolve_arguments(args: dict[str, Any]) -> dict[str, Any]:
     """
     Apparently required positional arguments must come first...
     So I'm resolving them by hand here.
@@ -175,7 +176,7 @@ class ValidationError(Exception):
     pass
 
 
-def validate_argument_presence(args: Dict[str, str]) -> None:
+def validate_argument_presence(args: dict[str, str]) -> None:
     """
     Raises a `ValidationError` if one of the arguments is not allowed based
     on the other arguments.
@@ -216,7 +217,7 @@ def validate_argument_presence(args: Dict[str, str]) -> None:
 
 def expand_color_name(color: str) -> str:
     # Initialize the array of matches
-    matching_color_names: List[str] = []
+    matching_color_names: list[str] = []
     # Filter `color_names` to only get the color names that start with `color`
     for color_name in VALID_COLOR_NAMES:
         if color_name.lower().startswith(color.lower()):
@@ -234,7 +235,7 @@ def expand_color_name(color: str) -> str:
         return matching_color_names[0]
     # If we have multiple choices, the given color was ambiguous.
     if len(matching_color_names) > 1:
-        matching_color_names_display: List[str] = []
+        matching_color_names_display: list[str] = []
         for matching_color_name in matching_color_names:
             matching_color_names_display += [
                 dye(

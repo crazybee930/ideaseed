@@ -2,7 +2,8 @@ from ideaseed.dumb_utf8_art import ask_text
 from os import getenv
 from os import path
 from os.path import isfile
-from typing import *
+from __future__ import annotations
+from typing import Union, Optional, Any
 import shlex
 
 
@@ -31,7 +32,7 @@ SHELL_NAMES_TO_RC_PATHS = {
 }
 
 
-def reverse_docopt(program_name: str, args_map: Dict[str, Any]) -> str:
+def reverse_docopt(program_name: str, args_map: dict[str, Any]) -> str:
     """
     Turns a docopt-style dict of arguments and flags into a string
     you would type into your shell (WIP)
@@ -60,7 +61,7 @@ def reverse_docopt(program_name: str, args_map: Dict[str, Any]) -> str:
         # Count (repeated value-less flag)
         elif type(value) is int:
             line += f" {key}" * value
-        # List (repeated flag with value)
+        # list (repeated flag with value)
         elif type(value) is list:
             for v in value:
                 line += f" {key}={shlex.quote(str(v))}"
@@ -72,7 +73,7 @@ def reverse_docopt(program_name: str, args_map: Dict[str, Any]) -> str:
     return line
 
 
-def get_alias_command(args_map: Dict[str, Any], shortcut_name: str) -> str:
+def get_alias_command(args_map: dict[str, Any], shortcut_name: str) -> str:
     """
     Returns the alias line, sth. like `idea='ideaseed --opt=value --opt2'`, 
     where ``shortcut_name`` is the alias' equation's LHS (`'idea'` in the example above)
@@ -110,12 +111,12 @@ def write_alias_to_rc_file(shell_name: str, alias_line: str):
         )
 
 
-def prompt_for_settings() -> Tuple[Dict[str, str], str]:
+def prompt_for_settings() -> tuple[dict[str, str], str]:
     """
     Return type: (settings, shortcut_name)
     """
 
-    settings: Dict[str, Any] = {}
+    settings: dict[str, Any] = {}
 
     settings["--user-project"] = ask_text(
         "What GitHub project do you use on your GitHub profile?", "--user-project="

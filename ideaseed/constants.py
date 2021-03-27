@@ -1,4 +1,5 @@
-from typing import *
+from __future__ import annotations
+from typing import Union, Optional, Any
 from flatten_list.flatten_list import flatten
 from semantic_version import Version
 
@@ -6,7 +7,7 @@ VERSION = Version("0.11.0")
 
 RELEASES_RSS_URL = "https://pypi.org/rss/project/ideaseed/releases.xml"
 
-COLOR_NAME_TO_HEX_MAP: Dict[str, int] = {
+COLOR_NAME_TO_HEX_MAP: dict[str, int] = {
     "Blue": 0xAECBFA,
     "Brown": 0xE6C9A8,
     "DarkBlue": 0xAECBFA,
