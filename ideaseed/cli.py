@@ -137,7 +137,7 @@ def run(argv=None):
 
     if args["color"] and args["color"] not in map(str.lower, VALID_COLOR_NAMES):
         raise UsageError(
-            f"{args['color']!r} is not a valid color names. Valid color names are {english_join(map(str.lower, VALID_COLOR_NAMES))}"
+            f"{args['color']!r} is not a valid color name. Valid color names are {english_join(map(str.lower, VALID_COLOR_NAMES))}"
         )
 
     if args["check_for_updates"]:
