@@ -1,12 +1,5 @@
 """Note down your ideas and get them to the right place, without switching away from your terminal
 Usage:
-    ideaseed [options] [-# TAG...] [-@ USER...] BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] REPO TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] REPO PROJECT TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] REPO PROJECT COLUMN TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] user PROJECT COLUMN TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] user PROJECT TITLE BODY
     ideaseed [options] config
     ideaseed [options] logout
     ideaseed [options] login
@@ -14,6 +7,13 @@ Usage:
     ideaseed [options] version | --version
     ideaseed [options] help | --help
     ideaseed [options] update
+    ideaseed [options] [-# TAG...] [-@ USER...] BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] REPO TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] REPO PROJECT TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] REPO PROJECT COLUMN TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] user PROJECT COLUMN TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] user PROJECT TITLE BODY
 
 
 Commands:
@@ -104,17 +104,14 @@ Placeholders:
 
 from __future__ import annotations
 
-from typing import Any, Optional, Union
 from pathlib import Path
+from typing import Any
 
 from docopt import docopt
 
-from ideaseed import config_wizard, update_checker, gkeep, github_cards
-from ideaseed.constants import (
-    VALID_COLOR_NAMES,
-    VERSION,
-)
-from ideaseed.dumb_utf8_art import ABOUT_SCREEN
+from ideaseed import config_wizard, github_cards, gkeep, update_checker
+from ideaseed.constants import VALID_COLOR_NAMES, VERSION
+from ideaseed.ui import ABOUT_SCREEN
 from ideaseed.update_checker import get_latest_version
 from ideaseed.utils import english_join
 
@@ -133,8 +130,6 @@ def run(argv=None):
     if args["keyring"] and args["auth_cache"]:
         args["auth_cache"] = None
 
-    print(args)
-
     if args["color"] and args["color"] not in map(str.lower, VALID_COLOR_NAMES):
         raise UsageError(
             f"{args['color']!r} is not a valid color name. Valid color names are {english_join(map(str.lower, VALID_COLOR_NAMES))}"
@@ -144,9 +139,6 @@ def run(argv=None):
         latest_version = get_latest_version()
         if latest_version > VERSION:
             print(update_checker.notification(VERSION, latest_version))
-
-    # Handle defaults
-
 
     if args["about"]:
         print(ABOUT_SCREEN.format(version=VERSION))
@@ -176,6 +168,7 @@ def run(argv=None):
         github_cards.push_to_repo(**args)
     else:
         gkeep.push_to_gkeep(**args)
+
 
 def flags_to_args(flags: dict[str, Any]) -> dict[str, Any]:
     """

@@ -1,36 +1,28 @@
 from __future__ import annotations
 
 import json
-from json.decoder import JSONDecodeError
 import re
 import webbrowser
+from json.decoder import JSONDecodeError
 from pathlib import Path
 from typing import Callable, Optional, TypeVar
-from github.Milestone import Milestone
-from github.Repository import Repository
 
+import github.GithubObject
 import inquirer as q
 from github import Github
 from github.GithubException import BadCredentialsException, TwoFactorException
 from github.Label import Label
+from github.Milestone import Milestone
 from github.Project import Project
 from github.ProjectColumn import ProjectColumn
-import github.GithubObject
+from github.Repository import Repository
+from rich import print
 
-from ideaseed.constants import C_PRIMARY
-from ideaseed.dumb_utf8_art import (
-    make_github_issue_art,
-    make_github_project_art,
-    make_github_user_project_art,
-)
-from ideaseed.utils import (
-    answered_yes_to,
-    ask_text,
-    dye,
-    error_message_no_object_found,
-    get_random_color_hexstring,
-    readable_text_color_on,
-)
+from ideaseed import ui
+from ideaseed.constants import UsageError
+from ideaseed.utils import (answered_yes_to, ask_text,
+                            error_message_no_object_found,
+                            get_random_color_hexstring)
 
 
 def validate_label_color(answers: dict, color: str):
@@ -209,11 +201,7 @@ def interactively_create_label(repo: Repository, name: str):
     )
 
     color = get_random_color_hexstring()
-    print(
-        "Creating label "
-        + dye(name, fg=color, bg=readable_text_color_on(color))
-        + " ..."
-    )
+    print(f"Creating label {ui.Label(name, color)}...")
     repo.create_label(name=name, color=f"{color:6x}", **label_data)
 
 
@@ -303,39 +291,49 @@ def push_to_repo(
         else:
             url = "N/A"
 
-        print(
-            make_github_issue_art(
-                owner=owner,
-                repository=repository,
-                project=(project.name if project is not None else None),
-                column=(column.name if column is not None else None),
-                username=username,
-                url=url,
-                issue_number=(issue.number if issue is not None else "N/A"),
-                labels=labels,
-                body=body,
+        ui.show(
+            ui.make_card(
                 title=title,
+                right_of_title=issue.number if issue else "",
+                description=body,
+                labels=map(to_ui_label, labels),
+                card_title=f"{owner}/{repository}",
+            ),
+            ui.make_listing(
+                milestone=milestone.title if milestone else None,
                 assignees=assignees,
-                milestone=(milestone.title if milestone is not None else None),
-            )
+                project=project.name if project else None,
+                project_column=column.name if column else None,
+                url=url,
+            ),
         )
 
-    else:
+    elif project and column:
         if not dry_run:
             column.create_card(note=body)
             url = project.html_url
         else:
             url = "N/A"
 
-        print(
-            make_github_project_art(
-                owner=owner,
-                repository=repository,
-                project=project,
-                column=column,
-                body=body,
+        ui.show(
+            ui.make_card(
+                title=title,
+                right_of_title="",
+                description=body,
+                labels=[],
+                card_title=f"{owner}/{repository}",
+            ),
+            ui.make_listing(
+                milestone=None,
+                assignees=None,
+                project=project.name,
+                project_column=column.name,
                 url=url,
-            )
+            ),
+        )
+    else:
+        UsageError(
+            "Cannot use --no-issue without a project and column (the idea needs to be put somewhere!)"
         )
 
     # Open project URL
@@ -360,17 +358,17 @@ def push_to_user(
     gh = login(auth_cache)
     user = gh.get_user()
     username = user.login
-    # for some reason, we have to do this to get a NamedUser (not an AuthenticatedUser) to be able to call .get_projects()...
     project, column = get_project_and_column(
-        gh.get_user(user.login), project, column, create_missing
+        # XXX: for some reason, we have to call get_user again to get a NamedUser
+        # and not an AuthenticatedUser, because those don't have .get_projects() defined
+        gh.get_user(user.login),
+        project,
+        column,
+        create_missing,
     )
 
     if not column or not project:
         return
-
-    print(
-        f"Saving card in {dye(username, C_PRIMARY)} › {dye(project.name, C_PRIMARY)} › {dye(column.name, C_PRIMARY)}..."
-    )
 
     if not dry_run:
         column.create_card(note=body)
@@ -378,14 +376,21 @@ def push_to_user(
     else:
         url = "N/A"
 
-    print(
-        make_github_user_project_art(
-            username=username,
-            project=project.name,
-            column=column.name,
-            body=body,
+    ui.show(
+        ui.make_card(
+            title=title,
+            right_of_title="",
+            description=body,
+            labels=[],
+            card_title=f"@{username}",
+        ),
+        ui.make_listing(
+            assignees=[],
+            milestone=None,
+            project=project,
+            project_column=column.name,
             url=url,
-        )
+        ),
     )
 
     # Open project URL
@@ -424,6 +429,7 @@ def search_for_object(
 
     return the_object
 
+
 def get_project_and_column(
     repo: Repository, project_name: str, column_name: str, create_missing: bool
 ) -> tuple[Optional[Project], Optional[ProjectColumn]]:
@@ -454,6 +460,10 @@ def get_project_and_column(
     )
 
     return project, column
+
+
+def to_ui_label(label: Label) -> ui.Label:
+    return ui.Label(name=label.name, color=label.color)
 
 
 if __name__ == "__main__":

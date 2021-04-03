@@ -1,36 +1,13 @@
 from __future__ import annotations
 
-from strip_ansi import strip_ansi
-from wcwidth import wcswidth
-import re
-from os import path
 from random import randint
-from typing import Any, Iterable, Optional, Union
+from typing import Any, Iterable, Union
 
-import colr
 import inquirer
-from emoji import emojize
+from rich import print
 
 
-def dye(
-    text: str,
-    fg: Union[int, str, None] = None,
-    bg: Union[int, str, None] = None,
-    style: Optional[str] = None,
-    no_closing: bool = False,
-):
-    return colr.color(
-        text=text,
-        fore=f"{fg:x}" if type(fg) is int else fg,
-        back=f"{bg:x}" if type(bg) is int else bg,
-        style=style,
-        no_closing=no_closing,
-    )
-
-
-def readable_text_color_on(
-    background: str, light: str = "FFFFFF", dark: str = "000000"
-) -> str:
+def readable_on(background: str, light: str = "FFFFFF", dark: str = "000000") -> str:
     """
     Choses either ``light`` or ``dark`` based on the background color
     the text is supposed to be written on ``background`` (also given as an hex int)
@@ -116,51 +93,15 @@ def print_dry_run(text: str):
     """
     Apply special formatting for dry-run specific messages
     """
-    DRY_RUN_FMT = dye(" DRY RUN ", bg=0x333, fg=0xFFF) + dye("  {}", style="dim")
-    print(DRY_RUN_FMT.format(text))
+    print(f"[black on yellow] DRY RUN [/]   [dim]{text}")
 
 
 def error_message_no_object_found(objtype: str, objname: str) -> str:
     return (
-        dye(f"Error: missing {objtype} {objname!r}", fg=0xF00,)
+        print(f"[red]Error: missing {objtype} {objname!r}")
         + """
 TIP: Use --create-missing and ideaseed will ask you if you want to create missing labels, issues, projects, columns, milestones..."""
     )
-
-
-def render_markdown(text: str) -> str:
-    heading = re.compile(r"(#+)\s*(.+)")
-    list_item = re.compile(r"(\s*)-\s+(.+)")
-    image = re.compile(r"!\[(.+)\]\((.+)\)")
-    code = re.compile(r"`([^`]+)`")
-    em = re.compile(r"(?:_([^_].+[^_])_)|(?:\*([^*].+[^*])\*)")
-    strong = re.compile(r"(?:__(.+)__)|(?:\*\*(.+)\*\*)")
-    rendered = ""
-    in_code_block = False
-    for line in text.splitlines():
-        if line.strip().startswith("```"):
-            in_code_block = not in_code_block
-            rendered += "\n"
-            continue
-        if in_code_block:
-            rendered += " " * 2 + line + "\n"
-            continue
-        if heading.match(line):
-            match = heading.search(line)
-            rendered_line = dye(match.group(2), style="bold")
-        elif list_item.match(line):
-            match = list_item.search(line)
-            rendered_line = match.group(1) + dye("• ", style="dim") + match.group(2)
-        else:
-            rendered_line = line
-        rendered_line = image.sub(dye(r"(image: \1)", style="dim"), rendered_line)
-        rendered_line = code.sub(dye(r" \1 ", bg=0xDEDEDE), rendered_line)
-        rendered_line = emojize(rendered_line, use_aliases=True)
-        rendered_line = strong.sub(dye(r"\1\2", style="bold"), rendered_line)
-        rendered_line = em.sub(dye(r"\1\2", style="italic"), rendered_line)
-        # rendered_line = link.sub(dye(r' (link: \1)', style="dim"), rendered_line)
-        rendered += rendered_line + "\n"
-    return rendered
 
 
 def case_insensitive_find(haystack: Iterable[str], needle: str) -> str:
@@ -170,12 +111,6 @@ def case_insensitive_find(haystack: Iterable[str], needle: str) -> str:
 
     return None
 
-def strwidth(o: str) -> int:
-    """
-    Smartly calculates the actual width taken on a terminal of `o`. 
-    Handles ANSI codes (using `strip-ansi`) and Unicode (using `wcwidth`)
-    """
-    return wcswidth(strip_ansi(o))
 
 if __name__ == "__main__":
     import doctest
