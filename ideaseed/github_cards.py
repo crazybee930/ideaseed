@@ -408,7 +408,6 @@ def search_for_object(
     for obj in objects:
         if get_name(obj).lower() == name.lower():
             the_object = obj
-            print(f"found {the_object!r}")
             break
     else:
         if create_missing and answered_yes_to(
@@ -419,7 +418,6 @@ def search_for_object(
             return
 
     # Not found and not created
-    print(f"the object is {the_object!r}")
     if the_object is None:
         print(error_message_no_object_found(objtype=object_name, objname=name))
         return
@@ -432,7 +430,6 @@ def get_project_and_column(
     """
     Gets a project and column from a repo
     """
-    print(f"create_missing is {create_missing!r}")
     project = search_for_object(
         repo.get_projects(),
         project_name,
@@ -442,7 +439,6 @@ def get_project_and_column(
             name=project_name, body=ask_text("Enter the project's description..."),
         ),
     )
-    print(f"project is {project!r}")
 
     if project is None:
         return None, None
