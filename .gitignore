@@ -145,3 +145,7 @@ dmypy.json
 
 # Symlinked .interpreter
 .interpreter
+
+callgraph.{dot,pdf,svg,json}
+depends-dv8map.mapping
+depends.log
