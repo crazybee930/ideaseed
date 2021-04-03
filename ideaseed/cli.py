@@ -2,8 +2,9 @@
 Usage:
     ideaseed [options] [-# TAG...] [-@ USER...] BODY
     ideaseed [options] [-# TAG...] [-@ USER...] TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] PROJECT TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] PROJECT COLUMN TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] REPO TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] REPO PROJECT TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] REPO PROJECT COLUMN TITLE BODY
     ideaseed [options] [-# TAG...] [-@ USER...] user PROJECT COLUMN TITLE BODY
     ideaseed [options] [-# TAG...] [-@ USER...] user PROJECT TITLE BODY
     ideaseed [options] config
