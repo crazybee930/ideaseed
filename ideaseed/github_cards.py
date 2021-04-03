@@ -177,9 +177,13 @@ def resolve_defaults(
     "testy", "testy"
     """
     owner, repository = repo_full_name.split("/")
+    if not project and not default_project:
+        return None, None
     project = project or default_project.format(
         owner=owner, repository=repository, username=username
     )
+    if not column and not default_column:
+        return project, None
     column = column or default_column.format(
         owner=owner, repository=repository, username=username, project=project
     )
@@ -293,7 +297,8 @@ def push_to_repo(
                 labels=tag,
                 milestone=(milestone or github.GithubObject.NotSet),
             )
-            card = column.create_card(content_id=issue.id, content_type="Issue")
+            if column is not None:
+                column.create_card(content_id=issue.id, content_type="Issue")
             url = issue.html_url
         else:
             url = "N/A"
