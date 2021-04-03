@@ -1,14 +1,17 @@
 from __future__ import annotations
-from typing import Union, Optional, Any
-from ideaseed.constants import C_PRIMARY, RELEASES_RSS_URL
-from xml.dom.minidom import parseString as parse_xml
-import cli_box
-import requests
-from ideaseed.utils import ask, dye, render_markdown
-import inquirer as q
-from semantic_version import Version
-import subprocess
+
 import re
+import subprocess
+from typing import Any, Optional, Union
+from xml.dom.minidom import parseString as parse_xml
+
+import cli_box
+import inquirer as q
+import requests
+from semantic_version import Version
+
+from ideaseed.constants import C_PRIMARY, RELEASES_RSS_URL, VERSION
+from ideaseed.utils import ask, dye, render_markdown
 
 
 def get_latest_version() -> Version:
@@ -111,6 +114,8 @@ def notification(upgrade_from: Version, upgrade_to: Version) -> str:
 
 A new version of ideaseed is available for download:
 {upgrade_from} -> {upgrade_to}
+
+Use `ideaseed update` to see what changed and do the update.
 """
     )
 
@@ -173,3 +178,13 @@ Please check for breaking changes that might affect the result of your command b
     else:
         print(f"Running {' '.join(cmd)}...")
         subprocess.run(cmd)
+
+
+def check_and_prompt():
+    latest_version = get_latest_version()
+    if latest_version > VERSION:
+        if prompt(VERSION, latest_version):
+            upgrade(latest_version)
+            return
+    else:
+        print("Great, you're already up to date!")

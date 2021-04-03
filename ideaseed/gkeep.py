@@ -1,35 +1,48 @@
-from ideaseed.dumb_utf8_art import make_google_keep_art
-from ideaseed.constants import COLOR_NAME_TO_HEX_MAP, C_PRIMARY
-import json
-import webbrowser
-from os import path
-from ideaseed.utils import (
-    ask,
-    dye,
-    error_message_no_object_found,
-    get_token_cache_filepath,
-    print_dry_run,
-)
 from __future__ import annotations
-from typing import Union, Optional, Any
+
+import json
+import sys
+import webbrowser
+from pathlib import Path
+from typing import Any, Optional, Union
+
 import inquirer
 from gkeepapi import Keep
-from gkeepapi.exception import LoginException, APIException
+from gkeepapi.exception import APIException, LoginException
 from gkeepapi.node import ColorValue
-import sys
+
+from ideaseed.constants import (
+    COLOR_ALIASES,
+    C_PRIMARY,
+    COLOR_NAME_TO_HEX_MAP,
+    VALID_COLOR_NAMES,
+)
+from ideaseed.dumb_utf8_art import make_google_keep_art
+from ideaseed.utils import (
+    answered_yes_to,
+    case_insensitive_find,
+    dye,
+    error_message_no_object_found,
+    print_dry_run,
+)
 
 
-def write_to_cache(keep: Keep, email: str) -> None:
-    with open(get_token_cache_filepath("gkeep"), "w", encoding="utf8") as file:
-        json.dump({"master_token": keep.getMasterToken(), "email": email}, file)
+def write_to_cache(keep: Keep, email: str, cache_path: Path) -> None:
+    cache = {}
+    cache_path.parent.mkdir(exist_ok=True, parents=True)
+    if cache_path.exists():
+        cache = json.loads(cache_path.read_text(encoding="utf-8"))
+    cache["keep"] = {"master_token": keep.getMasterToken(), "email": email}
+    cache_path.write_text(json.dumps(cache), encoding="utf-8")
 
 
-def login_from_cache() -> Optional[Keep]:
-    if not path.exists(get_token_cache_filepath("gkeep")):
+def login_from_cache(cache_path: Path) -> Optional[Keep]:
+    if not cache_path.exists():
         return None
 
-    with open(get_token_cache_filepath("gkeep"), encoding="utf8") as file:
-        creds = json.load(file)
+    creds = json.loads(cache_path.read_text(encoding="utf-8")).get("keep")
+    if not creds:
+        return None
 
     keep = Keep()
     keep.resume(email=creds["email"], master_token=creds["master_token"])
@@ -37,13 +50,15 @@ def login_from_cache() -> Optional[Keep]:
 
 
 def login(
-    args: dict[str, Any],
+    auth_cache: Optional[str],
     username: Optional[str] = None,
     password: Optional[str] = None,
     entering_app_password: bool = False,
+    **_,
 ) -> Keep:
     # Try to log in from cache
-    keep = login_from_cache()
+    if auth_cache:
+        keep = login_from_cache(Path(auth_cache))
     if keep is not None:
         return keep
     else:
@@ -61,14 +76,16 @@ def login(
     keep = Keep()
     try:
         keep.login(username, password)
-        if not args["--no-auth-cache"]:
-            write_to_cache(keep, username)
+        if auth_cache:
+            write_to_cache(keep, username, cache_path=Path(auth_cache))
+        # elif keyring:
+        #     service, name =
     except LoginException as error:
         # Handle errors...
-        (topic, message) = error.args
-        if topic == "BadAuthentification":
+        topic, _ = error.args
+        if topic == "BadAuthentication":
             print(dye("Bad credentials", fg=0xF00))
-            return login(args)
+            return login(auth_cache)
         elif topic == "NeedsBrowser":
             print(
                 dye(
@@ -79,20 +96,45 @@ Go to https://myaccount.google.com/apppasswords (a tab should've been opened)"""
             )
             webbrowser.open("https://myaccount.google.com/apppasswords")
             try:
-                return login(args, username=username, entering_app_password=True)
+                return login(auth_cache, username=username, entering_app_password=True)
             except RecursionError:
+                print("Too much attempts.")
                 sys.exit()
+        else:
+            print(topic)
+            sys.exit()
     return keep
 
 
-def push_to_gkeep(args: dict[str, Any]) -> None:
+def push_to_gkeep(
+    color: str,
+    tag: list[str],
+    create_missing: bool,
+    dry_run: bool,
+    title: Optional[str],
+    body: str,
+    pin: bool,
+    assign: list[str],
+    open: bool,
+    auth_cache: Optional[str],
+    keyring: Optional[str],
+    **_,
+) -> None:
+    tags = tag
+    # Get correct color name casing
+    color = case_insensitive_find(VALID_COLOR_NAMES, color)
+    # Resolve color aliases
+    if color in COLOR_ALIASES.keys():
+        color = COLOR_ALIASES[color]
+
     # Log in
     sys.stdout.flush()
     # Handle API errors
+    print("Logging in...")
     try:
-        keep = login(args)
+        keep = login(auth_cache, keyring)
     except APIException as error:
-        print("❌ Error with the Google Keep API")
+        print("Error with the Google Keep API")
         if error.code == 429:
             print(
                 """Too much requests per minute. Try again later.
@@ -101,17 +143,16 @@ just up-arrow on your terminal to re-run the command :)"""
             )
         print(dye(error, style="dim"))
         return
-    print("✅ Logged in.")
+    print("Logged in.")
 
-    color = args["--color"] or "White"
     note = None
 
     # Find/create all the labels
     labels = []
-    for tag in args["--tag"]:
+    for tag in tags:
         label = keep.findLabel(tag)
-        if label is None and args["--create-missing"]:
-            if ask(Confirm("ans", message=f"Create missing tag {tag!r}?")):
+        if label is None and create_missing:
+            if answered_yes_to(f"Create missing tag {tag!r}?"):
                 label = keep.createLabel(tag)
         elif label is None:
             print(error_message_no_object_found("tag", tag))
@@ -119,35 +160,34 @@ just up-arrow on your terminal to re-run the command :)"""
         labels += [label]
 
     # Create the card
-    if not args["--dry-run"]:
-        note = keep.createNote(title=args["--title"], text=args["IDEA"])
+    if not dry_run:
+        note = keep.createNote(title=title, text=body)
         note.color = getattr(ColorValue, color)
-        note.pinned = args["--pin"]
+        note.pinned = pin
         url = f"https://keep.google.com/u/0/#NOTE/{note.id}"
         for label in labels:
             note.labels.add(label)
-        for email in args["--assign-to"]:
+        for email in assign:
             note.collaborators.add(email)
     else:
-        print_dry_run(
-            f"note = keep.createNote(title={args['--title']!r}, text={args['IDEA']!r})"
-        )
-        print_dry_run(f"note.color = getattr(ColorValue, {color!r})")
-        print_dry_run(f"note.pinned = {args['--pin']!r}")
+        print_dry_run(f"Create note with title {title!r} and text {body!r}")
+        print_dry_run(f"Set its color to {color!r}")
+        if pin:
+            print_dry_run(f"Pin it")
         url = "N/A"
         for label in labels:
-            print_dry_run(f"note.labels.add({label!r})")
+            print_dry_run(f"Add label {label!r}")
 
     # Announce created card
     print(
         make_google_keep_art(
             url=url,
-            title=args["--title"],
-            pinned=args["--pin"],
-            tags=args["--tag"],
-            body=args["IDEA"],
-            color=args["--color"],
-            collaborators=args["--assign-to"],
+            title=title,
+            pinned=pin,
+            tags=tags,
+            body=body,
+            color=color,
+            collaborators=assign,
         )
     )
 
@@ -155,5 +195,21 @@ just up-arrow on your terminal to re-run the command :)"""
     keep.sync()
 
     # Open the browser
-    if args["--open"] and not args["--dry-run"]:
+    if open and not dry_run:
         webbrowser.open(url)
+
+
+if __name__ == "__main__":
+    push_to_gkeep(
+        "cyan",
+        [],
+        True,
+        False,
+        title="gkrep",
+        body="mm",
+        pin=False,
+        assign=[],
+        open=True,
+        auth_cache="/home/ewen/.cache/ideaseed/auth.json",
+        keyring=None,
+    )

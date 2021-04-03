@@ -5,14 +5,11 @@ from os import get_terminal_size
 from typing import Any, Optional, Union
 
 import cli_box
-from strip_ansi import strip_ansi
-from wcwidth import wcswidth
 
 from github.Label import Label
 from github.Repository import Repository
 from ideaseed.constants import C_PRIMARY, COLOR_NAME_TO_HEX_MAP
-from ideaseed.utils import (dye, english_join, readable_text_color_on,
-                            render_markdown)
+from ideaseed.utils import dye, english_join, readable_text_color_on, render_markdown, strwidth
 
 ABOUT_SCREEN = """
 
@@ -49,14 +46,11 @@ https://github.com/docopt
 """
 
 CARD_INNER_WIDTH = 50
-CARD_LINE_SEPARATOR = "─" * CARD_INNER_WIDTH
 
 ISSUE_ART = """\
 Opening issue in {owner} › {repository} › {project} › {column}...
 
-{issue_card}{timeline_item_milestone}{timeline_item_assignees}
- │
-[◫] @{username} added this to {column} in {project}
+{issue_card}{timeline_item_milestone}{timeline_item_assignees}{timeline_item_project_card}
  │
  →  Issue available at {url}
 """
@@ -68,6 +62,10 @@ GITHUB_ISSUE_TIMELINE_ITEM_MILESTONE_ART = """
 GITHUB_ISSUE_TIMELINE_ITEM_ASSIGNEES_ART = """
  │
 [Ω] @{username} {assignation_sentence}"""
+
+GITHUB_ISSUE_TIMELINE_ITEM_PROJECT_CARD_ART = """
+ │
+[◫] @{username} added this to {column} in {project}"""
 
 GITHUB_CARD_ART = """\
 {card_header}
@@ -81,12 +79,6 @@ GITHUB_ART = """\
 """
 
 
-def strwidth(o: str) -> int:
-    """
-    Smartly calculates the actual width taken on a terminal of `o`. 
-    Handles ANSI codes (using `strip-ansi`) and Unicode (using `wcwidth`)
-    """
-    return wcswidth(strip_ansi(o))
 
 
 def make_card_header(left: str, right: str) -> str:
@@ -115,8 +107,6 @@ ISSUE_CARD_ART = """\
 
 {content}{labels}
 """
-
-TAGS_ART = "[{tag}]"
 
 GOOGLE_KEEP_ADDED_COLLABORATORS_ART = """
  │
@@ -184,10 +174,16 @@ def wrap_card_content(body: str) -> str:
 
 
 def make_github_project_art(
-    owner: str, repository: str, project: str, column: str, body: str, url: str
+    owner: str,
+    repository: str,
+    project: Optional[str],
+    column: Optional[str],
+    body: str,
+    url: str,
 ):
     card_header = make_card_header(
-        left=f"{owner}/{repository}", right=f"{column} in {project}"
+        left=f"{owner}/{repository}",
+        right=(f"{column} in {project}" if column and project else ""),
     )
     card = cli_box.rounded(
         GITHUB_CARD_ART.format(
@@ -249,6 +245,13 @@ def make_github_issue_art(
                 )
             ),
         )
+    timeline_item_project_card = ""
+    if project and column:
+        GITHUB_ISSUE_TIMELINE_ITEM_PROJECT_CARD_ART.format(
+            username=username,
+            column=dye(column, fg=C_PRIMARY, style="bold"),
+            project=dye(project, fg=C_PRIMARY, style="bold"),
+        )
     card = cli_box.rounded(
         ISSUE_CARD_ART.format(
             card_header=card_header,
@@ -270,6 +273,7 @@ def make_github_issue_art(
         issue_card=card,
         timeline_item_milestone=timeline_item_milestone,
         timeline_item_assignees=timeline_item_assignees,
+        timeline_item_project_card=timeline_item_project_card,
     )
 
 

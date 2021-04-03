@@ -1,10 +1,11 @@
-from ideaseed.dumb_utf8_art import ask_text
-from os import getenv
-from os import path
-from os.path import isfile
 from __future__ import annotations
-from typing import Union, Optional, Any
+
 import shlex
+from os import getenv, path
+from os.path import isfile
+from typing import Any, Optional, Union
+
+from ideaseed.dumb_utf8_art import ask_text
 
 
 class UnknownShellError(Exception):

@@ -1,12 +1,15 @@
-from typing import Optional
 from __future__ import annotations
-from typing import Union, Optional, Any
-import colr
-from emoji import emojize
-import inquirer
+
+from strip_ansi import strip_ansi
+from wcwidth import wcswidth
+import re
 from os import path
 from random import randint
-import re
+from typing import Any, Iterable, Optional, Union
+
+import colr
+import inquirer
+from emoji import emojize
 
 
 def dye(
@@ -83,8 +86,12 @@ def ask(*questions) -> Union[list[Any], Any]:
     return answers
 
 
-def get_token_cache_filepath(service: str) -> str:
-    return path.join(path.dirname(path.dirname(__file__)), f".auth-cache--{service}")
+def ask_text(question: str):
+    return ask(inquirer.Text("ans", message=question))
+
+
+def answered_yes_to(question: str) -> bool:
+    return ask(inquirer.Confirm("ans", message=question))
 
 
 def english_join(items: list[str]) -> str:
@@ -98,9 +105,11 @@ def english_join(items: list[str]) -> str:
     >>> english_join(["a", "b"])
     'a and b'
     """
+    if not items:
+        return ""
     if len(items) == 1:
         return items[0]
-    return ", ".join(items[: len(items) - 1]) + " and " + items[len(items) - 1]
+    return ", ".join(items[:-1]) + " and " + items[-1]
 
 
 def print_dry_run(text: str):
@@ -115,8 +124,7 @@ def error_message_no_object_found(objtype: str, objname: str) -> str:
     return (
         dye(f"Error: missing {objtype} {objname!r}", fg=0xF00,)
         + """
-💡 Use --create-missing and ideaseed will ask you if you want to create missing 
-labels, issues, projects, columns, milestones..."""
+TIP: Use --create-missing and ideaseed will ask you if you want to create missing labels, issues, projects, columns, milestones..."""
     )
 
 
@@ -154,6 +162,20 @@ def render_markdown(text: str) -> str:
         rendered += rendered_line + "\n"
     return rendered
 
+
+def case_insensitive_find(haystack: Iterable[str], needle: str) -> str:
+    for item in haystack:
+        if item.lower() == needle.lower():
+            return item
+
+    return None
+
+def strwidth(o: str) -> int:
+    """
+    Smartly calculates the actual width taken on a terminal of `o`. 
+    Handles ANSI codes (using `strip-ansi`) and Unicode (using `wcwidth`)
+    """
+    return wcswidth(strip_ansi(o))
 
 if __name__ == "__main__":
     import doctest

@@ -1,252 +1,212 @@
 """Note down your ideas and get them to the right place, without switching away from your terminal
+Usage:
+    ideaseed [options] [-# TAG...] [-@ USER...] BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] PROJECT TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] PROJECT COLUMN TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] user PROJECT COLUMN TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] user PROJECT TITLE BODY
+    ideaseed [options] config
+    ideaseed [options] logout
+    ideaseed [options] login
+    ideaseed [options] about | --about
+    ideaseed [options] version | --version
+    ideaseed [options] help | --help
+    ideaseed [options] update
 
-Usage: 
-    ideaseed (--help | --about | --version | --config)
-    ideaseed [options] [-t TAG...] [-l LABEL...] [-# LABEL...] [-@ USERNAME...] ARGUMENTS...
 
-Examples:
-    # Save a card "test" in schoolsyst/webapp > project "UX" > column "To-Do"
-    $ ideaseed schoolsyst/webapp UX "test"
-    # Save a card "lorem" in your-username/ipsum > project "ipsum" > column "To-Do"
-    $ ideaseed ipsum "lorem"
-    # Save a card "a CLI to note down ideas named ideaseed" in your user profile > project "incubator" > column "willmake"
-    $ ideaseed --user-keyword=project --user-project=incubator project willmake "a CLI to note down ideas named ideaseed"
+Commands:
+    user                    Creates cards in your user's project. 
+                            (see https://github.com/users/YOURUSERNAME/projects)
+                            Flags --no-issue and --repo has no effects.
+                            Flag --default-column still applies.
+                            REPO is _not_ set to 'user'.
+    config                  Configures an alias with Configuration flags through a series of questions.
+    log(in/out)             Fills/Clears the auth cache (see --auth-cache).
+                            Has no effect when used with --keyring.
+    about                   Show information about ideaseed.
+    version                 Outputs the version number
+    update                  Check for updates. If any is available, shows the changelog. 
+                            You can then decide to install the new version.
+
 
 Arguments:
-    REPO        Select a repository
-                    If not given                        Uses Google Keep instead of GitHub (or uses your user profile's projects if --project is used)
-                    If --user-keyword's value is given  Creates a card on your user's project (select which project with --user-project)
-                    If given in the form OWNER/REPO     Uses the repository OWNER/REPO
-                    If given in the form REPO           Uses the repository "your username/REPO"
-    PROJECT     Select a project by name to put your card to [default: --default-project's value]
-                    If creating a card on your user's project, this becomes the COLUMN
-    COLUMN      Select a project's column by name [default: --default-column's value]
-                    If creating a card on your user's project, this is ignored
+    BODY      Sets the note's body. Required.
+    TITLE     Sets the title.
+    REPO      The repository to put the issue/card into. Uses the format [USER/]REPO. 
+              If USER/ is omitted, the currently-logged-in user's username is assumed.
+              Omitting this argument entirely has the effect of creating a Google Keep card instead.
+              When used without PROJECT, the card is added to the Default Project (see --default-project)
+              If the Default Project is '<None>', it creates an issue without a project card.
+    PROJECT   Specify which GitHub project to add the card to.
+              When used without COLUMN, the card is added to the Default Column (see --default-column)
+              Can use Placeholders
+    COLUMN    Specify which column to use.
+              Can use Placeholders.
+
 
 Options:
-    -c --color COLOR           Chooses which color to use for Google Keep cards. See Color names for allowed values.
-    -t --tag TAG               Adds tags to the Google Keep card or labels to the GitHub issue (see --issue). Use it multiple times to set multiple tags.
-    -i --issue                 Creates an issue for the card and link them together. IDEA becomes the issue's title, except if --title is specified,
-                               in which case IDEA becomes the issue's description and --title's value the issue title.
-    (WIP) -I --interactive     Prompts you for the above options when they are not provided.
-    -T --title TEXT            Sets the Google Keep card's title. When used with --issue, sets the issue's title.
-    -L --logout                Clears the authentification cache
-    -m --create-missing        Create non-existant tags, labels, projects or columns specified, upon confirmation.
-    -o --open                  Open the relevant URL in your web browser.
-    -l --label LABEL           Alias for --tag. See --tag's description.
-    -# --label LABEL           Just another shorthand for --label.
-    -@ --assign-to USERNAME    Assigns users to the created issue. Only works when --issue is used.
-    -M --milestone TITLE       Assign the issue to a milestone with title TITLE.
-       --pin                   Pin Google Keep cards
-       --dry-run               Don't actually affect websites, put print what it would've done. Still logs in. Beware, --create-missing ignores this flag and still creates missing objects.
-       --about                 Details about ideaseed like currently-installed version
-       --config                Easily configure your ideaseed and create your alias.
-       --version               Like --about, without dumb and useless stuff
+    -I --no-issue           Only creates a project card, no issue is created.
+                            Has no effect when used without a REPO
+    -T --title=TITLE        Specifies TITLE
+    -R --repo=REPO          Specifies REPOSITORY
+    -P --project=PROJECT    Specifies PROJECT
+    -C --column=COLUMN      Specifies COLUMN
+    -# --tag=TAG...         Add tags (GitHub) or labels (Google Keep)
+                            Can be specified multiple times.
+    -o --open               Open the created card (or issue) in your $BROWSER.
+       --dry-run            Tell what will happen but does not do it. Still logs you in.
+                            Beware, objects created with --create-missing will
+                            still be created.
+    -m --create-missing     Creates missing objects (projects, columns, and labels/tags)
+    -@ --assign=USER...     Assign USER to the created issue. 
+                            Can be specified multiple times.
+                            Cannot be used in the 'user' command.
 
-Settings options: It's comfier to set these in your alias (run `ideaseed --config`)
-       --user-project NAME     Name of the project to use as your user project
-       --user-keyword NAME     When REPO is NAME, creates a GitHub card on your user profile instead of putting it on REPO
-       --no-auth-cache         Don't save credentials in a temporary file at {cache_filepath}
-       --no-check-for-updates  Don't check for updates, don't prompt to update when current version is outdated
-       --no-self-assign        Don't assign the issue to yourself
-    
-    Options beginning with --default can refer to some dynamic information using %(placeholder)s.
-    Available placeholders:
-        repository - the repository's name
-        owner      - the repository's owner
-        username   - the username of which account you are using ideaseed with
-        project    - the selected project's name (only available to --default-column)
-    
-       --default-column NAME   Set the default column name. [default: To Do]
-       --default-project NAME  Set the default project name. [default: %(repository)s]
-       
+    REPO only: 
+       --self-assign        Assign the created issue to yourself. 
+                            Has no effect when --assign is used.
+    -M --milestone=NAME     Adds the issue to the milestone NAME.
 
-Color names: Try with the first letter only too
-    blue, brown, darkblue, gray, green, orange, pink, purple, red, teal, white, yellow
-    Some color have aliases:
-    - cyan is the same as teal
-    - indigo is the same as darkblue
-    - grey is the same as gray
-    - magenta is the same as purple
+    Google Keep only:
+       --pin                Pins the card. 
+       --color=COLOR        Sets the card's color. [default: white]
+                            Available values: blue, brown, darkblue (or indigo), 
+                            gray (or grey), green, orange, pink, purple (or magenta), 
+                            red, teal (or cyan), white, yellow. 
+
+
+Configuration:
+   --default-column=COLUMN    Specifies the Default Column. 
+                              Used when PROJECT is set but not COLUMN
+                              Can use Placeholders.
+   --default-project=PROJECT  Specifies the Default Project. 
+                              Used when REPO is set but not PROJECT
+                              Can use Placeholders.
+                              If not set, or set to '<None>',
+                              using REPO without PROJECT creates an issue
+                              without its project card.
+   --auth-cache=FILEPATH      Set the filepath for the auth. cache [default: $HOME/cache/ideaseed/auth.json]
+                              If set to '<None>', disables caching of credentials.
+                              Has no effect when used with --keyring.
+   --check-for-updates        Check for new versions and show a notification if a new one is found.
+
+
+Placeholders:
+    {repository}      Replaced with the repository's name
+    {owner}           Replaced with the repository's owner
+    {username}        Replaced with the currently-logged-in GitHub user's username
+    {project}         Replaced with the project the card will be added to.
+                      Not available to --default-project or PROJECT.
 """
 
-from ideaseed.update_checker import get_latest_version
-from ideaseed import update_checker, config_wizard
-from ideaseed.gkeep import push_to_gkeep
-from ideaseed.github import clear_auth_cache, push_to_repo, push_to_user
+
 from __future__ import annotations
-from typing import Union, Optional, Any
-from colr import docopt
-from pprint import pprint
-from ideaseed.utils import ask, dye, get_token_cache_filepath
+
+from typing import Any, Optional, Union
+from pathlib import Path
+
+from docopt import docopt
+
+from ideaseed import config_wizard, update_checker, gkeep, github_cards
 from ideaseed.constants import (
-    COLOR_ALIASES,
-    COLOR_NAME_TO_HEX_MAP,
     VALID_COLOR_NAMES,
     VERSION,
 )
 from ideaseed.dumb_utf8_art import ABOUT_SCREEN
-import cli_box as box
-from inquirer import Confirm
-import subprocess
-import sys
+from ideaseed.update_checker import get_latest_version
+from ideaseed.utils import english_join
+
+__doc__ = __doc__.replace("$HOME", str(Path.home()))
 
 
-def run(argv=None):
-    args = resolve_arguments(
-        docopt(
-            __doc__.format(cache_filepath=get_token_cache_filepath("*")),
-            argv,
-            script="ideaseed",
-        )
-    )
-    validate_argument_presence(args)
-
-    args["--tag"] += args["--label"]
-    # Remove duplicate tags
-    args["--tag"] = list(
-        set(args["--tag"])
-    )  # XXX: We're loosing order of elements here.
-
-    if not args["--no-check-for-updates"]:
-        latest_version = get_latest_version()
-        if latest_version > VERSION:
-            print(update_checker.notification(VERSION, latest_version))
-            if update_checker.prompt(VERSION, latest_version):
-                update_checker.upgrade(latest_version)
-                print(f"Re-running your command with ideaseed v{latest_version}...")
-                print("Running " + " ".join(sys.argv))
-                subprocess.run(sys.argv)
-                return
-
-    if args["--dry-run"]:
-        print(
-            dye(
-                f"\n============ Running in {dye('dry run', style='bold', fg=0xfff)} {dye('mode ============', style='dim')}\n",
-                style="dim",
-            )
-        )
-
-    if args["--about"]:
-        print(ABOUT_SCREEN.format(version=VERSION))
-        return
-
-    if args["--config"]:
-        config_wizard.run()
-        return
-
-    if args["--version"]:
-        print(VERSION)
-        return
-
-    if args["--color"]:
-        args["--color"] = expand_color_name(args["--color"])
-
-    if args["--logout"]:
-        clear_auth_cache()
-
-    if args["REPO"]:
-        if args["REPO"] == args["--user-keyword"]:
-            push_to_user(args)
-        else:
-            push_to_repo(args)
-    else:
-        push_to_gkeep(args)
-
-
-def resolve_arguments(args: dict[str, Any]) -> dict[str, Any]:
-    """
-    Apparently required positional arguments must come first...
-    So I'm resolving them by hand here.
-    """
-    positional_args = args["ARGUMENTS"]
-    idea = repo = project = column = None
-    if len(positional_args) == 1:
-        idea = positional_args[0]
-    if len(positional_args) == 2:
-        repo, idea = positional_args
-    if len(positional_args) == 3:
-        repo, project, idea = positional_args
-    if len(positional_args) >= 4:
-        repo, project, column, idea = positional_args
-    return {"REPO": repo, "PROJECT": project, "COLUMN": column, "IDEA": idea, **args}
-
-
-class ValidationError(Exception):
+class UsageError(Exception):
     pass
 
 
-def validate_argument_presence(args: dict[str, str]) -> None:
+def run(argv=None):
+    flags = docopt(__doc__, argv)
+    args = flags_to_args(flags)
+    args |= {"keyring": None}  # I'll add support for keyrings in another PR
+
+    if args["keyring"] and args["auth_cache"]:
+        args["auth_cache"] = None
+
+    print(args)
+
+    if args["color"] and args["color"] not in map(str.lower, VALID_COLOR_NAMES):
+        raise UsageError(
+            f"{args['color']!r} is not a valid color names. Valid color names are {english_join(map(str.lower, VALID_COLOR_NAMES))}"
+        )
+
+    if args["check_for_updates"]:
+        latest_version = get_latest_version()
+        if latest_version > VERSION:
+            print(update_checker.notification(VERSION, latest_version))
+
+    # Handle defaults
+
+
+    if args["about"]:
+        print(ABOUT_SCREEN.format(version=VERSION))
+    elif args["version"]:
+        print(VERSION)
+    elif args["help"]:
+        print(__doc__)
+    elif args["update"]:
+        update_checker.check_and_prompt()
+    elif args["config"]:
+        config_wizard.run()
+    elif args["login"]:
+        print("Logging into Google Keep:")
+        gkeep.login(**args)
+        print("Logging into GitHub:")
+        github_cards.login(**args)
+    elif args["logout"]:
+        if args["auth_cache"] is None:
+            # print("No cache to clear (remove --keyring or set --auth-cache to not '<None>')")
+            print("No cache to clear")
+        else:
+            Path(args["auth_cache"]).unlink(missing_ok=True)
+            print("Cache cleared.")
+    elif args["user"]:
+        github_cards.push_to_user(**args)
+    elif args["repo"]:
+        github_cards.push_to_repo(**args)
+    else:
+        gkeep.push_to_gkeep(**args)
+
+def flags_to_args(flags: dict[str, Any]) -> dict[str, Any]:
     """
-    Raises a `ValidationError` if one of the arguments is not allowed based
-    on the other arguments.
+    Turn flags dict from docopt into **kwargs-usable dict.
+    '--'-prefix is removed, dashes are turned into underscores 
+    and keys are lowercased.
+    When conflicts arise (ie --repo: None vs REPO: "ideaseed"), do a 'or',
+    prefering values appearing sooner in the dict.
+    Also replaces `'<None>'` with `None`
+
+    >>> flags_to_args({'--about': False,
+    ... '--assign': None,
+    ... '--auth-cache': '~/.cache/ideaseed/auth.json',
+    ... '--create-missing': False,
+    ... '--default-project': '<None>',
+    ... '--tag': None,
+    ... '--title': None,
+    ... '--version': False,
+    ... 'BODY': 'b',
+    ... 'COLUMN': None,
+    ... 'REPO': None,
+    ... 'TITLE': 'a',
+    ... 'version': True})
+    {'about': False, 'assign': None, 'auth_cache': '~/.cache/ideaseed/auth.json', 'create_missing': False, 'default_project': None, 'tag': None, 'title': 'a', 'version': True, 'body': 'b', 'column': None, 'repo': None}
     """
-
-    GOOGLE_KEEP_ONLY = ("--color",)
-    GITHUB_ONLY = ("--issue",)
-    GITHUB_ISSUE_ONLY = ("--milestone",)
-    using_github = len(args["ARGUMENTS"]) > 1
-
-    if using_github and not args["--issue"] and (args["--tag"] or args["--label"]):
-        raise ValidationError(
-            "--label (or --tag) can only be used with --issue or when creating"
-            "a Google Keep card."
-        )
-
-    if not args["--issue"] and any(
-        [v for k, v in args.items() if k in GITHUB_ISSUE_ONLY]
-    ):
-        raise ValidationError(
-            "The following options only work when --issue is used: "
-            + ", ".join(GITHUB_ISSUE_ONLY)
-        )
-
-    if using_github and any([v for k, v in args.items() if k in GOOGLE_KEEP_ONLY]):
-        raise ValidationError(
-            "The following options are not allowed when using GitHub: "
-            + ", ".join(GOOGLE_KEEP_ONLY)
-        )
-    if not using_github and any([v for k, v in args.items() if k in GITHUB_ONLY]):
-        raise ValidationError(
-            "The following options are not allowed when using Google Keep: "
-            + ", ".join(GITHUB_ONLY)
-            + "\n"
-            + "Maybe you've forgotten to specify a repository? (see ideaseed --help)"
-        )
-
-
-def expand_color_name(color: str) -> str:
-    # Initialize the array of matches
-    matching_color_names: list[str] = []
-    # Filter `color_names` to only get the color names that start with `color`
-    for color_name in VALID_COLOR_NAMES:
-        if color_name.lower().startswith(color.lower()):
-            matching_color_names += [color_name]
-    # Resolve synonyms
-    matching_color_names_resolved = matching_color_names
-    for i, color_name in enumerate(matching_color_names):
-        if color_name in COLOR_ALIASES.keys():
-            matching_color_names_resolved[i] = COLOR_ALIASES[color_name]
-    # Remove duplicates
-    matching_color_names = list(set(matching_color_names))
-    # If we have exactly _one_ element of `color_names` that matches, we return the only
-    # element: it's a match!
-    if len(matching_color_names) == 1:
-        return matching_color_names[0]
-    # If we have multiple choices, the given color was ambiguous.
-    if len(matching_color_names) > 1:
-        matching_color_names_display: list[str] = []
-        for matching_color_name in matching_color_names:
-            matching_color_names_display += [
-                dye(
-                    matching_color_name,
-                    fg=0x000,
-                    bg=COLOR_NAME_TO_HEX_MAP[matching_color_name],
-                )
-            ]
-        raise ValueError(
-            f"Ambiguous color shorthand {color!r}, it could mean one of: "
-            + ", ".join(matching_color_names_display)
-        )
-    # If we had an empty array, then the given color name was incorrect.
-    raise ValueError(f"Unknown color {color}")
+    args = {}
+    for name in flags.keys():
+        if flags[name] == "<None>":
+            flags[name] = None
+        normalized_name = name.removeprefix("--").replace("-", "_").lower()
+        if normalized_name in args.keys():
+            args[normalized_name] = args[normalized_name] or flags[name]
+        else:
+            args[normalized_name] = flags[name]
+    return args

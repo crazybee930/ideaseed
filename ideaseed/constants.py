@@ -1,6 +1,7 @@
 from __future__ import annotations
-from typing import Union, Optional, Any
-from flatten_list.flatten_list import flatten
+
+from typing import Any, Optional, Union
+
 from semantic_version import Version
 
 VERSION = Version("0.11.0")
@@ -29,9 +30,7 @@ COLOR_ALIASES = {
     "Magenta": "Purple",
 }
 
-VALID_COLOR_NAMES = list(flatten(list(COLOR_ALIASES.items()))) + list(
-    COLOR_NAME_TO_HEX_MAP.keys()
-)
+VALID_COLOR_NAMES = list(COLOR_ALIASES.keys()) + list(COLOR_NAME_TO_HEX_MAP.keys())
 
 # colors
 C_PRIMARY = "blue"
