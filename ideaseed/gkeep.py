@@ -6,25 +6,19 @@ import webbrowser
 from pathlib import Path
 from typing import Any, Optional, Union
 
+import gkeepapi
+import gkeepapi.node
 import inquirer
 from gkeepapi import Keep
 from gkeepapi.exception import APIException, LoginException
 from gkeepapi.node import ColorValue
+from rich import print
 
-from ideaseed.constants import (
-    COLOR_ALIASES,
-    C_PRIMARY,
-    COLOR_NAME_TO_HEX_MAP,
-    VALID_COLOR_NAMES,
-)
-from ideaseed.dumb_utf8_art import make_google_keep_art
-from ideaseed.utils import (
-    answered_yes_to,
-    case_insensitive_find,
-    dye,
-    error_message_no_object_found,
-    print_dry_run,
-)
+from ideaseed import ui
+from ideaseed.constants import (COLOR_ALIASES, COLOR_NAME_TO_HEX_MAP,
+                                VALID_COLOR_NAMES)
+from ideaseed.utils import (answered_yes_to, case_insensitive_find,
+                            error_message_no_object_found, print_dry_run)
 
 
 def write_to_cache(keep: Keep, email: str, cache_path: Path) -> None:
@@ -84,15 +78,12 @@ def login(
         # Handle errors...
         topic, _ = error.args
         if topic == "BadAuthentication":
-            print(dye("Bad credentials", fg=0xF00))
+            print("[red]Bad credentials")
             return login(auth_cache)
         elif topic == "NeedsBrowser":
             print(
-                dye(
-                    """You have two-step authentification set up, please add an App Password.
+                """[red]You have two-step authentification set up, please add an App Password.
 Go to https://myaccount.google.com/apppasswords (a tab should've been opened)""",
-                    fg=0xF00,
-                )
             )
             webbrowser.open("https://myaccount.google.com/apppasswords")
             try:
@@ -141,14 +132,14 @@ def push_to_gkeep(
 Don't worry, your idea is still safe,
 just up-arrow on your terminal to re-run the command :)"""
             )
-        print(dye(error, style="dim"))
+        print(f"[dim]{error}[/]")
         return
     print("Logged in.")
 
     note = None
 
     # Find/create all the labels
-    labels = []
+    labels: list[gkeepapi.node.Label] = []
     for tag in tags:
         label = keep.findLabel(tag)
         if label is None and create_missing:
@@ -179,16 +170,21 @@ just up-arrow on your terminal to re-run the command :)"""
             print_dry_run(f"Add label {label!r}")
 
     # Announce created card
-    print(
-        make_google_keep_art(
-            url=url,
-            title=title,
-            pinned=pin,
-            tags=tags,
-            body=body,
-            color=color,
-            collaborators=assign,
-        )
+    ui.show(
+        ui.make_card(
+            title=title or "",
+            right_of_title="pinned" if pin else "",
+            description=body,
+            labels=[
+                ui.Label(name=l.name, url=f"https://keep.google.com/#label/{l.name}")
+                for l in labels
+            ],
+            card_title="",
+            card_style="#" + COLOR_NAME_TO_HEX_MAP[color],
+        ),
+        ui.make_listing(
+            milestone=None, assignees=assign, project=None, project_column=None, url=url
+        ),
     )
 
     # Beam it up to Google's servers

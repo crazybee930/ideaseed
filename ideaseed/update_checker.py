@@ -2,16 +2,20 @@ from __future__ import annotations
 
 import re
 import subprocess
-from typing import Any, Optional, Union
 from xml.dom.minidom import parseString as parse_xml
 
-import cli_box
 import inquirer as q
 import requests
+from rich.markdown import Markdown
+from rich.panel import Panel
 from semantic_version import Version
 
-from ideaseed.constants import C_PRIMARY, RELEASES_RSS_URL, VERSION
-from ideaseed.utils import ask, dye, render_markdown
+from ideaseed.constants import RELEASES_RSS_URL, VERSION
+from ideaseed.ui import \
+    FramelessCodeBlock  # markdown with no ugly frame around code blocks
+from ideaseed.utils import ask
+
+Markdown.elements["code_block"] = FramelessCodeBlock
 
 
 def get_latest_version() -> Version:
@@ -149,11 +153,12 @@ def prompt(upgrade_from: Version, upgrade_to: Version) -> bool:
         else:
             notes = get_release_notes_for_version(release_notes, upgrade_to)
         print(
+            # TODO: get markdown back here
             f"""\
 Release notes for v{upgrade_from} -> v{upgrade_to}
 ====================================
 
-{render_markdown(notes).strip()}
+{notes}
 
 ---------------------------------------------
 To see images, you can also read this online:

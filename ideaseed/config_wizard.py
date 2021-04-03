@@ -5,7 +5,7 @@ from os import getenv, path
 from os.path import isfile
 from typing import Any, Optional, Union
 
-from ideaseed.dumb_utf8_art import ask_text
+from ideaseed.utils import ask_text
 
 
 class UnknownShellError(Exception):
