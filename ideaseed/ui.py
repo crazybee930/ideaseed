@@ -131,19 +131,47 @@ def make_listing(
     return listing
 
 
-def show(card: Panel, listing: Table):
+def show(
+    title: str,
+    right_of_title: str,
+    description: str,
+    labels: list[Label],
+    card_title: str,
+    card_style: str = "default",
+    milestone: Optional[str] = None,
+    assignees: Optional[Iterable[str]] = None,
+    project: Optional[str] = None,
+    project_column: Optional[str] = None,
+    url: Optional[str] = None,
+):
     c = Console()
-    c.print(card)
+    c.print(
+        make_card(
+            title=title,
+            right_of_title=right_of_title,
+            description=description,
+            labels=labels,
+            card_title=card_title,
+            card_style=card_style,
+        )
+    )
     c.print()
-    c.print(listing)
+    c.print(
+        make_listing(
+            milestone=milestone,
+            assignees=assignees,
+            project=project,
+            project_column=project_column,
+            url=url,
+        )
+    )
 
 
 if __name__ == "__main__":
     show(
-        make_card(
-            title="lsd cannot follow windows symlinks",
-            right_of_title="#499",
-            description=r"""
+        title="lsd cannot follow windows symlinks",
+        right_of_title="#499",
+        description=r"""
 I've tried a few and stumbled upon a more general solution that supports multiple languages and multiple types of graphs, called [depends](https://github.com/multilang-depends/depends).
 
 It does something weird with its DOT format generation, it puts node names (so actual functions) in some weird format in _comments_ atop the `digraph` and only uses numbers in the actually shown content. I patched together a small python script that fixes the DOT file to actually show the functions' names, and it works well.
@@ -173,22 +201,19 @@ print(content)
 ```
 
 just putting this out here in case an internet stranger stumbles upon this issue.""",
-            labels=[
-                Label(name="help wanted", color="00E6C4"),
-                Label(name="kind/enhancement", color="A0EEEE"),
-                Label(
-                    name="os/windows",
-                    color="CE8D4C",
-                    url="https://github.com/anishathalye/dotbot/labels/enhancement",
-                ),
-            ],
-            card_title=href("Peltoche/lsd", "https://github.com/Peltoche/lsd"),
-        ),
-        make_listing(
-            milestone="1.6.3",
-            assignees=(href("meain", "https://github.com/meain"), "Peltoche"),
-            project="Backlog",
-            project_column="work in progress",
-            url="https://github.com/Peltoche/lsd/issues/499",
-        ),
+        labels=[
+            Label(name="help wanted", color="00E6C4"),
+            Label(name="kind/enhancement", color="A0EEEE"),
+            Label(
+                name="os/windows",
+                color="CE8D4C",
+                url="https://github.com/anishathalye/dotbot/labels/enhancement",
+            ),
+        ],
+        card_title=href("Peltoche/lsd", "https://github.com/Peltoche/lsd"),
+        milestone="1.6.3",
+        assignees=(href("meain", "https://github.com/meain"), "Peltoche"),
+        project="Backlog",
+        project_column="work in progress",
+        url="https://github.com/Peltoche/lsd/issues/499",
     )

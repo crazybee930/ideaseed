@@ -292,20 +292,16 @@ def push_to_repo(
             url = "N/A"
 
         ui.show(
-            ui.make_card(
-                title=title,
-                right_of_title=issue.number if issue else "",
-                description=body,
-                labels=map(to_ui_label, labels),
-                card_title=f"{owner}/{repository}",
-            ),
-            ui.make_listing(
-                milestone=milestone.title if milestone else None,
-                assignees=assignees,
-                project=project.name if project else None,
-                project_column=column.name if column else None,
-                url=url,
-            ),
+            title=title,
+            right_of_title=with_link(issue) if issue else "",
+            description=body,
+            labels=map(to_ui_label, labels),
+            card_title=f"{with_link(repo.owner)}/{with_link(repo)}",
+            milestone=with_link(milestone) if milestone else None,
+            assignees=map(linkify_github_username, assignees),
+            project=with_link(project) if project else None,
+            project_column=with_link(column) if column else None,
+            url=url,
         )
 
     elif project and column:
@@ -316,20 +312,16 @@ def push_to_repo(
             url = "N/A"
 
         ui.show(
-            ui.make_card(
-                title=title,
-                right_of_title="",
-                description=body,
-                labels=[],
-                card_title=f"{owner}/{repository}",
-            ),
-            ui.make_listing(
-                milestone=None,
-                assignees=None,
-                project=project.name,
-                project_column=column.name,
-                url=url,
-            ),
+            title=title,
+            right_of_title="",
+            description=body,
+            labels=[],
+            card_title=f"{with_link(repo.owner)}/{with_link(repo)}",
+            milestone=None,
+            assignees=None,
+            project=with_link(project),
+            project_column=with_link(column),
+            url=url,
         )
     else:
         UsageError(
@@ -377,20 +369,16 @@ def push_to_user(
         url = "N/A"
 
     ui.show(
-        ui.make_card(
-            title=title,
-            right_of_title="",
-            description=body,
-            labels=[],
-            card_title=f"@{username}",
-        ),
-        ui.make_listing(
-            assignees=[],
-            milestone=None,
-            project=project,
-            project_column=column.name,
-            url=url,
-        ),
+        title=title,
+        right_of_title="",
+        description=body,
+        labels=[],
+        card_title=f"@{linkify_github_username(username)}",
+        assignees=[],
+        milestone=None,
+        project=with_link(project),
+        project_column=with_link(column),
+        url=url,
     )
 
     # Open project URL

@@ -15,10 +15,13 @@ from gkeepapi.node import ColorValue
 from rich import print
 
 from ideaseed import ui
-from ideaseed.constants import (COLOR_ALIASES, COLOR_NAME_TO_HEX_MAP,
-                                VALID_COLOR_NAMES)
-from ideaseed.utils import (answered_yes_to, case_insensitive_find,
-                            error_message_no_object_found, print_dry_run)
+from ideaseed.constants import COLOR_ALIASES, COLOR_NAME_TO_HEX_MAP, VALID_COLOR_NAMES
+from ideaseed.utils import (
+    answered_yes_to,
+    case_insensitive_find,
+    error_message_no_object_found,
+    print_dry_run,
+)
 
 
 def write_to_cache(keep: Keep, email: str, cache_path: Path) -> None:
@@ -172,20 +175,20 @@ just up-arrow on your terminal to re-run the command :)"""
 
     # Announce created card
     ui.show(
-        ui.make_card(
-            title=title or "",
-            right_of_title="pinned" if pin else "",
-            description=body,
-            labels=[
-                ui.Label(name=l.name, url=f"https://keep.google.com/#label/{l.name}")
-                for l in labels
-            ],
-            card_title="",
-            card_style="#" + COLOR_NAME_TO_HEX_MAP[color],
-        ),
-        ui.make_listing(
-            milestone=None, assignees=assign, project=None, project_column=None, url=url
-        ),
+        title=title or "",
+        right_of_title="pinned" if pin else "",
+        description=body,
+        labels=[
+            ui.Label(name=l.name, url=f"https://keep.google.com/#label/{l.name}")
+            for l in labels
+        ],
+        card_title="",
+        card_style="#" + COLOR_NAME_TO_HEX_MAP[color],
+        milestone=None,
+        assignees=assign,
+        project=None,
+        project_column=None,
+        url=url,
     )
 
     # Beam it up to Google's servers
