@@ -5,9 +5,11 @@ import re
 import webbrowser
 from json.decoder import JSONDecodeError
 from pathlib import Path
-from typing import Callable, Optional, TypeVar
+from typing import Callable, Optional, TypeVar, Union
 
 import github.GithubObject
+from github.Issue import Issue
+from github.NamedUser import NamedUser
 import inquirer as q
 from github import Github
 from github.GithubException import BadCredentialsException, TwoFactorException
@@ -20,9 +22,12 @@ from rich import print
 
 from ideaseed import ui
 from ideaseed.constants import UsageError
-from ideaseed.utils import (answered_yes_to, ask_text,
-                            error_message_no_object_found,
-                            get_random_color_hexstring)
+from ideaseed.utils import (
+    answered_yes_to,
+    ask_text,
+    error_message_no_object_found,
+    get_random_color_hexstring,
+)
 
 
 def validate_label_color(answers: dict, color: str):
@@ -453,6 +458,31 @@ def get_project_and_column(
 def to_ui_label(label: Label) -> ui.Label:
     return ui.Label(name=label.name, color=label.color)
 
+
+def with_link(o: Union[ProjectColumn, Project, Issue, NamedUser, Label]) -> str:
+    """
+    Returns `o.name` (or `o.title`, or `o.login`) wrapped around a terminal link sequence pointing to `o.html_url`
+    """
+    name = (
+        f"#{o.number}"
+        if hasattr(o, "number")
+        else o.name
+        if hasattr(o, "name")
+        else o.title
+        if hasattr(o, "title")
+        else o.login
+        if hasattr(o, "login")
+        else None
+    )
+    if name is None:
+        raise ValueError(
+            f"ideaseed.github_cards.with_link: object {o!r} has neither .number, nor .name, nor .title, nor .login attributes"
+        )
+    return ui.href(name, o.html_url)
+
+def linkify_github_username(username: str) -> str:
+    # XXX: Assuming that github will not change its username URL scheme. Highly probable.
+    return ui.href(username, f"https://github.com/{username}") 
 
 if __name__ == "__main__":
     import doctest
