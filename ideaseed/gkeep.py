@@ -142,12 +142,13 @@ just up-arrow on your terminal to re-run the command :)"""
     labels: list[gkeepapi.node.Label] = []
     for tag in tags:
         label = keep.findLabel(tag)
-        if label is None and create_missing:
-            if answered_yes_to(f"Create missing tag {tag!r}?"):
-                label = keep.createLabel(tag)
-        elif label is None:
-            print(error_message_no_object_found("tag", tag))
-            return
+        if label is None:
+            if create_missing:
+                if answered_yes_to(f"Create missing tag {tag!r}?"):
+                    label = keep.createLabel(tag)
+            else:
+                print(error_message_no_object_found("tag", tag))
+                return
         labels += [label]
 
     # Create the card

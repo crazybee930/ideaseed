@@ -129,32 +129,34 @@ def prompt(upgrade_from: Version, upgrade_to: Version) -> bool:
     Returns ``True`` if the user wants to upgrade, ``False`` otherwise.
     """
     answer = ask(
-        q.list(
+        q.List(
             "ans",
             message=f"Upgrade to v{upgrade_to} now?",
             choices=["Yes", "What has changed?", "No"],
         )
     )
-    if answer == "What has changed?":
-        release_notes = get_release_notes()
-        url = get_release_notes_link(release_notes, upgrade_to)
-        all_versions = get_versions_list_from_release_notes(release_notes)
-        # If the version jump is more than one version, print concatednated release notes
-        # so that the user can get all of the changes.
-        # eg: i'm upgrading from 0.6.0 to 0.10.0, but there has been 0.8.0 and 0.9.0 in between,
-        #     i want all the changes, not just the ones from 0.9.0 to 0.10.0
-        if len([v for v in all_versions if upgrade_from < v <= upgrade_to]) > 1:
-            notes = get_release_notes_between_versions(
-                release_notes, upgrade_from, upgrade_to
-            )
-        # else just get the single one.
-        # this is because doing get_release_notes_between_versions would still return
-        # the version <h2>, which would be stupid to show here
-        else:
-            notes = get_release_notes_for_version(release_notes, upgrade_to)
-        print(
-            # TODO: get markdown back here
-            f"""\
+    if answer != "What has changed?":
+        return answer == "Yes"
+
+    release_notes = get_release_notes()
+    url = get_release_notes_link(release_notes, upgrade_to)
+    all_versions = get_versions_list_from_release_notes(release_notes)
+    # If the version jump is more than one version, print concatednated release notes
+    # so that the user can get all of the changes.
+    # eg: i'm upgrading from 0.6.0 to 0.10.0, but there has been 0.8.0 and 0.9.0 in between,
+    #     i want all the changes, not just the ones from 0.9.0 to 0.10.0
+    if len([v for v in all_versions if upgrade_from < v <= upgrade_to]) > 1:
+        notes = get_release_notes_between_versions(
+            release_notes, upgrade_from, upgrade_to
+        )
+    # else just get the single one.
+    # this is because doing get_release_notes_between_versions would still return
+    # the version <h2>, which would be stupid to show here
+    else:
+        notes = get_release_notes_for_version(release_notes, upgrade_to)
+    print(
+        # TODO: get markdown back here
+        f"""\
 Release notes for v{upgrade_from} -> v{upgrade_to}
 ====================================
 
@@ -164,10 +166,8 @@ Release notes for v{upgrade_from} -> v{upgrade_to}
 To see images, you can also read this online:
 {url}
 """
-        )
-        return ask(q.Confirm("ans", message="Upgrade now?"))
-    else:
-        return answer == "Yes"
+    )
+    return ask(q.Confirm("ans", message="Upgrade now?"))
 
 
 def upgrade(upgrade_from: Version, upgrade_to: Version):
