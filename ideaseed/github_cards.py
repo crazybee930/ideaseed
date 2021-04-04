@@ -233,7 +233,7 @@ def push_to_repo(
         column, project, default_project, default_column, repo_full_name, username
     )
     # user specified a name
-    if project or column:
+    if project and column:
         project, column = get_project_and_column(repo, project, column, create_missing)
         # but it was not found nor created
         if not (project and column):
