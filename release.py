@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import os
+import re
+import subprocess
+import sys
+from datetime import date
 from os import getenv
 from os.path import abspath
-from __future__ import annotations
-from typing import Union, Optional, Any
-from datetime import date
-import sys
-import re
-import toml
-import subprocess
+from typing import Any, Optional, Union
+
 import github
+import toml
 from dotenv import load_dotenv
 
 load_dotenv(".env")

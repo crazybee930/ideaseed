@@ -11,8 +11,9 @@ from rich.panel import Panel
 from semantic_version import Version
 
 from ideaseed.constants import RELEASES_RSS_URL, VERSION
-from ideaseed.ui import \
-    FramelessCodeBlock  # markdown with no ugly frame around code blocks
+from ideaseed.ui import (
+    FramelessCodeBlock,
+)  # markdown with no ugly frame around code blocks
 from ideaseed.utils import ask
 
 Markdown.elements["code_block"] = FramelessCodeBlock

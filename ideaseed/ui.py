@@ -120,9 +120,7 @@ def make_listing(
     if assignees:
         listing.add_row(
             "Assigned to",
-            ", ".join(
-                f"[bold dim]@[/][bold blue]{name}[/]" for name in assignees
-            ),
+            ", ".join(f"[bold dim]@[/][bold blue]{name}[/]" for name in assignees),
         )
 
     if url:
