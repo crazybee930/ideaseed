@@ -202,7 +202,7 @@ def interactively_create_label(repo: Repository, name: str):
 
     color = get_random_color_hexstring()
     print(f"Creating label {ui.Label(name, color)}...")
-    repo.create_label(name=name, color=f"{color:6x}", **label_data)
+    repo.create_label(name=name, color=color, **label_data)
 
 
 def push_to_repo(
