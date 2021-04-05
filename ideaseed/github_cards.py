@@ -275,8 +275,6 @@ def push_to_repo(
         if milestone is None:
             return
 
-    owner, repository = repo_full_name.split("/")
-
     if not no_issue:
         issue = None
         if not dry_run:
