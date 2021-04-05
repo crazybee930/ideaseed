@@ -55,6 +55,7 @@ class FramelessCodeBlock(CodeBlock):
         syntax = Padding(Syntax(code, self.lexer_name, theme=self.theme), pad=(1, 4))
         yield syntax
 
+
 Markdown.elements["code_block"] = FramelessCodeBlock
 
 
@@ -71,7 +72,7 @@ class Label(NamedTuple):
 
 
 def href(s: str, url: str) -> str:
-    return f"[link {url}]{s}[/link {url}]"
+    return f"[link={url}]{s}[/link]"
 
 
 def make_card(

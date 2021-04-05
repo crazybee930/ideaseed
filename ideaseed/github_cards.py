@@ -300,12 +300,12 @@ def push_to_repo(
             title=title,
             right_of_title=with_link(issue) if issue else "",
             description=body,
-            labels=map(to_ui_label, labels),
+            labels=map(lambda l: to_ui_label(l, repo), labels),
             card_title=f"{with_link(repo.owner)}/{with_link(repo)}",
             milestone=with_link(milestone) if milestone else None,
             assignees=map(linkify_github_username, assignees),
             project=with_link(project) if project else None,
-            project_column=with_link(column) if column else None,
+            project_column=ui.href(column.name, project.html_url) if column else None,
             url=url,
         )
 
@@ -325,7 +325,7 @@ def push_to_repo(
             milestone=None,
             assignees=None,
             project=with_link(project),
-            project_column=with_link(column),
+            project_column=ui.href(column.name, project.html_url),
             url=url,
         )
     else:
@@ -382,7 +382,7 @@ def push_to_user(
         assignees=[],
         milestone=None,
         project=with_link(project),
-        project_column=with_link(column),
+        project_column=ui.href(column.name, project.html_url),
         url=url,
     )
 
@@ -455,34 +455,38 @@ def get_project_and_column(
     return project, column
 
 
-def to_ui_label(label: Label) -> ui.Label:
-    return ui.Label(name=label.name, color=label.color)
+def to_ui_label(label: Label, repo: Repository) -> ui.Label:
+    return ui.Label(name=label.name, color=label.color, url=f"{repo.html_url}/issues/?q=is:issue+is:open+label:{label.name}")
 
 
 def with_link(o: Union[ProjectColumn, Project, Issue, NamedUser, Label]) -> str:
     """
-    Returns `o.name` (or `o.title`, or `o.login`) wrapped around a terminal link sequence pointing to `o.html_url`
+    Returns `o.name` (or `o.title`, or `o.login`) wrapped around a terminal link sequence pointing to `o.html_url` (or `o.url`)
+    Special case: uses `f"#{o.number}"` as a name for issues
     """
+    # can't wait for py310 pattern matching
     name = (
         f"#{o.number}"
-        if hasattr(o, "number")
+        if isinstance(o, Issue)
+        else o.login
+        if isinstance(o, NamedUser)
         else o.name
         if hasattr(o, "name")
         else o.title
         if hasattr(o, "title")
-        else o.login
-        if hasattr(o, "login")
         else None
     )
     if name is None:
         raise ValueError(
             f"ideaseed.github_cards.with_link: object {o!r} has neither .number, nor .name, nor .title, nor .login attributes"
         )
-    return ui.href(name, o.html_url)
+    return ui.href(name, o.html_url if hasattr(o, "html_url") else o.url)
+
 
 def linkify_github_username(username: str) -> str:
     # XXX: Assuming that github will not change its username URL scheme. Highly probable.
-    return ui.href(username, f"https://github.com/{username}") 
+    return ui.href(username, f"https://github.com/{username}")
+
 
 if __name__ == "__main__":
     import doctest
