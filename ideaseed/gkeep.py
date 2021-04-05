@@ -169,7 +169,7 @@ just up-arrow on your terminal to re-run the command :)"""
         print_dry_run(f"Set its color to {color!r}")
         if pin:
             print_dry_run(f"Pin it")
-        url = "N/A"
+        url = None
         for label in labels:
             print_dry_run(f"Add label {label!r}")
 

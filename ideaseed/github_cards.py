@@ -294,7 +294,7 @@ def push_to_repo(
                 column.create_card(content_id=issue.id, content_type="Issue")
             url = issue.html_url
         else:
-            url = "N/A"
+            url = None
 
         ui.show(
             title=title,
@@ -314,7 +314,7 @@ def push_to_repo(
             column.create_card(note=body)
             url = project.html_url
         else:
-            url = "N/A"
+            url = None
 
         ui.show(
             title=title,
@@ -334,7 +334,7 @@ def push_to_repo(
         )
 
     # Open project URL
-    if open and url != "N/A":
+    if open and url: 
         webbrowser.open(url)
 
 
@@ -371,7 +371,7 @@ def push_to_user(
         column.create_card(note=body)
         url = project.html_url
     else:
-        url = "N/A"
+        url = None
 
     ui.show(
         title=title,
@@ -387,7 +387,7 @@ def push_to_user(
     )
 
     # Open project URL
-    if open and url != "N/A":
+    if open and url:
         webbrowser.open(url)
 
 
