@@ -67,9 +67,8 @@ def reverse_docopt(program_name: str, args_map: dict[str, Any]) -> str:
             for v in value:
                 line += f" {key}={shlex.quote(str(v))}"
         # Boolean (value-less flag, ony present if `True`)
-        elif type(value) is bool:
-            if value:
-                line += f" {key}"
+        elif type(value) is bool and value:
+            line += f" {key}"
 
     return line
 
