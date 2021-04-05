@@ -10,10 +10,12 @@ Usage:
     ideaseed [options] [-# TAG...] [-@ USER...] BODY
     ideaseed [options] [-# TAG...] [-@ USER...] TITLE BODY
     ideaseed [options] [-# TAG...] [-@ USER...] REPO TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] REPO PROJECT TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] REPO COLUMN TITLE BODY
     ideaseed [options] [-# TAG...] [-@ USER...] REPO PROJECT COLUMN TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] user PROJECT COLUMN TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] user BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] user TITLE BODY
     ideaseed [options] [-# TAG...] [-@ USER...] user PROJECT TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] user PROJECT COLUMN TITLE BODY
 
 
 Commands:
