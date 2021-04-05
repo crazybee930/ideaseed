@@ -118,7 +118,7 @@ def make_listing(
         )
     if milestone:
         listing.add_row("Milestone'd to", f"[bold blue]{milestone}[/]")
-    if assignees:
+    if list(assignees):
         listing.add_row(
             "Assigned to",
             ", ".join(f"[bold dim]@[/][bold blue]{name}[/]" for name in assignees),
