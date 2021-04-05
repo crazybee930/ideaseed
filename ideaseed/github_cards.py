@@ -8,13 +8,13 @@ from pathlib import Path
 from typing import Callable, Optional, TypeVar, Union
 
 import github.GithubObject
-from github.Issue import Issue
-from github.NamedUser import NamedUser
 import inquirer as q
 from github import Github
 from github.GithubException import BadCredentialsException, TwoFactorException
+from github.Issue import Issue
 from github.Label import Label
 from github.Milestone import Milestone
+from github.NamedUser import NamedUser
 from github.Project import Project
 from github.ProjectColumn import ProjectColumn
 from github.Repository import Repository
@@ -22,12 +22,9 @@ from rich import print
 
 from ideaseed import ui
 from ideaseed.constants import UsageError
-from ideaseed.utils import (
-    answered_yes_to,
-    ask_text,
-    error_message_no_object_found,
-    get_random_color_hexstring,
-)
+from ideaseed.utils import (answered_yes_to, ask_text,
+                            error_message_no_object_found,
+                            get_random_color_hexstring)
 
 
 def validate_label_color(answers: dict, color: str):
