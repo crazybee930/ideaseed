@@ -113,7 +113,7 @@ from ideaseed import config_wizard, github_cards, gkeep, update_checker
 from ideaseed.constants import VALID_COLOR_NAMES, VERSION
 from ideaseed.ui import ABOUT_SCREEN
 from ideaseed.update_checker import get_latest_version
-from ideaseed.utils import english_join
+from ideaseed.utils import english_join, remove_duplicates_in_list_of_dict
 
 __doc__ = __doc__.replace("$HOME", str(Path.home()))
 
@@ -125,6 +125,7 @@ class UsageError(Exception):
 def run(argv=None):
     flags = docopt(__doc__, argv)
     args = flags_to_args(flags)
+    args = remove_duplicates_in_list_of_dict(args) # docopt freaks out and duplicates any non-first --tag occurence:
     args |= {"keyring": None}  # I'll add support for keyrings in another PR
 
     if args["keyring"] and args["auth_cache"]:
