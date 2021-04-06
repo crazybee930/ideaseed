@@ -127,7 +127,9 @@ class UsageError(Exception):
 def run(argv=None):
     flags = docopt(__doc__, argv)
     args = flags_to_args(flags)
-    args = remove_duplicates_in_list_of_dict(args) # docopt freaks out and duplicates any non-first --tag occurence:
+    args = remove_duplicates_in_list_of_dict(
+        args
+    )  # docopt freaks out and duplicates any non-first --tag occurence:
     args |= {"keyring": None}  # I'll add support for keyrings in another PR
 
     if args["keyring"] and args["auth_cache"]:

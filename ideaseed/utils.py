@@ -116,7 +116,9 @@ def remove_duplicates_in_list_of_dict(o: dict[Any, Union[Any, list]]) -> dict:
     """
     Remove duplicates in values of `o` of type `list`.
     """
-    return {k: (list(dict.fromkeys(v)) if isinstance(v, list) else v) for k, v in o.items()}
+    return {
+        k: (list(dict.fromkeys(v)) if isinstance(v, list) else v) for k, v in o.items()
+    }
 
 
 if __name__ == "__main__":

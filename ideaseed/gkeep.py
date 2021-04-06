@@ -15,13 +15,10 @@ from gkeepapi.node import ColorValue
 from rich import print
 
 from ideaseed import ui
-from ideaseed.constants import COLOR_ALIASES, COLOR_NAME_TO_HEX_MAP, VALID_COLOR_NAMES
-from ideaseed.utils import (
-    answered_yes_to,
-    case_insensitive_find,
-    error_message_no_object_found,
-    print_dry_run,
-)
+from ideaseed.constants import (COLOR_ALIASES, COLOR_NAME_TO_HEX_MAP,
+                                VALID_COLOR_NAMES)
+from ideaseed.utils import (answered_yes_to, case_insensitive_find,
+                            error_message_no_object_found, print_dry_run)
 
 
 def write_to_cache(keep: Keep, email: str, cache_path: Path) -> None:
