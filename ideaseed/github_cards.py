@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 import webbrowser
+from collections import namedtuple
 from json.decoder import JSONDecodeError
 from pathlib import Path
 from typing import Callable, Optional, TypeVar, Union
@@ -21,6 +22,7 @@ from github.Repository import Repository
 from rich import print
 
 from ideaseed import ui
+from ideaseed.authentication import Cache as BaseCache
 from ideaseed.constants import UsageError
 from ideaseed.utils import (answered_yes_to, ask_text,
                             error_message_no_object_found,
@@ -38,103 +40,83 @@ def validate_label_color(answers: dict, color: str):
         )
 
 
-def login_with_cache(cache_path: Path) -> Optional[Github]:
-    """
-    Tries to login using the cached credentials.
-    `None` is returned if the cache does not exist or is invalid.
-    """
-    if cache_path.exists():
+class AuthCache(BaseCache):
+    def __init__(self, path: Path):
+        super().__init__(path=path, service="github")
+
+    def login_from_cache(self) -> Optional[Github]:
+        """
+        Tries to login using the cached credentials.
+        `None` is returned if the cache does not exist or is invalid.
+        """
         try:
-            creds = json.loads(cache_path.read_text(encoding="utf-8")).get("github")
-        except JSONDecodeError:
-            creds = None
-        if not creds:
-            return None
-        creds = (
-            [creds["username"], creds["password"]]
-            if creds["pat"] is None
-            else [creds["pat"]]
+            return Github(**self.read())
+        except Exception:
+            self.clear()
+
+    def login_manually(
+        self,
+        username: str = None,
+        password: str = None,
+        pat: str = None,
+        method: str = None,
+    ) -> Tuple[Github, dict[str, Any]]:
+
+        LOGIN_METHODS = namedtuple(
+            "LOGIN_METHODS",
+            PAT="Personal Access Token",
+            username="Username and password",
         )
-        try:
-            gh = Github(*creds)
-            gh.get_user().name
-            return gh
-        except BadCredentialsException:
-            return None
-        except TwoFactorException:
-            return None
-    return None
 
+        questions = [
+            q.List(
+                name="method",
+                message="Log in using",
+                choices=[LOGIN_METHODS.PAT, LOGIN_METHODS.username],
+                ignore=lambda _: method is not None,
+            ),
+            q.Password(
+                name="pat",
+                message=LOGIN_METHODS.PAT,
+                ignore=lambda ans: (method or ans["method"]) != LOGIN_METHODS.PAT,
+            ),
+            q.Text(
+                name="username",
+                message="Username",
+                ignore=lambda ans: (method or ans["method"]) != LOGIN_METHODS.username,
+            ),
+            q.Password(
+                name="password",
+                message="Password",
+                ignore=lambda ans: (method or ans["method"]) != LOGIN_METHODS.username,
+            ),
+        ]
+        answers = q.prompt(questions)
 
-def write_auth_cache(data, cache_path: Path):
-    cache_path.parent.mkdir(exist_ok=True, parents=True)
-    cache_path.touch()
-    try:
-        existing_data = json.loads(cache_path.read_text("utf-8"))
-    except JSONDecodeError:
-        existing_data = {}
-    cache_path.write_text(json.dumps(existing_data | {"github": data}))
+        if answers:
+            self.write(answers)
 
+        method = answers["method"] or method
 
-def login(auth_cache: str, method: Optional[str] = None, **_) -> Github:
-    """
-    Returns a `Github` instance to interact with.
-    Prompts the user to login, either via username/password
-    or using a Personal Access Token
-    """
-    gh = login_with_cache(Path(auth_cache))
-    if gh is not None:
-        return gh
-    else:
-        del gh
-
-    questions = [
-        q.List(
-            name="method",
-            message="Log in using",
-            choices=["Personal Access Token", "Username and password"],
-            ignore=lambda _: method is not None,
-        ),
-        q.Password(
-            name="pat",
-            message="Personal Access Token",
-            ignore=lambda ans: (method or ans["method"]) != "Personal Access Token",
-        ),
-        q.Text(
-            name="username",
-            message="Username",
-            ignore=lambda ans: (method or ans["method"]) != "Username and password",
-        ),
-        q.Password(
-            name="password",
-            message="Password",
-            ignore=lambda ans: (method or ans["method"]) != "Username and password",
-        ),
-    ]
-    answers = q.prompt(questions)
-
-    if auth_cache and answers:
-        write_auth_cache(answers, cache_path=Path(auth_cache))
-
-    if answers["pat"] is not None:
-        try:
-            gh = Github(answers["pat"])
-            return gh
-        except BadCredentialsException:
-            print("Bad token")
-            return login(auth_cache, method)
-    else:
-        try:
-            gh = Github(answers["username"], answers["password"])
-            return gh
-        except TwoFactorException:
-            print(
-                "Your account uses two-factor authentification. Please use a personal access token instead."
-            )
-            return login(auth_cache, method="Personal Access Token")
-        except BadCredentialsException:
-            print("Bad credentials")
-            return login(auth_cache, method)
+        if method == LOGIN_METHODS.PAT:
+            try:
+                gh = Github(answers["pat"])
+                return gh
+            except BadCredentialsException:
+                print("Bad token")
+                return self.login_manually(self, **answers)
+        else:
+            try:
+                gh = Github(answers["username"], answers["password"])
+                return gh
+            except TwoFactorException:
+                print(
+                    "Your account uses two-factor authentification. Please use a personal access token instead."
+                )
+                return self.login_manually(self, method="Personal Access Token")
+            except BadCredentialsException:
+                print("Bad credentials")
+                return self.login_manually(self, **answers)
 
 
 def resolve_self_repository_shorthand(gh: Github, repo: str) -> str:
@@ -207,6 +189,116 @@ def interactively_create_label(repo: Repository, name: str):
     repo.create_label(name=name, color=color, **label_data)
 
 
+def tag_names_to_labels(
+    repo: Repository, create_missing: bool, tag: list[str]
+) -> list[Label]:
+    if not tag:
+        return []
+    all_labels = repo.get_labels()
+    labels: list[Label] = []
+    for label_name in tag:
+        label = search_for_object(
+            all_labels,
+            label_name,
+            create_missing=create_missing,
+            object_name="label",
+            create=lambda: interactively_create_label(repo, label_name),
+        )
+        if label:
+            labels.append(label)
+    return labels
+
+
+def get_milestone_from_name(
+    repo: Repository, create_missing: bool, name: str
+) -> Milestone:
+    return search_for_object(
+        repo.get_milestones(),
+        name,
+        create_missing=create_missing,
+        object_name="milestone",
+        create=lambda: repo.create_milestone(title=name),
+        get_name=lambda obj: obj.title,
+    )
+
+
+def create_and_show_issue(
+    dry_run: bool,
+    body: str,
+    repo: Repository,
+    title: str,
+    milestone: Optional[Milestone],
+    project: Optional[Project],
+    labels: list[Label],
+    column: Optional[ProjectColumn],
+    assignees: list[NamedUser],
+):
+    issue = None
+    if not dry_run:
+        issue = repo.create_issue(
+            title=title or body,
+            body=body if title else "",
+            assignees=assignees,
+            labels=labels,
+            milestone=(milestone or github.GithubObject.NotSet),
+        )
+        if column is not None:
+            column.create_card(content_id=issue.id, content_type="Issue")
+        url = issue.html_url
+    else:
+        url = None
+
+    ui.show(
+        title=title,
+        right_of_title=with_link(issue),
+        description=body,
+        labels=map(lambda l: to_ui_label(l, repo), labels),
+        card_title=get_card_title(repo),
+        milestone=with_link(milestone) if milestone else None,
+        assignees=map(linkify_github_username, assignees),
+        project=with_link(project) if project else None,
+        project_column=ui.href(column.name, project.html_url) if column else None,
+        url=url,
+    )
+
+
+def get_card_title(repo_or_user: Union[Repository, NamedUser]) -> str:
+    if isinstance(repo_or_user, Repository):
+        return f"{with_link(repo_or_user.owner)}/{with_link(repo_or_user)}"
+    elif isinstance(repo_or_user, NamedUser):
+        return f"@{with_link(repo_or_user)}"
+    else:
+        raise TypeError("repo_or_user should be of type NamedUser or Repository")
+
+
+def create_and_show_github_card(
+    dry_run: bool,
+    column: ProjectColumn,
+    project: Project,
+    repo_or_user: Union[Repository, NamedUser],
+    title: str,
+    body: str,
+):
+    if not dry_run:
+        column.create_card(note=body)
+        url = project.html_url
+    else:
+        url = None
+
+    ui.show(
+        title=title,
+        right_of_title="",
+        description=body,
+        labels=[],
+        card_title=get_card_title(repo_or_user),
+        milestone=None,
+        assignees=None,
+        project=with_link(project),
+        project_column=ui.href(column.name, project.html_url),
+        url=url,
+    )
+
+
 def push_to_repo(
     auth_cache: Optional[str],
     body: str,
@@ -226,7 +318,7 @@ def push_to_repo(
     open: bool,
     **_,
 ) -> None:
-    gh = login(auth_cache)
+    gh = AuthCache(auth_cache).login()
     repo_full_name = resolve_self_repository_shorthand(gh, repo)
     repo: Repository = gh.get_repo(repo_full_name)
     username = gh.get_user().login
@@ -248,80 +340,38 @@ def push_to_repo(
     column: Optional[ProjectColumn]
 
     # Get all labels
-    all_labels = repo.get_labels()
-    labels: list[Label] = []
-    for label_name in tag:
-        label = search_for_object(
-            all_labels,
-            label_name,
-            create_missing=create_missing,
-            object_name="label",
-            create=lambda: interactively_create_label(repo, label_name),
-        )
-        if label is None:
-            return
-        labels.append(label)
+    labels = tag_names_to_labels(repo, create_missing, tag)
+
+    # Some labels where not found
+    if len(labels) != len(tag):
+        return
 
     if milestone is not None:
-        milestone: Milestone = search_for_object(
-            repo.get_milestones(),
-            milestone,
-            create_missing=create_missing,
-            object_name="milestone",
-            create=lambda: repo.create_milestone(title=milestone),
-            get_name=lambda obj: obj.title,
-        )
+        milestone = get_milestone_from_name(repo, create_missing, milestone)
 
-        if milestone is None:
-            return
+    url = None if dry_run else repo.html_url
 
     if not no_issue:
-        issue = None
-        if not dry_run:
-            issue = repo.create_issue(
-                title=title or body,
-                body=body if title else "",
-                assignees=assignees,
-                labels=tag,
-                milestone=(milestone or github.GithubObject.NotSet),
-            )
-            if column is not None:
-                column.create_card(content_id=issue.id, content_type="Issue")
-            url = issue.html_url
-        else:
-            url = None
-
-        ui.show(
+        create_and_show_issue(
+            dry_run=dry_run,
+            body=body,
             title=title,
-            right_of_title=with_link(issue) if issue else "",
-            description=body,
-            labels=map(lambda l: to_ui_label(l, repo), labels),
-            card_title=f"{with_link(repo.owner)}/{with_link(repo)}",
-            milestone=with_link(milestone) if milestone else None,
-            assignees=map(linkify_github_username, assignees),
-            project=with_link(project) if project else None,
-            project_column=ui.href(column.name, project.html_url) if column else None,
-            url=url,
+            repo=repo,
+            milestone=milestone,
+            project=project,
+            labels=labels,
+            column=column,
+            assignees=assignees,
         )
 
     elif project and column:
-        if not dry_run:
-            column.create_card(note=body)
-            url = project.html_url
-        else:
-            url = None
-
-        ui.show(
+        create_and_show_github_card(
+            dry_run=dry_run,
+            body=body,
+            column=column,
+            project=project,
+            repo=repo,
             title=title,
-            right_of_title="",
-            description=body,
-            labels=[],
-            card_title=f"{with_link(repo.owner)}/{with_link(repo)}",
-            milestone=None,
-            assignees=None,
-            project=with_link(project),
-            project_column=ui.href(column.name, project.html_url),
-            url=url,
         )
     else:
         UsageError(
@@ -329,7 +379,7 @@ def push_to_repo(
         )
 
     # Open project URL
-    if open and url: 
+    if open and url:
         webbrowser.open(url)
 
 
@@ -347,7 +397,7 @@ def push_to_user(
     if title:
         body = f"# {title}\n\n{body}"
 
-    gh = login(auth_cache)
+    gh = AuthCache(auth_cache).login()
     user = gh.get_user()
     username = user.login
     project, column = get_project_and_column(
@@ -362,23 +412,15 @@ def push_to_user(
     if not column or not project:
         return
 
-    if not dry_run:
-        column.create_card(note=body)
-        url = project.html_url
-    else:
-        url = None
+    url = None if dry_run else project.html_url
 
-    ui.show(
+    create_and_show_github_card(
+        dry_run=dry_run,
+        column=column,
+        project=project,
+        repo=user,
         title=title,
-        right_of_title="",
-        description=body,
-        labels=[],
-        card_title=f"@{linkify_github_username(username)}",
-        assignees=[],
-        milestone=None,
-        project=with_link(project),
-        project_column=ui.href(column.name, project.html_url),
-        url=url,
+        body=body,
     )
 
     # Open project URL
@@ -451,7 +493,11 @@ def get_project_and_column(
 
 
 def to_ui_label(label: Label, repo: Repository) -> ui.Label:
-    return ui.Label(name=label.name, color=label.color, url=f"{repo.html_url}/issues/?q=is:issue+is:open+label:{label.name}")
+    return ui.Label(
+        name=label.name,
+        color=label.color,
+        url=f"{repo.html_url}/issues/?q=is:issue+is:open+label:{label.name}",
+    )
 
 
 def with_link(o: Union[ProjectColumn, Project, Issue, NamedUser, Label]) -> str:
@@ -460,6 +506,8 @@ def with_link(o: Union[ProjectColumn, Project, Issue, NamedUser, Label]) -> str:
     Special case: uses `f"#{o.number}"` as a name for issues
     """
     # can't wait for py310 pattern matching
+    if not o:
+        return ""
     name = (
         f"#{o.number}"
         if isinstance(o, Issue)

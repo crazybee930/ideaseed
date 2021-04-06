@@ -103,6 +103,7 @@ Placeholders:
                       Not available to --default-project or PROJECT.
 """
 
+# TODO: big refactoring: have a common abstract "IdeaCard" that holds all the attrs (milestone, etc.) so I don't have to pass 54654 args to each func.
 
 from __future__ import annotations
 
@@ -111,7 +112,8 @@ from typing import Any
 
 from docopt import docopt
 
-from ideaseed import config_wizard, github_cards, gkeep, update_checker
+from ideaseed import (authentication, config_wizard, github_cards, gkeep,
+                      update_checker)
 from ideaseed.constants import VALID_COLOR_NAMES, VERSION
 from ideaseed.ui import ABOUT_SCREEN
 from ideaseed.update_checker import get_latest_version
@@ -127,50 +129,56 @@ class UsageError(Exception):
 def run(argv=None):
     flags = docopt(__doc__, argv)
     args = flags_to_args(flags)
-    args = remove_duplicates_in_list_of_dict(
-        args
-    )  # docopt freaks out and duplicates any non-first --tag occurence:
-    args |= {"keyring": None}  # I'll add support for keyrings in another PR
 
+    # docopt freaks out and duplicates any non-first --tag occurence, so we remove them
+    args = remove_duplicates_in_list_of_dict(args)
+
+    # I'll add support for keyrings in another PR
+    args |= {"keyring": None}
+
+    # Let keyring take precedence from auth_cache right off the bat
     if args["keyring"] and args["auth_cache"]:
         args["auth_cache"] = None
 
-    if args["color"] and args["color"] not in map(str.lower, VALID_COLOR_NAMES):
-        raise UsageError(
-            f"{args['color']!r} is not a valid color name. Valid color names are {english_join(map(str.lower, VALID_COLOR_NAMES))}"
-        )
+    # Initialize auth caches
+    if args["auth_cache"]:
+        github_cache = github_cards.AuthCache(args["auth_cache"])
+        gkeep_cache = gkeep.AuthCache(args["auth_cache"])
 
-    if args["check_for_updates"]:
-        latest_version = get_latest_version()
-        if latest_version > VERSION:
-            print(update_checker.notification(VERSION, latest_version))
+    # Validate color's value
+    validate_tag_color(args["color"])
+
+    # Check for updates
+    check_for_updates(args["check_for_updates"])
 
     if args["about"]:
         print(ABOUT_SCREEN.format(version=VERSION))
+
     elif args["version"]:
         print(VERSION)
+
     elif args["help"]:
         print(__doc__)
+
     elif args["update"]:
         update_checker.check_and_prompt()
+
     elif args["config"]:
         config_wizard.run()
+
     elif args["login"]:
-        print("Logging into Google Keep:")
-        gkeep.login(**args)
-        print("Logging into GitHub:")
-        github_cards.login(**args)
+        github_cache.login()
+        gkeep_cache.login()
+
     elif args["logout"]:
-        if args["auth_cache"] is None:
-            # print("No cache to clear (remove --keyring or set --auth-cache to not '<None>')")
-            print("No cache to clear")
-        else:
-            Path(args["auth_cache"]).unlink(missing_ok=True)
-            print("Cache cleared.")
+        authentication.Cache(args["auth_cache"]).clear_all()
+
     elif args["user"]:
         github_cards.push_to_user(**args)
+
     elif args["repo"]:
         github_cards.push_to_repo(**args)
+
     else:
         gkeep.push_to_gkeep(**args)
 
@@ -209,3 +217,17 @@ def flags_to_args(flags: dict[str, Any]) -> dict[str, Any]:
         else:
             args[normalized_name] = flags[name]
     return args
+
+
+def check_for_updates(check_for_updates_flag: bool):
+    if check_for_updates_flag:
+        latest_version = get_latest_version()
+        if latest_version > VERSION:
+            print(update_checker.notification(VERSION, latest_version))
+
+
+def validate_tag_color(color: Optional[str]):
+    if color and color not in map(str.lower, VALID_COLOR_NAMES):
+        raise UsageError(
+            f"{color!r} is not a valid color name. Valid color names are {english_join(map(str.lower, VALID_COLOR_NAMES))}"
+        )
