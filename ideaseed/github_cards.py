@@ -87,7 +87,7 @@ class AuthCache(BaseCache):
         ]
         answers = q.prompt(questions)
 
-        method = answers["method"] or method
+        method = answers.get("method", method)
 
         if method == LOGIN_METHODS.PAT:
             try:
@@ -417,6 +417,7 @@ def push_to_user(
     url = None if dry_run else project.html_url
 
     create_and_show_github_card(
+        repo_or_user=user,
         dry_run=dry_run,
         column=column,
         project=project,
@@ -487,7 +488,7 @@ def get_project_and_column(
         create_missing=create_missing,
         object_name="column",
         create=lambda: project.create_column(
-            name=column_name, body=ask_text("Enter the column's description..."),
+            name=column_name
         ),
     )
 
@@ -523,7 +524,13 @@ def with_link(o: Union[ProjectColumn, Project, Issue, NamedUser, Milestone]) -> 
         raise ValueError(
             f"ideaseed.github_cards.with_link: object {o!r} has neither .number, nor .name, nor .title, nor .login attributes"
         )
-    return ui.href(name, o.url if isinstance(o, ProjectColumn) else o.html_url)
+
+    if isinstance(o, ProjectColumn) or isinstance(o, Milestone):
+        url = o.url
+    else:
+        url = o.html_url
+
+    return ui.href(name, url)
 
 
 def linkify_github_username(username: str) -> str:
