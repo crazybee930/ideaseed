@@ -5,11 +5,12 @@ import sys
 import webbrowser
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Optional, Tuple, Union
 
 import gkeepapi
 import gkeepapi.node
 import inquirer
+import rich.traceback
 from gkeepapi import Keep
 from gkeepapi.exception import APIException, LoginException
 from gkeepapi.node import ColorValue
@@ -20,6 +21,8 @@ from ideaseed.constants import (COLOR_ALIASES, COLOR_NAME_TO_HEX_MAP,
                                 VALID_COLOR_NAMES)
 from ideaseed.utils import (answered_yes_to, case_insensitive_find,
                             error_message_no_object_found, print_dry_run)
+
+rich.traceback.install()
 
 
 class AuthCache(authentication.Cache):
@@ -136,10 +139,8 @@ def push_to_gkeep(
     # Log in
     sys.stdout.flush()
     # Handle API errors
-    print("Logging in...")
     with handle_api_errors():
-        keep = AuthCache(auth_cache).login()
-    print("Logged in.")
+        keep = AuthCache(Path(auth_cache)).login()
 
     # Find/create all the labels
     labels = find_and_create_labels(keep, tags, create_missing=create_missing)
@@ -165,7 +166,7 @@ def push_to_gkeep(
         description=body,
         labels=map(to_ui_label, labels),
         card_title="",
-        card_style=to_rich_color(color),
+        card_style=to_rich_color(color) + " on black",
         milestone=None,
         assignees=assign,
         project=None,

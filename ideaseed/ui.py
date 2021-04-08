@@ -6,7 +6,6 @@ from rich.padding import Padding
 from rich.panel import Panel
 from rich.syntax import Syntax
 from rich.table import Table
-from rich.text import Text
 
 from ideaseed.utils import readable_on
 
@@ -22,16 +21,16 @@ ABOUT_SCREEN = """
                 ██████████      ██
                 ██      ██      ██
                 ██████████      ██
-      
+     
             ideaseed v{version}
             by Ewen Le Bihan
             more at https://ewen.works
-      
+     
                 ~ thx to these ppl ~
 
 https://github.com/kiwiz
     This madman reverse-engineered Google Keep's
-    internal REST API so that anyone could 
+    internal REST API so that anyone could
     use it with ease.
                     
 https://github.com/PyGithub

@@ -142,8 +142,11 @@ def run(argv=None):
 
     # Initialize auth caches
     if args["auth_cache"]:
-        github_cache = github_cards.AuthCache(args["auth_cache"])
-        gkeep_cache = gkeep.AuthCache(args["auth_cache"])
+        auth_cache_path = Path(args["auth_cache"])
+        github_cache = github_cards.AuthCache(auth_cache_path)
+        gkeep_cache = gkeep.AuthCache(auth_cache_path)
+    else:
+        auth_cache_path = None
 
     # Validate color's value
     validate_tag_color(args["color"])
@@ -171,7 +174,7 @@ def run(argv=None):
         gkeep_cache.login()
 
     elif args["logout"]:
-        authentication.Cache(args["auth_cache"]).clear_all()
+        authentication.Cache(auth_cache_path).clear_all()
 
     elif args["user"]:
         github_cards.push_to_user(**args)
