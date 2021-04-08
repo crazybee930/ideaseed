@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from random import randint
-from typing import Any, Iterable, Union
+from typing import Any, Iterable, Union, Optional
 
 import inquirer
 from rich import print
@@ -98,13 +98,13 @@ def print_dry_run(text: str):
 
 def error_message_no_object_found(objtype: str, objname: str) -> str:
     return (
-        print(f"[red]Error: missing {objtype} {objname!r}")
+        f"[red]Error: missing {objtype} {objname!r}"
         + """
 TIP: Use --create-missing and ideaseed will ask you if you want to create missing labels, issues, projects, columns, milestones..."""
     )
 
 
-def case_insensitive_find(haystack: Iterable[str], needle: str) -> str:
+def case_insensitive_find(haystack: Iterable[str], needle: str) -> Optional[str]:
     for item in haystack:
         if item.lower() == needle.lower():
             return item
