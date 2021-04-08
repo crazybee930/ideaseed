@@ -502,7 +502,7 @@ def to_ui_label(label: Label, repo: Repository) -> ui.Label:
     )
 
 
-def with_link(o: Union[ProjectColumn, Project, Issue, NamedUser]) -> str:
+def with_link(o: Union[ProjectColumn, Project, Issue, NamedUser, Milestone]) -> str:
     """
     Returns `o.name` (or `o.title`, or `o.login`) wrapped around a terminal link sequence pointing to `o.html_url` (or `o.url`)
     Special case: uses `f"#{o.number}"` as a name for issues
@@ -515,6 +515,8 @@ def with_link(o: Union[ProjectColumn, Project, Issue, NamedUser]) -> str:
         if isinstance(o, Issue)
         else o.login
         if isinstance(o, NamedUser)
+        else o.title
+        if isinstance(o, Milestone)
         else o.name
     )
     if name is None:
