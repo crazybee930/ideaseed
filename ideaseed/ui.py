@@ -78,7 +78,7 @@ def make_card(
     title: str,
     right_of_title: str,
     description: str,
-    labels: list[Label],
+    labels: Iterable[Label],
     card_title: str,
     card_style: str = "default",
 ) -> Panel:
@@ -133,7 +133,7 @@ def show(
     title: str,
     right_of_title: str,
     description: str,
-    labels: list[Label],
+    labels: Iterable[Label],
     card_title: str,
     card_style: str = "default",
     milestone: Optional[str] = None,
