@@ -4,7 +4,7 @@ import re
 import webbrowser
 from collections import namedtuple
 from pathlib import Path
-from typing import Any, Callable, Optional, Tuple, TypeVar, Union
+from typing import Any, Callable, Optional, Tuple, TypeVar, Union, Iterable
 
 import github.GithubObject
 import inquirer as q
@@ -434,7 +434,7 @@ T = TypeVar("T")
 
 
 def search_for_object(
-    objects: list[T],
+    objects: Iterable[T],
     name: str,
     create_missing: bool,
     object_name: str,
