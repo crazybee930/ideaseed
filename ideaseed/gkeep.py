@@ -45,8 +45,10 @@ class AuthCache(authentication.Cache):
 
         # Log in
         keep = Keep()
+        
         try:
             keep.login(username, password)
+            
             # elif keyring:
             #     service, name =
         except LoginException as error:
@@ -54,7 +56,7 @@ class AuthCache(authentication.Cache):
             topic, _ = error.args
             if topic == "BadAuthentication":
                 print("[red]Bad credentials")
-                return self.login_manually(self)
+                return self.login_manually()
             elif topic == "NeedsBrowser":
                 print(
                     """[red]You have two-step authentification set up, please add an App Password.
@@ -75,7 +77,9 @@ class AuthCache(authentication.Cache):
 
     def login_from_cache(self) -> Optional[Keep]:
         try:
-            return Keep().resume(**self.read())
+            keep = Keep()
+            keep.resume(**self.cache)
+            return keep
         except LoginException:
             return None
 
@@ -141,6 +145,7 @@ def push_to_gkeep(
     # Handle API errors
     with handle_api_errors():
         keep = AuthCache(Path(auth_cache)).login()
+        
 
     # Find/create all the labels
     labels = find_and_create_labels(keep, tags, create_missing=create_missing)
