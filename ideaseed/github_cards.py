@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import json
 import re
 import webbrowser
 from collections import namedtuple
-from json.decoder import JSONDecodeError
 from pathlib import Path
-from typing import Callable, Optional, TypeVar, Union
+from typing import Any, Callable, Optional, Tuple, TypeVar, Union
 
 import github.GithubObject
 import inquirer as q
@@ -29,7 +27,7 @@ from ideaseed.utils import (answered_yes_to, ask_text,
                             get_random_color_hexstring)
 
 
-def validate_label_color(answers: dict, color: str):
+def validate_label_color(color: str):
     """
     Throws a `inquirer.errors.ValidationError` when the format isn't matched.
     (format: 6-digit hex int representing a color)
@@ -50,22 +48,18 @@ class AuthCache(BaseCache):
         `None` is returned if the cache does not exist or is invalid.
         """
         try:
-            return Github(**self.read())
-        except Exception:
+            return Github(
+                login_or_token=self.cache["pat"] or self.cache["username"],
+                password=self.cache["password"],
+            )
+        except Exception as error:
+            print(f"[black on red]{error}")
             self.clear()
 
-    def login_manually(
-        self,
-        username: str = None,
-        password: str = None,
-        pat: str = None,
-        method: str = None,
-    ) -> Tuple[Github, dict[str, Any]]:
+    def login_manually(self, method: str = None) -> Tuple[Github, dict[str, Any]]:
 
-        LOGIN_METHODS = namedtuple(
-            "LOGIN_METHODS",
-            PAT="Personal Access Token",
-            username="Username and password",
+        LOGIN_METHODS = namedtuple("LoginMethods", ["PAT", "username"])(
+            PAT="Personal Access Token", username="Username and password",
         )
 
         questions = [
@@ -77,7 +71,7 @@ class AuthCache(BaseCache):
             ),
             q.Password(
                 name="pat",
-                message=LOGIN_METHODS.PAT,
+                message="Personal access token",
                 ignore=lambda ans: (method or ans["method"]) != LOGIN_METHODS.PAT,
             ),
             q.Text(
@@ -93,30 +87,29 @@ class AuthCache(BaseCache):
         ]
         answers = q.prompt(questions)
 
-        if answers:
-            self.write(answers)
-
         method = answers["method"] or method
 
         if method == LOGIN_METHODS.PAT:
             try:
                 gh = Github(answers["pat"])
-                return gh
+                print(answers)
+                return gh, answers
             except BadCredentialsException:
                 print("Bad token")
-                return self.login_manually(self, **answers)
+                return self.login_manually(method=method)
         else:
             try:
                 gh = Github(answers["username"], answers["password"])
-                return gh
+                print(answers)
+                return gh, answers
             except TwoFactorException:
                 print(
                     "Your account uses two-factor authentification. Please use a personal access token instead."
                 )
-                return self.login_manually(self, method="Personal Access Token")
+                return self.login_manually(method=LOGIN_METHODS.username)
             except BadCredentialsException:
                 print("Bad credentials")
-                return self.login_manually(self, **answers)
+                return self.login_manually(method=method)
 
 
 def resolve_self_repository_shorthand(gh: Github, repo: str) -> str:
@@ -299,26 +292,35 @@ def create_and_show_github_card(
     )
 
 
+class AbstractCard:
+    """ Represents a future github card/issue, with all attributes refering to their names instead of their resolved github objects """
+    
+
+
 def push_to_repo(
     auth_cache: Optional[str],
     body: str,
     title: Optional[str],
     repo: str,
     project: Optional[str],
-    default_project: Optional[str],
     column: Optional[str],
-    default_column: Optional[str],
     assign: list[str],
     self_assign: bool,
     milestone: Optional[str],
     tag: list[str],
+    default_project: Optional[str],
+    default_column: Optional[str],
     create_missing: bool,
     no_issue: bool,
     dry_run: bool,
     open: bool,
     **_,
 ) -> None:
-    gh = AuthCache(auth_cache).login()
+    if auth_cache is None:
+        raise NotImplementedError(
+            "You need to specify a cache for now, I'll get to the --keyring implementation later"
+        )
+    gh = AuthCache(Path(auth_cache)).login()
     repo_full_name = resolve_self_repository_shorthand(gh, repo)
     repo: Repository = gh.get_repo(repo_full_name)
     username = gh.get_user().login
@@ -500,7 +502,7 @@ def to_ui_label(label: Label, repo: Repository) -> ui.Label:
     )
 
 
-def with_link(o: Union[ProjectColumn, Project, Issue, NamedUser, Label]) -> str:
+def with_link(o: Union[ProjectColumn, Project, Issue, NamedUser]) -> str:
     """
     Returns `o.name` (or `o.title`, or `o.login`) wrapped around a terminal link sequence pointing to `o.html_url` (or `o.url`)
     Special case: uses `f"#{o.number}"` as a name for issues
@@ -514,16 +516,12 @@ def with_link(o: Union[ProjectColumn, Project, Issue, NamedUser, Label]) -> str:
         else o.login
         if isinstance(o, NamedUser)
         else o.name
-        if hasattr(o, "name")
-        else o.title
-        if hasattr(o, "title")
-        else None
     )
     if name is None:
         raise ValueError(
             f"ideaseed.github_cards.with_link: object {o!r} has neither .number, nor .name, nor .title, nor .login attributes"
         )
-    return ui.href(name, o.html_url if hasattr(o, "html_url") else o.url)
+    return ui.href(name, o.url if isinstance(o, ProjectColumn) else o.html_url)
 
 
 def linkify_github_username(username: str) -> str:
