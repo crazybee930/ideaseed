@@ -1,4 +1,5 @@
 from typing import Iterable, NamedTuple, Optional
+from shutil import get_terminal_size
 
 from rich.console import Console, ConsoleOptions, RenderResult
 from rich.markdown import CodeBlock, Markdown
@@ -142,7 +143,7 @@ def show(
     project_column: Optional[str] = None,
     url: Optional[str] = None,
 ):
-    c = Console()
+    c = Console(width=min(get_terminal_size().columns, 75))
     c.print(
         make_card(
             title=title,
