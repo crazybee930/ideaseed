@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from random import randint
-from typing import Any, Iterable, Union, Optional
+from typing import Any, Iterable, Union, Optional, Callable
 
-import inquirer
 from rich import print
+from rich.prompt import Confirm, Prompt
 
 
 def readable_on(background: str, light: str = "FFFFFF", dark: str = "000000") -> str:
@@ -44,31 +44,16 @@ def get_random_color_hexstring() -> str:
     return f"{randint(0x0, 0xFFFFFF):6x}".upper()
 
 
-def ask(*questions) -> Union[list[Any], Any]:
-    if len(questions) == 1:
-        # No need to turn the hash into a tuple, just return the only value
-        questions[0].name = "ans"
-        return inquirer.prompt(questions)["ans"]
-
-    for i, _ in enumerate(questions):
-        questions[i].name = i
-    # Ask dem questions
-    answers = inquirer.prompt(questions)
-    # Turn into a list of tuple
-    answers = list(answers.items())
-    # Sort by key
-    answers = sorted(answers, key=lambda a: a[0])
-    # Get only the answers
-    answers = [a[1] for a in answers]
-    return answers
-
-
-def ask_text(question: str):
-    return ask(inquirer.Text("ans", message=question))
-
+def ask(question: str, is_valid: Callable[[str], bool] = bool, choices: Optional[list[str]] = None, password = False) -> str:
+    answer = ""
+    while True:
+        answer = Prompt.ask(question, password=password, choices=choices)
+        if is_valid(answer):
+            break
+    return answer
 
 def answered_yes_to(question: str) -> bool:
-    return ask(inquirer.Confirm("ans", message=question))
+    return Confirm.ask(question)
 
 
 def english_join(items: list[str]) -> str:

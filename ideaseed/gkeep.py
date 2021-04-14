@@ -9,18 +9,18 @@ from typing import Any, Optional, Tuple, Union
 
 import gkeepapi
 import gkeepapi.node
-import inquirer
 import rich.traceback
 from gkeepapi import Keep
 from gkeepapi.exception import APIException, LoginException
 from gkeepapi.node import ColorValue
 from rich import print
+from validate_email import validate_email
 
 from ideaseed import authentication, ui
 from ideaseed.constants import (COLOR_ALIASES, COLOR_NAME_TO_HEX_MAP,
                                 VALID_COLOR_NAMES)
 from ideaseed.utils import (answered_yes_to, case_insensitive_find,
-                            error_message_no_object_found, print_dry_run)
+                            error_message_no_object_found, print_dry_run, ask)
 
 rich.traceback.install()
 
@@ -37,10 +37,11 @@ class AuthCache(authentication.Cache):
     ) -> Tuple[Keep, dict[str, Any]]:
         # Ask for creds
         if not username:
-            username = inquirer.text("E-mail")
+            username = ask("Email", is_valid=validate_email)
         if not password:
-            password = inquirer.password(
-                "App password" if entering_app_password else "Password"
+            password = ask(
+                "App password" if entering_app_password else "Password",
+                password=True
             )
 
         # Log in
@@ -112,7 +113,7 @@ def find_and_create_labels(
                     label = keep.createLabel(tag)
             else:
                 print(error_message_no_object_found("tag", tag))
-                return
+                return []
 
         if label:
             labels += [label]

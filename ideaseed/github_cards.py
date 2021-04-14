@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Any, Callable, Iterable, Optional, Tuple, TypeVar, Union
 
 import github.GithubObject
-import inquirer as q
 from github import Github
 from github.GithubException import BadCredentialsException, TwoFactorException
 from github.Issue import Issue
@@ -22,7 +21,7 @@ from rich import print
 from ideaseed import ui
 from ideaseed.authentication import Cache as BaseCache
 from ideaseed.constants import UsageError
-from ideaseed.utils import (answered_yes_to, ask_text,
+from ideaseed.utils import (answered_yes_to, ask,
                             error_message_no_object_found,
                             get_random_color_hexstring)
 
@@ -32,10 +31,7 @@ def validate_label_color(color: str):
     Throws a `inquirer.errors.ValidationError` when the format isn't matched.
     (format: 6-digit hex int representing a color)
     """
-    if not re.match(r"[a-fA-F0-9]{6}", color):
-        raise q.errors.ValidationError(
-            "", reason="Please use a valid color (6-digit hexadecimal integer)"
-        )
+    return re.match(r"[a-fA-F0-9]{6}", color)
 
 
 class AuthCache(BaseCache):
@@ -57,51 +53,26 @@ class AuthCache(BaseCache):
             self.clear()
 
     def login_manually(self, method: str = None) -> Tuple[Github, dict[str, Any]]:
-
         LOGIN_METHODS = namedtuple("LoginMethods", ["PAT", "username"])(
             PAT="Personal Access Token", username="Username and password",
         )
 
-        questions = [
-            q.List(
-                name="method",
-                message="Log in using",
-                choices=[LOGIN_METHODS.PAT, LOGIN_METHODS.username],
-                ignore=lambda _: method is not None,
-            ),
-            q.Password(
-                name="pat",
-                message="Personal access token",
-                ignore=lambda ans: (method or ans["method"]) != LOGIN_METHODS.PAT,
-            ),
-            q.Text(
-                name="username",
-                message="Username",
-                ignore=lambda ans: (method or ans["method"]) != LOGIN_METHODS.username,
-            ),
-            q.Password(
-                name="password",
-                message="Password",
-                ignore=lambda ans: (method or ans["method"]) != LOGIN_METHODS.username,
-            ),
-        ]
-        answers = q.prompt(questions)
-
-        method = answers.get("method", method)
+        method = method or ask("Log in using", choices=[LOGIN_METHODS.PAT, LOGIN_METHODS.username])
 
         if method == LOGIN_METHODS.PAT:
+            pat = ask("Personal access token", password=True)
             try:
-                gh = Github(answers["pat"])
-                print(answers)
-                return gh, answers
+                gh = Github(pat)
+                return gh, dict(method=method, pat=pat)
             except BadCredentialsException:
                 print("Bad token")
                 return self.login_manually(method=method)
         else:
+            username = ask("Username")
+            password = ask("Password", password=True)
             try:
-                gh = Github(answers["username"], answers["password"])
-                print(answers)
-                return gh, answers
+                gh = Github(username, password)
+                return gh, dict(method=method, username=username, password=password)
             except TwoFactorException:
                 print(
                     "Your account uses two-factor authentification. Please use a personal access token instead."
@@ -161,25 +132,14 @@ def resolve_defaults(
 
 
 def interactively_create_label(repo: Repository, name: str):
-    label_data = q.prompt(
-        [
-            # TODO: Proper color prompt with color names, live color preview, default value that is removed once you start typing.
-            #       will need to use prompt-toolkit at some point.
-            # q.Text(
-            #     "color",
-            #     message="Choose a color for your label",
-            #     validate=validate_label_color,
-            #     default=lambda ans: f"{randint(0x0, 0xFFFFFF):6x}".upper()
-            # ),
-            q.Text(
-                "description", message="A short description of your label", default="",
-            ),
-        ]
-    )
-
+    label_data = {
+        'color': get_random_color_hexstring(),
+        'description': ask("A short description of your label"),
+        'name': name
+    }
     color = get_random_color_hexstring()
     print(f"Creating label {ui.Label(name, color)}...")
-    repo.create_label(name=name, color=color, **label_data)
+    return repo.create_label(**label_data)
 
 
 def tag_names_to_labels(
@@ -479,7 +439,7 @@ def get_project_and_column(
         create_missing=create_missing,
         object_name="project",
         create=lambda: repo.create_project(
-            name=project_name, body=ask_text("Enter the project's description..."),
+            name=project_name, body=ask("Enter the project's description..."),
         ),
     )
 
