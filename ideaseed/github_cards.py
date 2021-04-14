@@ -57,7 +57,9 @@ class AuthCache(BaseCache):
             PAT="Personal Access Token", username="Username and password",
         )
 
-        method = method or ask("Log in using", choices=[LOGIN_METHODS.PAT, LOGIN_METHODS.username])
+        method = method or ask(
+            "Log in using", choices=[LOGIN_METHODS.PAT, LOGIN_METHODS.username]
+        )
 
         if method == LOGIN_METHODS.PAT:
             pat = ask("Personal access token", password=True)
@@ -133,9 +135,9 @@ def resolve_defaults(
 
 def interactively_create_label(repo: Repository, name: str):
     label_data = {
-        'color': get_random_color_hexstring(),
-        'description': ask("A short description of your label"),
-        'name': name
+        "color": get_random_color_hexstring(),
+        "description": ask("A short description of your label"),
+        "name": name,
     }
     color = get_random_color_hexstring()
     print(f"Creating label {ui.Label(name, color)}...")
@@ -254,7 +256,6 @@ def create_and_show_github_card(
 
 class AbstractCard:
     """ Represents a future github card/issue, with all attributes refering to their names instead of their resolved github objects """
-    
 
 
 def push_to_repo(
@@ -369,12 +370,7 @@ def push_to_user(
     # XXX: for some reason, we have to call get_user again to get a NamedUser
     # and not an AuthenticatedUser, because those don't have .get_projects() defined
     user = gh.get_user(gh.get_user().login)
-    project, column = get_project_and_column(
-        user,
-        project,
-        column,
-        create_missing,
-    )
+    project, column = get_project_and_column(user, project, column, create_missing,)
 
     if not column or not project:
         return
@@ -451,9 +447,7 @@ def get_project_and_column(
         column_name,
         create_missing=create_missing,
         object_name="column",
-        create=lambda: project.create_column(
-            name=column_name
-        ),
+        create=lambda: project.create_column(name=column_name),
     )
 
     return project, column
