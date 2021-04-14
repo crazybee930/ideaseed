@@ -148,20 +148,6 @@ Some color have aliases:
 - grey is the same as gray
 - magenta is the same as purple
 
-#### Relax. You don't need to remember those options (Coming in [v1.0.0])
-
-You can also use `ideaseed -I` to prompt you for some information:
-
-- Where do you want to upload this idea? (github, google keep)
-- If you decide to use github,
-  - On your profile?
-  - If not:
-    - Which repo? (using REPO or OWNER/REPO) (autocompletes with repositories you contribute to)
-    - Which column? (choices are the column names, and you can type the column's index to be quicker)
-- If you decide to use google keep,
-  - Which color? (defaults to white)
-  - Some tags?
-
 ## Installation troubleshooting
 
 If you get an error message saying "No matching distribution found":
