@@ -110,6 +110,7 @@ def make_table(
     project_column: Optional[str] = None,
     url: Optional[str] = None,
 ) -> Table:
+    assignees = assignees or []
     listing = Table.grid(expand=True, padding=0)
     listing.add_column()
     listing.add_column(justify="right")
