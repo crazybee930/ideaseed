@@ -102,7 +102,7 @@ def make_card(
     return Panel(card, title=card_title, style=card_style)
 
 
-def make_listing(
+def make_table(
     milestone: Optional[str] = None,
     assignees: Optional[Iterable[str]] = None,
     project: Optional[str] = None,
@@ -156,7 +156,7 @@ def show(
     )
     c.print()
     c.print(
-        make_listing(
+        make_table(
             milestone=milestone,
             assignees=assignees,
             project=project,
