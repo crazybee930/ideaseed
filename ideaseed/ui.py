@@ -22,22 +22,22 @@ ABOUT_SCREEN = """
                 ██████████      ██
                 ██      ██      ██
                 ██████████      ██
-     
+
             ideaseed v{version}
             by Ewen Le Bihan
             more at https://ewen.works
-     
+
                 ~ thx to these ppl ~
 
 https://github.com/kiwiz
     This madman reverse-engineered Google Keep's
     internal REST API so that anyone could
     use it with ease.
-                    
+
 https://github.com/PyGithub
     This one of the cleanest libs I've ever used.
     Like `requests`-level cleanliness.
-                    
+
 https://github.com/docopt
     Designing CLIs with this is a fucking breeze.
     I can almost copy-paste documentation into
@@ -165,54 +165,3 @@ def show(
         )
     )
 
-
-if __name__ == "__main__":
-    show(
-        title="lsd cannot follow windows symlinks",
-        right_of_title="#499",
-        description=r"""
-I've tried a few and stumbled upon a more general solution that supports multiple languages and multiple types of graphs, called [depends](https://github.com/multilang-depends/depends).
-
-It does something weird with its DOT format generation, it puts node names (so actual functions) in some weird format in _comments_ atop the `digraph` and only uses numbers in the actually shown content. I patched together a small python script that fixes the DOT file to actually show the functions' names, and it works well.
-
-```python
-from pathlib import Path
-names = dict()
-
-content = Path('PUT YOUR FILE'S PATH HERE').read_text('utf-8')
-
-for mapping_line in filter(lambda s: s.startswith('// '), content.splitlines()):
-    ident, rest = mapping_line.removeprefix('// ').split(':')
-    module, rest = rest.split('(')
-    module = module.removesuffix('.py')
-    function = rest.split('/')[-1].removeprefix('ideaseed.').removesuffix(')')
-    names[ident] = module + "." + function
-
-for ident, name in names.items():
-    content = content.replace(f"\t{ident} ->", f"\t\"{name}\" ->")
-    content = content.replace(f" {ident};", f" \"{name}\";")
-
-for line in content.splitlines():
-    if 'cli.run" ->' in line or 'utils.' in line:
-        content = content.replace(line, "")
-
-print(content)
-```
-
-just putting this out here in case an internet stranger stumbles upon this issue.""",
-        labels=[
-            Label(name="help wanted", color="00E6C4"),
-            Label(name="kind/enhancement", color="A0EEEE"),
-            Label(
-                name="os/windows",
-                color="CE8D4C",
-                url="https://github.com/anishathalye/dotbot/labels/enhancement",
-            ),
-        ],
-        card_title=href("Peltoche/lsd", "https://github.com/Peltoche/lsd"),
-        milestone="1.6.3",
-        assignees=(href("meain", "https://github.com/meain"), "Peltoche"),
-        project="Backlog",
-        project_column="work in progress",
-        url="https://github.com/Peltoche/lsd/issues/499",
-    )
