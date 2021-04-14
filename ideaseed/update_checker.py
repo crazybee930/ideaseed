@@ -29,10 +29,12 @@ def get_latest_version() -> Version:
     )
     return Version(version)
 
+
 def get_release_notes() -> str:
     return requests.get(
         "https://raw.githubusercontent.com/ewen-lbh/ideaseed/master/CHANGELOG.md"
     ).text
+
 
 def get_changelog_heading_anchor(release_notes: str, upgrade_to: Version) -> str:
     """
@@ -43,6 +45,7 @@ def get_changelog_heading_anchor(release_notes: str, upgrade_to: Version) -> str
     pattern = re.compile(r"## \[" + str(upgrade_to) + r"\] - (.+)")
     date = pattern.search(release_notes).group(1)
     return f"{str(upgrade_to).replace('.', '')}---{date}"
+
 
 def get_release_notes_for_version(release_notes: str, version: Version) -> str:
     in_target_version = False
@@ -109,10 +112,12 @@ def get_release_notes_link(release_notes: str, upgrade_to: Version) -> str:
 
 def notification(upgrade_from: Version, upgrade_to: Version) -> None:
     print(Rule("Update available!"))
-    print(f"""A new version of ideaseed is available for download:
+    print(
+        f"""A new version of ideaseed is available for download:
 [blue bold]{upgrade_from}[/] [magenta]->[/] [blue bold]{upgrade_to}[/]
 
-Use [blue bold]ideaseed update[/] to see what changed and do the update.""")
+Use [blue bold]ideaseed update[/] to see what changed and do the update."""
+    )
 
 
 def prompt(upgrade_from: Version, upgrade_to: Version) -> bool:
@@ -140,11 +145,15 @@ def prompt(upgrade_from: Version, upgrade_to: Version) -> bool:
         # the version <h2>, which would be stupid to show here
         else:
             notes = get_release_notes_for_version(release_notes, upgrade_to)
-        print(Rule(f"Release notes for [bold blue]{upgrade_from}[/] [magenta]->[/] [bold blue]{upgrade_to}[/]"))
+        print(
+            Rule(
+                f"Release notes for [bold blue]{upgrade_from}[/] [magenta]->[/] [bold blue]{upgrade_to}[/]"
+            )
+        )
         print(Markdown(notes))
         return answered_yes_to("Update now?")
 
-    return True 
+    return True
 
 
 def upgrade(upgrade_from: Version, upgrade_to: Version):

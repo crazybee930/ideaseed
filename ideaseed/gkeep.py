@@ -19,8 +19,8 @@ from validate_email import validate_email
 from ideaseed import authentication, ui
 from ideaseed.constants import (COLOR_ALIASES, COLOR_NAME_TO_HEX_MAP,
                                 VALID_COLOR_NAMES)
-from ideaseed.utils import (answered_yes_to, case_insensitive_find,
-                            error_message_no_object_found, print_dry_run, ask)
+from ideaseed.utils import (answered_yes_to, ask, case_insensitive_find,
+                            error_message_no_object_found, print_dry_run)
 
 rich.traceback.install()
 
@@ -40,16 +40,15 @@ class AuthCache(authentication.Cache):
             username = ask("Email", is_valid=validate_email)
         if not password:
             password = ask(
-                "App password" if entering_app_password else "Password",
-                password=True
+                "App password" if entering_app_password else "Password", password=True
             )
 
         # Log in
         keep = Keep()
-        
+
         try:
             keep.login(username, password)
-            
+
             # elif keyring:
             #     service, name =
         except LoginException as error:
@@ -146,7 +145,6 @@ def push_to_gkeep(
     # Handle API errors
     with handle_api_errors():
         keep = AuthCache(Path(auth_cache)).login()
-        
 
     # Find/create all the labels
     labels = find_and_create_labels(keep, tags, create_missing=create_missing)

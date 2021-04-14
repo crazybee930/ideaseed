@@ -1,5 +1,5 @@
-from typing import Iterable, NamedTuple, Optional
 from shutil import get_terminal_size
+from typing import Iterable, NamedTuple, Optional
 
 from rich.console import Console, ConsoleOptions, RenderResult
 from rich.markdown import CodeBlock, Markdown
@@ -83,7 +83,7 @@ def make_card(
     card_title: str,
     card_style: str = "default",
 ) -> Panel:
-    title = title or "" # no silly 'None' as title
+    title = title or ""  # no silly 'None' as title
     header = Table.grid(expand=True)
     header.add_column()
     header.add_column(justify="right")
@@ -166,4 +166,3 @@ def show(
             url=url,
         )
     )
-

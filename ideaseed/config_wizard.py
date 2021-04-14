@@ -58,18 +58,18 @@ def reverse_docopt(program_name: str, args_map: dict[str, Any]) -> str:
             continue
         # Flags with a value
         elif type(value) is str:
-            line += [ f"{key}={shlex.quote(value)}" ]
+            line += [f"{key}={shlex.quote(value)}"]
         # Count (repeated value-less flag)
         elif type(value) is int:
-            line += [key] * value 
+            line += [key] * value
         # list (repeated flag with value)
         elif type(value) is list:
-            line += [ f"{key}={shlex.quote(str(v))}" for v in value ]
+            line += [f"{key}={shlex.quote(str(v))}" for v in value]
         # Boolean (value-less flag, ony present if `True`)
         elif type(value) is bool and value:
             line += [key]
 
-    return ' '.join(line)
+    return " ".join(line)
 
 
 def get_alias_command(args_map: dict[str, Any], shortcut_name: str) -> str:
@@ -84,7 +84,7 @@ def get_alias_command(args_map: dict[str, Any], shortcut_name: str) -> str:
     "alias idea='ideaseed --ab --ab --ab --ab --bb=yes --cb --eb=5 --eb=\\\\'fefez$$/./!**fe\\\\' thingie :thinking:'"
     """
     # nested shlex.quote gives completely bonkers output, adding '"'" to each side of a deeply-quoted string (the fezfez... here, for example)
-    shortcut = reverse_docopt('ideaseed', args_map).replace('\'', '\\\'')
+    shortcut = reverse_docopt("ideaseed", args_map).replace("'", "\\'")
     return f"alias {shortcut_name}='{shortcut}'"
 
 
@@ -114,9 +114,14 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
 
     settings: dict[str, Any] = {}
 
-    settings["--auth-cache"] = ask("Path to the authentification cache (leave blank to not use any)") or '<None>'
+    settings["--auth-cache"] = (
+        ask("Path to the authentification cache (leave blank to not use any)")
+        or "<None>"
+    )
     settings["--check-for-updates"] = answered_yes_to("Check for updates?")
-    settings["--self-assign"] = answered_yes_to("Assign yourself to issues if you don't assign anyone with -@ ?")
+    settings["--self-assign"] = answered_yes_to(
+        "Assign yourself to issues if you don't assign anyone with -@ ?"
+    )
 
     print(
         """

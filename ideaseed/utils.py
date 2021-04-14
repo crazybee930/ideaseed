@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from random import randint
-from typing import Any, Iterable, Union, Optional, Callable
+from typing import Any, Callable, Iterable, Optional, Union
 
 from rich import print
 from rich.prompt import Confirm, Prompt
@@ -44,13 +44,19 @@ def get_random_color_hexstring() -> str:
     return f"{randint(0x0, 0xFFFFFF):6x}".upper()
 
 
-def ask(question: str, is_valid: Callable[[str], bool] = bool, choices: Optional[list[str]] = None, password = False) -> str:
+def ask(
+    question: str,
+    is_valid: Callable[[str], bool] = bool,
+    choices: Optional[list[str]] = None,
+    password=False,
+) -> str:
     answer = ""
     while True:
         answer = Prompt.ask(question, password=password, choices=choices)
         if is_valid(answer):
             break
     return answer
+
 
 def answered_yes_to(question: str) -> bool:
     return Confirm.ask(question)
