@@ -76,13 +76,14 @@ def href(s: str, url: str) -> str:
 
 
 def make_card(
-    title: str,
+    title: Optional[str],
     right_of_title: str,
     description: str,
     labels: Iterable[Label],
     card_title: str,
     card_style: str = "default",
 ) -> Panel:
+    title = title or "" # no silly 'None' as title
     header = Table.grid(expand=True)
     header.add_column()
     header.add_column(justify="right")
