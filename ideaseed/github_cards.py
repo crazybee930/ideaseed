@@ -106,7 +106,7 @@ def resolve_defaults(
 
     Returns a `(project, column)` tuple.
     
-    >>> resolve_default_arguments(
+    >>> resolve_defaults(
     ...     column=None, 
     ...     project='testy',
     ...     default_project='1', 
@@ -114,7 +114,7 @@ def resolve_defaults(
     ...     repo_full_name='ewen-lbh/project',
     ...     username='ewen-lbh',
     ... )
-    "testy", "testy"
+    ('testy', 'testy')
     """
     owner, repository = repo_full_name.split("/")
     if not project and not default_project:

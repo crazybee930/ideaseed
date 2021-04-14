@@ -29,23 +29,20 @@ def get_latest_version() -> Version:
     )
     return Version(version)
 
-
-def get_changelog_heading_anchor(release_notes: str, upgrade_to: Version) -> str:
-    """
-    Get the changelog heading anchor for github.
-    >>> get_changelog_heading_anchor(Version('0.8.0'))
-    '080---2020-06-20'
-    """
-    pattern = re.compile(r"## \[" + str(upgrade_to) + r"\] - (.+)")
-    date = pattern.search(release_notes).group(1)
-    return f"{str(upgrade_to).replace('.', '')}---{date}"
-
-
 def get_release_notes() -> str:
     return requests.get(
         "https://raw.githubusercontent.com/ewen-lbh/ideaseed/master/CHANGELOG.md"
     ).text
 
+def get_changelog_heading_anchor(release_notes: str, upgrade_to: Version) -> str:
+    """
+    Get the changelog heading anchor for github.
+    >>> get_changelog_heading_anchor(get_release_notes(), Version('0.8.0'))
+    '080---2020-06-20'
+    """
+    pattern = re.compile(r"## \[" + str(upgrade_to) + r"\] - (.+)")
+    date = pattern.search(release_notes).group(1)
+    return f"{str(upgrade_to).replace('.', '')}---{date}"
 
 def get_release_notes_for_version(release_notes: str, version: Version) -> str:
     in_target_version = False

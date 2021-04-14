@@ -14,9 +14,9 @@ def readable_on(background: str, light: str = "FFFFFF", dark: str = "000000") ->
     
     WARN: All the color strings must be exactly 6 digits long.
     
-    >>> readable_text_color_on('FEFAFE')
+    >>> readable_on('FEFAFE')
     '000000'
-    >>> readable_text_color_on('333333')
+    >>> readable_on('333333')
     'FFFFFF'
     """
     r, g, b = hex_to_rgb(background)
