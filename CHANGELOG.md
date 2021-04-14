@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reduce friction when connecting to Google Keep from a 2FA-secured account
 - All-new UI using [rich](https://pypi.org/project/rich)
 - More intuitive CLI, using a bunch of positional arguments. See 0f86a87 and related issues (#112 mainly)
-- about & version are now commands instead of flags
+- about, config and version are now commands instead of flags (do `ideaseed config` instead of `ideaseed --config`, for example.)
 - no-* flags are now --* (i.e. negative flags are positive) (e.g. --no-check-for-updates is now --check-for-updates)
 - The update checking is less intrusive, the notification just tells you that an update is available, but does not ask for upgrading
 - Creating issues is now the default behavior. A new flag `-I`/`--no-issue` has been created to prevent issue creation.
