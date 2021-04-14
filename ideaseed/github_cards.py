@@ -4,7 +4,7 @@ import re
 import webbrowser
 from collections import namedtuple
 from pathlib import Path
-from typing import Any, Callable, Optional, Tuple, TypeVar, Union, Iterable
+from typing import Any, Callable, Iterable, Optional, Tuple, TypeVar, Union
 
 import github.GithubObject
 import inquirer as q
@@ -285,7 +285,7 @@ def create_and_show_github_card(
         labels=[],
         card_title=get_card_title(repo_or_user),
         milestone=None,
-        assignees=None,
+        assignees=[],
         project=with_link(project),
         project_column=ui.href(column.name, project.html_url),
         url=url,
@@ -396,16 +396,21 @@ def push_to_user(
     open: bool,
     **_,
 ) -> None:
+    # FIXME: creates a duplicated title in the card.
+    #           the thing is that the card displays the title and the body
+    #           but github cards themselves do not have a title, so we need
+    #           to include the title in the body as an <h1>
+    #           but the same body gets passed to `ui.show`, so it appears twice:
+    #           as the `title`, and as the <h1> of `body`.
     if title:
         body = f"# {title}\n\n{body}"
 
-    gh = AuthCache(auth_cache).login()
-    user = gh.get_user()
-    username = user.login
+    gh = AuthCache(Path(auth_cache)).login()
+    # XXX: for some reason, we have to call get_user again to get a NamedUser
+    # and not an AuthenticatedUser, because those don't have .get_projects() defined
+    user = gh.get_user(gh.get_user().login)
     project, column = get_project_and_column(
-        # XXX: for some reason, we have to call get_user again to get a NamedUser
-        # and not an AuthenticatedUser, because those don't have .get_projects() defined
-        gh.get_user(user.login),
+        user,
         project,
         column,
         create_missing,
@@ -421,7 +426,6 @@ def push_to_user(
         dry_run=dry_run,
         column=column,
         project=project,
-        repo=user,
         title=title,
         body=body,
     )
