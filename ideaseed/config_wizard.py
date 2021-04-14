@@ -5,7 +5,7 @@ from os import getenv, path
 from os.path import isfile
 from typing import Any, Optional, Union
 
-from ideaseed.utils import ask_text
+from ideaseed.utils import answered_yes_to, ask
 
 
 class UnknownShellError(Exception):
@@ -38,39 +38,38 @@ def reverse_docopt(program_name: str, args_map: dict[str, Any]) -> str:
     Turns a docopt-style dict of arguments and flags into a string
     you would type into your shell (WIP)
     
-    >>> reverse_docopt('prog', { '--ab': 4, '--bb': 'yes', '--cb': True, '--db': False, '--eb' ['5', 'fefez$$/./!**fe'], 'thingie': True, 'nothingie': False, 'SHOUT': ':thinking:' })
-    'prog --ab --ab --ab --ab --bb=yes --cb --eb=5 --eb=5 --eb="fefez\\$\\$/./\\!\\*\\*fe" thingie :thinking:'
+    >>> reverse_docopt('prog', { '--ab': 4, '--bb': 'yes', '--cb': True, '--db': False, '--eb': ['5', 'fefez$$/./!**fe'], 'thingie': True, 'nothingie': False, 'SHOUT': ':thinking:' })
+    "prog --ab --ab --ab --ab --bb=yes --cb --eb=5 --eb='fefez$$/./!**fe' thingie :thinking:"
     """
-    line = program_name
+    line = [program_name]
 
     for key, value in args_map.items():
         # Arguments
         if not key.startswith("--"):
             # Strings in the command that are either present or not
             if type(value) is bool and value:
-                line += f" {key}"
+                line += [key]
             # Positional arguments
             elif type(value) is str:
-                line += f" {value}"
+                line += [value]
             continue
         # Flag with a value, but is not specified
         if value is None:
             continue
         # Flags with a value
         elif type(value) is str:
-            line += f" {key}={shlex.quote(value)}"
+            line += [ f"{key}={shlex.quote(value)}" ]
         # Count (repeated value-less flag)
         elif type(value) is int:
-            line += f" {key}" * value
+            line += [key] * value 
         # list (repeated flag with value)
         elif type(value) is list:
-            for v in value:
-                line += f" {key}={shlex.quote(str(v))}"
+            line += [ f"{key}={shlex.quote(str(v))}" for v in value ]
         # Boolean (value-less flag, ony present if `True`)
         elif type(value) is bool and value:
-            line += f" {key}"
+            line += [key]
 
-    return line
+    return ' '.join(line)
 
 
 def get_alias_command(args_map: dict[str, Any], shortcut_name: str) -> str:
@@ -81,15 +80,12 @@ def get_alias_command(args_map: dict[str, Any], shortcut_name: str) -> str:
     {
         '--option': 'value'
     }
+    >>> get_alias_command({ '--ab': 4, '--bb': 'yes', '--cb': True, '--db': False, '--eb': ['5', 'fefez$$/./!**fe'], 'thingie': True, 'nothingie': False, 'SHOUT': ':thinking:' }, 'idea')
+    "alias idea='ideaseed --ab --ab --ab --ab --bb=yes --cb --eb=5 --eb=\\\\'fefez$$/./!**fe\\\\' thingie :thinking:'"
     """
-    return (
-        "alias "
-        + shortcut_name
-        + "="
-        + "'"
-        + reverse_docopt("ideaseed", args_map).replace("'", "\\'")
-        + "'"
-    )
+    # nested shlex.quote gives completely bonkers output, adding '"'" to each side of a deeply-quoted string (the fezfez... here, for example)
+    shortcut = reverse_docopt('ideaseed', args_map).replace('\'', '\\\'')
+    return f"alias {shortcut_name}='{shortcut}'"
 
 
 def write_alias_to_rc_file(shell_name: str, alias_line: str):
@@ -118,54 +114,24 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
 
     settings: dict[str, Any] = {}
 
-    settings["--user-project"] = ask_text(
-        "What GitHub project do you use on your GitHub profile?", "--user-project="
-    )
-    settings["--user-keyword"] = ask_text(
-        "What 'repository' name do you want to type to tell ideaseed to use your GitHub user profile's project instead?",
-        "--user-keyword=",
-    )
-    settings["--no-auth-cache"] = (
-        not ask_text("Cache credentials? (y/N)").lower().strip().startswith("y")
-    )
-    settings["--no-check-for-updates"] = (
-        not ask_text("Check for updates? (y/N)").lower().strip().startswith("y")
-    )
-    settings["--no-self-assign"] = (
-        not ask_text(
-            "Assign yourself to issues if you don't assign anyone with -@ ? (y/N)"
-        )
-        .lower()
-        .strip()
-        .startswith("y")
-    )
+    settings["--auth-cache"] = ask("Path to the authentification cache (leave blank to not use any)") or '<None>'
+    settings["--check-for-updates"] = answered_yes_to("Check for updates?")
+    settings["--self-assign"] = answered_yes_to("Assign yourself to issues if you don't assign anyone with -@ ?")
+
     print(
-        """\
+        """
+        For the two following questions, you can use {placeholders}.
+        See https://github.com/ewen-lbh/ideaseed#placeholders
+        for the full list of available placeholders.
+        """.strip()
+    )
 
-For the two following questions, you can use %(placeholders)s.
-See https://github.com/ewen-lbh/ideaseed#available-placeholders-for---default--options
-for the full list of available placeholders.
-
-"""
-    )
-    settings["--default-project"] = (
-        ask_text(
-            "Enter the default value for the project name (default: %(repository)s)",
-            "--default-project=",
-        )
-        or "%(repository)s"
-    )
-    settings["--default-column"] = (
-        ask_text(
-            "Enter the default value for the column name (default: To Do)",
-            "--default-column=",
-        )
-        or "To Do"
-    )
+    settings["--default-project"] = ask("Enter the default value for the project name")
+    settings["--default-column"] = ask("Enter the default value for the column name")
 
     return (
         settings,
-        ask_text(
+        ask(
             "What name do you want to invoke your configured ideaseed with? (a good one is 'idea')"
         ),
     )
