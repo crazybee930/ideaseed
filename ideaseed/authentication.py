@@ -24,7 +24,8 @@ class Cache:
 
     def create(self):
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        self.path.touch()
+        if not (self.path.exists() and self.path.read_text() != ""):
+            self.path.write_text('{}')
 
     @contextmanager
     def modify(self):
