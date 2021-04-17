@@ -58,7 +58,7 @@ class AuthCache(BaseCache):
         )
 
         method = method or ask(
-            "Log in using", choices=[LOGIN_METHODS.PAT, LOGIN_METHODS.username]
+            "Log in using", choices={"0": LOGIN_METHODS.PAT, "1": LOGIN_METHODS.username}
         )
 
         if method == LOGIN_METHODS.PAT:
