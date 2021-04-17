@@ -46,7 +46,7 @@ class AuthCache(BaseCache):
         try:
             return Github(
                 login_or_token=self.cache["pat"] or self.cache["username"],
-                password=self.cache["password"],
+                password=self.cache["password"] if "password" in self.cache else None,
             )
         except Exception as error:
             print(f"[black on red]{error}")
