@@ -14,7 +14,6 @@ from gkeepapi import Keep
 from gkeepapi.exception import APIException, LoginException
 from gkeepapi.node import ColorValue
 from rich import print
-from validate_email import validate_email
 
 from ideaseed import authentication, ui
 from ideaseed.constants import (COLOR_ALIASES, COLOR_NAME_TO_HEX_MAP,
@@ -37,7 +36,7 @@ class AuthCache(authentication.Cache):
     ) -> Tuple[Keep, dict[str, Any]]:
         # Ask for creds
         if not username:
-            username = ask("Email", is_valid=validate_email)
+            username = ask("Email")
         if not password:
             password = ask(
                 "App password" if entering_app_password else "Password", password=True
