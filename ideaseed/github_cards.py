@@ -69,6 +69,9 @@ class AuthCache(BaseCache):
             except BadCredentialsException:
                 print("Bad token")
                 return self.login_manually(method=method)
+            except Exception as e:
+                print(repr(e))
+                return self.login_manually(method=method)
         else:
             username = ask("Username")
             password = ask("Password", password=True)
@@ -82,6 +85,9 @@ class AuthCache(BaseCache):
                 return self.login_manually(method=LOGIN_METHODS.username)
             except BadCredentialsException:
                 print("Bad credentials")
+                return self.login_manually(method=method)
+            except Exception as e:
+                print(repr(e))
                 return self.login_manually(method=method)
 
 
