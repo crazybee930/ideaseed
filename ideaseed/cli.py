@@ -174,7 +174,7 @@ def run(argv=None):
         gkeep_cache.login()
 
     elif args["logout"]:
-        authentication.Cache(auth_cache_path).clear_all()
+        authentication.Cache(auth_cache_path, "whatever").clear_all()
 
     elif args["user"]:
         github_cards.push_to_user(**args)
