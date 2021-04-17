@@ -65,6 +65,12 @@ class AuthCache(BaseCache):
             pat = ask("Personal access token", password=True)
             try:
                 gh = Github(pat)
+                # just instanciating does not mean auth succeeded
+                # seems like you need to _really_ hit Auth-retricted APIs,
+                # even gh.get_user() does not work.
+                # There does not seem to be a method made for auth-checking, 
+                # so I'm using that. sigh...
+                gh.get_user().get_user_issues().get_page(0)
                 return gh, dict(method=method, pat=pat)
             except BadCredentialsException:
                 print("Bad token")
@@ -77,6 +83,7 @@ class AuthCache(BaseCache):
             password = ask("Password", password=True)
             try:
                 gh = Github(username, password)
+                gh.get_user().get_user_issues().get_page(0)
                 return gh, dict(method=method, username=username, password=password)
             except TwoFactorException:
                 print(
