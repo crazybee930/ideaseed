@@ -124,32 +124,9 @@ wrapt = ">=1.10,<2"
 dev = ["tox", "bump2version (<1)", "sphinx (<2)", "importlib-metadata (<3)", "importlib-resources (<4)", "configparser (<5)", "sphinxcontrib-websupport (<2)", "zipp (<2)", "PyTest (<5)", "PyTest-Cov (<2.6)", "pytest", "pytest-cov"]
 
 [[package]]
-name = "dnspython"
-version = "2.1.0"
-description = "DNS toolkit"
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.extras]
-dnssec = ["cryptography (>=2.6)"]
-doh = ["requests", "requests-toolbelt"]
-idna = ["idna (>=2.1)"]
-curio = ["curio (>=1.2)", "sniffio (>=1.1)"]
-trio = ["trio (>=0.14.0)", "sniffio (>=1.1)"]
-
-[[package]]
 name = "docopt"
 version = "0.6.2"
 description = "Pythonic argument parser, that will make you smile"
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
-name = "filelock"
-version = "3.0.12"
-description = "A platform independent file lock."
 category = "main"
 optional = false
 python-versions = "*"
@@ -186,14 +163,6 @@ python-versions = "*"
 [package.dependencies]
 pycryptodomex = ">=3.0"
 requests = "*"
-
-[[package]]
-name = "idna"
-version = "3.1"
-description = "Internationalized Domain Names in Applications (IDNA)"
-category = "main"
-optional = false
-python-versions = ">=3.4"
 
 [[package]]
 name = "inquirer"
@@ -255,19 +224,6 @@ description = "Utility library for gitignore style pattern matching of file path
 category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-
-[[package]]
-name = "py3-validate-email"
-version = "1.0.0"
-description = "Email validator with regex, blacklisted domains and SMTP checking."
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-dnspython = ">=2.0,<3.0"
-filelock = ">=3.0,<4.0"
-idna = ">=3.0,<4.0"
 
 [[package]]
 name = "pycryptodomex"
@@ -480,7 +436,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "d30612ab9c8b2e6f437355cef9dce207a84462752bc5ef8f37be36781584c815"
+content-hash = "93fd48084a4096bcb80b7efaf28b88c7f97cdf0a7eef84db33c7956c19be4f19"
 
 [metadata.files]
 ansicon = [
@@ -527,16 +483,8 @@ deprecated = [
     {file = "Deprecated-1.2.12-py2.py3-none-any.whl", hash = "sha256:08452d69b6b5bc66e8330adde0a4f8642e969b9e1702904d137eeb29c8ffc771"},
     {file = "Deprecated-1.2.12.tar.gz", hash = "sha256:6d2de2de7931a968874481ef30208fd4e08da39177d61d3d4ebdf4366e7dbca1"},
 ]
-dnspython = [
-    {file = "dnspython-2.1.0-py3-none-any.whl", hash = "sha256:95d12f6ef0317118d2a1a6fc49aac65ffec7eb8087474158f42f26a639135216"},
-    {file = "dnspython-2.1.0.zip", hash = "sha256:e4a87f0b573201a0f3727fa18a516b055fd1107e0e5477cded4a2de497df1dd4"},
-]
 docopt = [
     {file = "docopt-0.6.2.tar.gz", hash = "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491"},
-]
-filelock = [
-    {file = "filelock-3.0.12-py3-none-any.whl", hash = "sha256:929b7d63ec5b7d6b71b0fa5ac14e030b3f70b75747cef1b10da9b879fef15836"},
-    {file = "filelock-3.0.12.tar.gz", hash = "sha256:18d82244ee114f543149c66a6e0c14e9c4f8a1044b5cdaadd0f82159d6a6ff59"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
@@ -546,10 +494,6 @@ gkeepapi = [
 ]
 gpsoauth = [
     {file = "gpsoauth-0.4.1.tar.gz", hash = "sha256:1c3f45824d45ac3d06b9d9a0c0eccafe1052505d31ac9a698aef8b00fb0dfc37"},
-]
-idna = [
-    {file = "idna-3.1-py3-none-any.whl", hash = "sha256:5205d03e7bcbb919cc9c19885f9920d622ca52448306f2377daede5cf3faac16"},
-    {file = "idna-3.1.tar.gz", hash = "sha256:c5b02147e01ea9920e6b0a3f1f7bb833612d507592c837a6c49552768f4054e1"},
 ]
 inquirer = [
     {file = "inquirer-2.7.0-py2.py3-none-any.whl", hash = "sha256:d15e15de1ad5696f1967e7a23d8e2fce69d2e41a70b008948d676881ed94c3a5"},
@@ -593,9 +537,6 @@ mccabe = [
 pathspec = [
     {file = "pathspec-0.8.0-py2.py3-none-any.whl", hash = "sha256:7d91249d21749788d07a2d0f94147accd8f845507400749ea19c1ec9054a12b0"},
     {file = "pathspec-0.8.0.tar.gz", hash = "sha256:da45173eb3a6f2a5a487efba21f050af2b41948be6ab52b6a1e3ff22bb8b7061"},
-]
-py3-validate-email = [
-    {file = "py3-validate-email-1.0.0.tar.gz", hash = "sha256:3d54cd631c729a01d87240e1892cf8061ae4ff0254294200d0388d3b5fc1834d"},
 ]
 pycryptodomex = [
     {file = "pycryptodomex-3.9.8-cp27-cp27m-macosx_10_6_intel.whl", hash = "sha256:c0d085c8187a1e4d3402f626c9e438b5861151ab132d8761d9c5ce6491a87761"},
