@@ -108,7 +108,7 @@ Placeholders:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from docopt import docopt
 
@@ -236,5 +236,5 @@ def check_for_updates(check_for_updates_flag: bool):
 def validate_tag_color(color: Optional[str]):
     if color and color not in map(str.lower, VALID_COLOR_NAMES):
         raise UsageError(
-            f"{color!r} is not a valid color name. Valid color names are {english_join(map(str.lower, VALID_COLOR_NAMES))}"
+            f"{color!r} is not a valid color name. Valid color names are {english_join(list(map(str.lower, VALID_COLOR_NAMES)))}"
         )
