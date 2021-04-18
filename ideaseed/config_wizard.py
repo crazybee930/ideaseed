@@ -162,12 +162,12 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
     )
 
 
-def placeholders_validator(valid_placeholers: set[str]) -> Callable[[str], bool]:
+def placeholders_validator(valid_placeholders: set[str]) -> Callable[[str], bool]:
     def _validate(text: str):
         all_placeholders = [p[1] for p in string.Formatter().parse(text)]
-        if not all(p in valid_placeholers for p in all_placeholders):
+        if not all(p in valid_placeholders for p in all_placeholders):
             raise InvalidResponse(
-                f"Allowed placeholders are {english_join(['{%s}' % p for p in valid_placeholers])}"
+                f"Allowed placeholders are {english_join(['{%s}' % p for p in valid_placeholders])}"
             )
         return True
 
