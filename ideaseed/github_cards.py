@@ -58,7 +58,8 @@ class AuthCache(BaseCache):
         )
 
         method = method or ask(
-            "Log in using", choices={"0": LOGIN_METHODS.PAT, "1": LOGIN_METHODS.username}
+            "Log in using",
+            choices={"0": LOGIN_METHODS.PAT, "1": LOGIN_METHODS.username},
         )
 
         if method == LOGIN_METHODS.PAT:
@@ -68,7 +69,7 @@ class AuthCache(BaseCache):
                 # just instanciating does not mean auth succeeded
                 # seems like you need to _really_ hit Auth-retricted APIs,
                 # even gh.get_user() does not work.
-                # There does not seem to be a method made for auth-checking, 
+                # There does not seem to be a method made for auth-checking,
                 # so I'm using that. sigh...
                 gh.get_user().get_user_issues().get_page(0)
                 return gh, dict(method=method, pat=pat)
@@ -223,7 +224,9 @@ def create_and_show_issue(
         labels=map(lambda l: to_ui_label(l, repo), labels),
         card_title=get_card_title(repo),
         milestone=with_link(milestone) if milestone else None,
-        assignees=list(map(linkify_github_username, assignees)),  # maps are generators, and generators exhaust!
+        assignees=list(
+            map(linkify_github_username, assignees)
+        ),  # maps are generators, and generators exhaust!
         project=with_link(project) if project else None,
         project_column=ui.href(column.name, project.html_url) if column else None,
         url=url,

@@ -147,10 +147,12 @@ def run(argv=None):
         gkeep_cache = gkeep.AuthCache(auth_cache_path)
     else:
         auth_cache_path = None
-    
+
     # Crash if auth_cache_path is None, I'll implement this in another PR
     if auth_cache_path is None:
-        raise NotImplementedError("You need to provide an authentication cache path, keyrings will get support later.")
+        raise NotImplementedError(
+            "You need to provide an authentication cache path, keyrings will get support later."
+        )
 
     # Validate color's value
     validate_tag_color(args["color"])

@@ -5,8 +5,10 @@ from typing import Any, Callable, Iterable, Optional, Text, Union
 
 from rich import print
 from rich.console import Console
-from rich.prompt import Confirm, DefaultType, InvalidResponse, Prompt, PromptType
+from rich.prompt import (Confirm, DefaultType, InvalidResponse, Prompt,
+                         PromptType)
 from rich.text import TextType
+
 
 class BetterPrompt(Prompt):
     """
@@ -16,18 +18,37 @@ class BetterPrompt(Prompt):
     Would like to implement a list of radio buttons like enquirer does,
     but that is way more difficult.
     """
+
     choices: Union[list[str], dict[str, str], None]
 
-    def __init__(self, prompt: TextType, *, console: Console, password: bool, choices: Union[list[str], dict[str, str]], show_default: bool, show_choices: bool) -> None:
-        super().__init__(prompt=prompt, console=console, password=password, choices=choices, show_default=show_default, show_choices=show_choices)
+    def __init__(
+        self,
+        prompt: TextType,
+        *,
+        console: Console,
+        password: bool,
+        choices: Union[list[str], dict[str, str]],
+        show_default: bool,
+        show_choices: bool,
+    ) -> None:
+        super().__init__(
+            prompt=prompt,
+            console=console,
+            password=password,
+            choices=choices,
+            show_default=show_default,
+            show_choices=show_choices,
+        )
 
     def check_choice(self, value: str) -> bool:
         assert self.choices is not None
         if isinstance(self.choices, list):
             return super().check_choice(value)
         else:
-            return value.strip() in set(self.choices.keys()) | set(self.choices.values())
-    
+            return value.strip() in (
+                set(self.choices.keys()) | set(self.choices.values())
+            )
+
     def make_prompt(self, default: DefaultType) -> Text:
         prompt = self.prompt.copy()
         prompt.end = ""
@@ -53,14 +74,13 @@ class BetterPrompt(Prompt):
         prompt.append(self.prompt_suffix)
 
         return prompt
-    
+
     def process_response(self, value: str) -> PromptType:
         val = super().process_response(value)
         if isinstance(self.choices, dict):
             if val not in self.choices.values() and val in self.choices.keys():
                 return self.choices[val]
         return val
-
 
 
 def readable_on(background: str, light: str = "FFFFFF", dark: str = "000000") -> str:
@@ -109,7 +129,9 @@ def ask(
 ) -> str:
     answer = ""
     while True:
-        answer = BetterPrompt.ask(question, password=password, choices=choices, default=default)
+        answer = BetterPrompt.ask(
+            question, password=password, choices=choices, default=default
+        )
         try:
             if is_valid(answer):
                 break

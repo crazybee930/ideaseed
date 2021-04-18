@@ -1,23 +1,19 @@
 from __future__ import annotations
 
 import shlex
-from pathlib import Path
 import string
 from os import getenv
+from pathlib import Path
 from typing import Any, Callable
-from rich.panel import Panel
-from rich import print
 
+from rich import print
+from rich.panel import Panel
 from rich.prompt import InvalidResponse
 
 from ideaseed.utils import answered_yes_to, ask, english_join
 
-VALID_PLACEHOLDERS = {
-    "owner",
-    "repository",
-    "username",
-    "project"
-}
+VALID_PLACEHOLDERS = {"owner", "repository", "username", "project"}
+
 
 class UnknownShellError(Exception):
     """The current login shell is not known"""
@@ -126,9 +122,14 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
 
     settings: dict[str, Any] = {}
 
-    settings["--auth-cache"] = str(Path(
-        ask("Path to the authentification cache", default="~/.cache/ideaseed/auth.json"),
-    ).expanduser())
+    settings["--auth-cache"] = str(
+        Path(
+            ask(
+                "Path to the authentification cache",
+                default="~/.cache/ideaseed/auth.json",
+            ),
+        ).expanduser()
+    )
     settings["--check-for-updates"] = answered_yes_to("Check for updates?", False)
     settings["--self-assign"] = answered_yes_to(
         "Assign yourself to issues if you don't assign anyone with -@ ?", True
@@ -142,27 +143,36 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
         """.strip()
     )
 
-    
-
-    settings["--default-project"] = ask("Enter the default value for the project name", is_valid=placeholders_validator({"repository", "owner"}))
-    settings["--default-column"] = ask("Enter the default value for the column name", is_valid=placeholders_validator({"repository", "owner", "project"}))
+    settings["--default-project"] = ask(
+        "Enter the default value for the project name",
+        is_valid=placeholders_validator({"repository", "owner"}),
+    )
+    settings["--default-column"] = ask(
+        "Enter the default value for the column name",
+        is_valid=placeholders_validator({"repository", "owner", "project"}),
+    )
 
     return (
         settings,
         ask(
             "What name do you want to invoke your configured ideaseed with? [dim](a good one is 'idea')",
             is_valid=lambda alias: alias not in ("/", ""),
-            default="ideaseed"
+            default="ideaseed",
         ),
     )
 
+
 def placeholders_validator(valid_placeholers: set[str]) -> Callable[[str], bool]:
     def _validate(text: str):
-        all_placeholders = [ p[1] for p in string.Formatter().parse(text) ]
+        all_placeholders = [p[1] for p in string.Formatter().parse(text)]
         if not all(p in valid_placeholers for p in all_placeholders):
-            raise InvalidResponse(f"Allowed placeholders are {english_join(['{%s}' % p for p in valid_placeholers])}")
+            raise InvalidResponse(
+                f"Allowed placeholders are {english_join(['{%s}' % p for p in valid_placeholers])}"
+            )
         return True
+
     return _validate
+
 
 def run():
     settings, shortcut_name = prompt_for_settings()
