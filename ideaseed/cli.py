@@ -26,7 +26,6 @@ Commands:
                             REPO is _not_ set to 'user'.
     config                  Configures an alias with Configuration flags through a series of questions.
     log(in/out)             Fills/Clears the auth cache (see --auth-cache).
-                            Has no effect when used with --keyring.
     about                   Show information about ideaseed.
     version                 Outputs the version number
     update                  Check for updates. If any is available, shows the changelog. 
