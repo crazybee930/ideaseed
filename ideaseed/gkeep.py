@@ -100,17 +100,17 @@ just up-arrow on your terminal to re-run the command :)"""
 
 
 def find_and_create_labels(
-    keep: Keep, tags: list[str], create_missing: bool
+    keep: Keep, labels: list[str], create_missing: bool
 ) -> list[gkeepapi.node.Label]:
     labels = []
-    for tag in tags:
-        label = keep.findLabel(tag)
+    for label in labels:
+        label = keep.findLabel(label)
         if label is None:
             if create_missing:
-                if answered_yes_to(f"Create missing tag {tag!r}?"):
-                    label = keep.createLabel(tag)
+                if answered_yes_to(f"Create missing label {label!r}?"):
+                    label = keep.createLabel(label)
             else:
-                print(error_message_no_object_found("tag", tag))
+                print(error_message_no_object_found("label", label))
                 return []
 
         if label:
@@ -120,7 +120,7 @@ def find_and_create_labels(
 
 def push_to_gkeep(
     color: str,
-    tag: list[str],
+    label: list[str],
     create_missing: bool,
     dry_run: bool,
     title: Optional[str],
@@ -129,10 +129,9 @@ def push_to_gkeep(
     assign: list[str],
     open: bool,
     auth_cache: Optional[str],
-    keyring: Optional[str],
     **_,
 ) -> None:
-    tags = tag
+
     # Get correct color name casing
     color = case_insensitive_find(VALID_COLOR_NAMES, color)
     # Resolve color aliases
@@ -146,7 +145,7 @@ def push_to_gkeep(
         keep = AuthCache(Path(auth_cache)).login()
 
     # Find/create all the labels
-    labels = find_and_create_labels(keep, tags, create_missing=create_missing)
+    labels = find_and_create_labels(keep, label, create_missing=create_missing)
 
     # Create the card
     if not dry_run:

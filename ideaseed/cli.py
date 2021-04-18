@@ -7,15 +7,15 @@ Usage:
     ideaseed [options] version | --version
     ideaseed [options] help | --help
     ideaseed [options] update
-    ideaseed [options] [-# TAG...] [-@ USER...] user BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] user TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] user PROJECT TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] user PROJECT COLUMN TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] REPO TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] REPO COLUMN TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] REPO PROJECT COLUMN TITLE BODY
+    ideaseed [options] [-# LABEL...] [-@ USER...] user BODY
+    ideaseed [options] [-# LABEL...] [-@ USER...] user TITLE BODY
+    ideaseed [options] [-# LABEL...] [-@ USER...] user PROJECT TITLE BODY
+    ideaseed [options] [-# LABEL...] [-@ USER...] user PROJECT COLUMN TITLE BODY
+    ideaseed [options] [-# LABEL...] [-@ USER...] BODY
+    ideaseed [options] [-# LABEL...] [-@ USER...] TITLE BODY
+    ideaseed [options] [-# LABEL...] [-@ USER...] REPO TITLE BODY
+    ideaseed [options] [-# LABEL...] [-@ USER...] REPO COLUMN TITLE BODY
+    ideaseed [options] [-# LABEL...] [-@ USER...] REPO PROJECT COLUMN TITLE BODY
 
 
 Commands:
@@ -54,16 +54,19 @@ Options:
     -R --repo=REPO          Specifies REPOSITORY
     -P --project=PROJECT    Specifies PROJECT
     -C --column=COLUMN      Specifies COLUMN
-    -# --tag=TAG...         Add tags (GitHub) or labels (Google Keep)
+    -# --label=LABEL...     Add labels
                             Can be specified multiple times.
+                            Cannot be used in the 'user' command.
+                            Cannot be used with --no-issue
     -o --open               Open the created card (or issue) in your $BROWSER.
        --dry-run            Tell what will happen but does not do it. Still logs you in.
                             Beware, objects created with --create-missing will
                             still be created.
-    -m --create-missing     Creates missing objects (projects, columns, and labels/tags)
+    -m --create-missing     Creates missing objects (projects, columns, and labels/labels)
     -@ --assign=USER...     Assign USER to the created issue. 
                             Can be specified multiple times.
                             Cannot be used in the 'user' command.
+                            Cannot be used with --no-issue
 
     REPO only: 
        --self-assign        Assign the created issue to yourself. 
@@ -130,7 +133,7 @@ def run(argv=None):
     flags = docopt(__doc__, argv)
     args = flags_to_args(flags)
 
-    # docopt freaks out and duplicates any non-first --tag occurence, so we remove them
+    # docopt freaks out and duplicates any non-first --label occurence, so we remove them
     args = remove_duplicates_in_list_of_dict(args)
 
     # I'll add support for keyrings in another PR
@@ -209,7 +212,7 @@ def flags_to_args(flags: dict[str, Any]) -> dict[str, Any]:
     ... '--auth-cache': '~/.cache/ideaseed/auth.json',
     ... '--create-missing': False,
     ... '--default-project': '<None>',
-    ... '--tag': None,
+    ... '--label': None,
     ... '--title': None,
     ... '--version': False,
     ... 'BODY': 'b',
@@ -217,7 +220,7 @@ def flags_to_args(flags: dict[str, Any]) -> dict[str, Any]:
     ... 'REPO': None,
     ... 'TITLE': 'a',
     ... 'version': True})
-    {'about': False, 'assign': None, 'auth_cache': '~/.cache/ideaseed/auth.json', 'create_missing': False, 'default_project': None, 'tag': None, 'title': 'a', 'version': True, 'body': 'b', 'column': None, 'repo': None}
+    {'about': False, 'assign': None, 'auth_cache': '~/.cache/ideaseed/auth.json', 'create_missing': False, 'default_project': None, 'label': None, 'title': 'a', 'version': True, 'body': 'b', 'column': None, 'repo': None}
     """
     args = {}
     for name in flags.keys():

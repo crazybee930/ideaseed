@@ -157,14 +157,15 @@ def interactively_create_label(repo: Repository, name: str):
     return repo.create_label(**label_data)
 
 
-def tag_names_to_labels(
-    repo: Repository, create_missing: bool, tag: list[str]
+def label_names_to_labels(
+    repo: Repository, create_missing: bool, label: list[str]
 ) -> list[Label]:
-    if not tag:
+    label_names = label.copy()  # list of `str`s, no need to deepcopy.
+    if not label_names:
         return []
     all_labels = repo.get_labels()
     labels: list[Label] = []
-    for label_name in tag:
+    for label_name in label_names:
         label = search_for_object(
             all_labels,
             label_name,
@@ -283,7 +284,7 @@ def push_to_repo(
     assign: list[str],
     self_assign: bool,
     milestone: Optional[str],
-    tag: list[str],
+    label: list[str],
     default_project: Optional[str],
     default_column: Optional[str],
     create_missing: bool,
@@ -320,10 +321,10 @@ def push_to_repo(
     column: Optional[ProjectColumn]
 
     # Get all labels
-    labels = tag_names_to_labels(repo, create_missing, tag)
+    labels = label_names_to_labels(repo, create_missing, label)
 
     # Some labels where not found
-    if len(labels) != len(tag):
+    if len(labels) != len(label):
         return
 
     if milestone is not None:
