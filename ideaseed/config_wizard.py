@@ -135,6 +135,8 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
         "Assign yourself to issues if you don't assign anyone with -@ ?", True
     )
 
+    settings["--create-missing"] = answered_yes_to("Ask for creation when milestones, labels, projects, etc. are missing?", True)
+
     print(
         """
         For the two following questions, you can use {placeholders}.
