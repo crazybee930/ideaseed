@@ -1,12 +1,21 @@
 from __future__ import annotations
 
 import shlex
-from typing import Any, Optional, Union
 from pathlib import Path
+import string
 from os import getenv
+from typing import Any, Callable
 
 from ideaseed.utils import answered_yes_to, ask
+from rich.prompt import InvalidResponse
 
+from ideaseed.utils import answered_yes_to, ask, english_join
+VALID_PLACEHOLDERS = {
+    "owner",
+    "repository",
+    "username",
+    "project"
+}
 
 class UnknownShellError(Exception):
     """The current login shell is not known"""
@@ -131,8 +140,10 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
         """.strip()
     )
 
-    settings["--default-project"] = ask("Enter the default value for the project name")
-    settings["--default-column"] = ask("Enter the default value for the column name")
+    
+
+    settings["--default-project"] = ask("Enter the default value for the project name", is_valid=placeholders_validator({"repository", "owner"}))
+    settings["--default-column"] = ask("Enter the default value for the column name", is_valid=placeholders_validator({"repository", "owner", "project"}))
 
     return (
         settings,
@@ -141,6 +152,13 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
         ),
     )
 
+def placeholders_validator(valid_placeholers: set[str]) -> Callable[[str], bool]:
+    def _validate(text: str):
+        all_placeholders = [ p[1] for p in string.Formatter().parse(text) ]
+        if not all(p in valid_placeholers for p in all_placeholders):
+            raise InvalidResponse(f"Allowed placeholders are {english_join(['{%s}' % p for p in valid_placeholers])}")
+        return True
+    return _validate
 
 def run():
     settings, shortcut_name = prompt_for_settings()

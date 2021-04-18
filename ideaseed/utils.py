@@ -5,7 +5,7 @@ from typing import Any, Callable, Iterable, Optional, Text, Union
 
 from rich import print
 from rich.console import Console
-from rich.prompt import Confirm, DefaultType, Prompt, PromptType
+from rich.prompt import Confirm, DefaultType, InvalidResponse, Prompt, PromptType
 from rich.text import TextType
 
 class BetterPrompt(Prompt):
@@ -62,6 +62,7 @@ class BetterPrompt(Prompt):
         return val
 
 
+
 def readable_on(background: str, light: str = "FFFFFF", dark: str = "000000") -> str:
     """
     Choses either ``light`` or ``dark`` based on the background color
@@ -107,9 +108,12 @@ def ask(
 ) -> str:
     answer = ""
     while True:
-        answer = BetterPrompt.ask(question, password=password, choices=choices)
-        if is_valid(answer):
-            break
+        answer = BetterPrompt.ask(question, password=password, choices=choices, default=default)
+        try:
+            if is_valid(answer):
+                break
+        except InvalidResponse as error:
+            print(error.message)
     return answer
 
 
