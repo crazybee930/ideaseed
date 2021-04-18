@@ -1,6 +1,9 @@
 from shutil import get_terminal_size
 from typing import Iterable, NamedTuple, Optional
 
+from rich import print
+from rich.align import Align
+from rich.box import Box
 from rich.console import Console, ConsoleOptions, RenderResult
 from rich.markdown import CodeBlock, Markdown
 from rich.padding import Padding
@@ -166,3 +169,31 @@ def show(
             url=url,
         )
     )
+
+
+def dry_run_banner() -> Panel:
+    width = min(get_terminal_size().columns, 75)
+    return Panel(
+        Align(
+            """\
+You are in [bold blue]dry-run mode[/].
+Issues and cards will not be created.
+
+Creation of objects from --create-missing will still occur
+[dim](e.g. missing labels will be created if you answer 'yes')[/]\
+""",
+            "center",
+            width=width,
+        ),
+        title="--dry-run was passed",
+        width=width,
+        style="black on yellow",
+        box=Box("    \n" * 8),
+    )
+
+
+def show_dry_run_banner(dry_run: bool, **_) -> None:
+    if dry_run:
+        print()
+        print(dry_run_banner())
+        print()

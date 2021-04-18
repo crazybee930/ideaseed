@@ -116,7 +116,7 @@ from rich import print
 from ideaseed import (authentication, config_wizard, github_cards, gkeep,
                       update_checker)
 from ideaseed.constants import VALID_COLOR_NAMES, VERSION
-from ideaseed.ui import ABOUT_SCREEN
+from ideaseed.ui import ABOUT_SCREEN, show_dry_run_banner
 from ideaseed.update_checker import get_latest_version
 from ideaseed.utils import english_join, remove_duplicates_in_list_of_dict
 
@@ -184,12 +184,15 @@ def run(argv=None):
         authentication.Cache(auth_cache_path, "whatever").clear_all()
 
     elif args["user"]:
+        show_dry_run_banner(**args)
         github_cards.push_to_user(**args)
 
     elif args["repo"]:
+        show_dry_run_banner(**args)
         github_cards.push_to_repo(**args)
 
     else:
+        show_dry_run_banner(**args)
         gkeep.push_to_gkeep(**args)
 
 
