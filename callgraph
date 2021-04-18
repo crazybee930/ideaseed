@@ -1,3 +1,0 @@
-#!/bin/sh
-
-~/apps/depends/depends.sh python ideaseed callgraph -s -g method -f dot && python callgraph.treat.py | dot -Tpng > callgraph.png
