@@ -1,45 +1,98 @@
 from __future__ import annotations
 
-from strip_ansi import strip_ansi
-from wcwidth import wcswidth
-import re
-from os import path
 from random import randint
-from typing import Any, Iterable, Optional, Union
+from typing import Any, Callable, Iterable, Optional, Text, Union
 
-import colr
-import inquirer
-from emoji import emojize
-
-
-def dye(
-    text: str,
-    fg: Union[int, str, None] = None,
-    bg: Union[int, str, None] = None,
-    style: Optional[str] = None,
-    no_closing: bool = False,
-):
-    return colr.color(
-        text=text,
-        fore=f"{fg:x}" if type(fg) is int else fg,
-        back=f"{bg:x}" if type(bg) is int else bg,
-        style=style,
-        no_closing=no_closing,
-    )
+from rich import print
+from rich.console import Console
+from rich.prompt import (Confirm, DefaultType, InvalidResponse, Prompt,
+                         PromptType)
+from rich.text import TextType
 
 
-def readable_text_color_on(
-    background: str, light: str = "FFFFFF", dark: str = "000000"
-) -> str:
+class BetterPrompt(Prompt):
+    """
+    Provides a nicer way to select from a *dict* of choices that maps aliases to descriptions,
+    so that the user doesn't have to type out the full option when choosing.
+
+    Would like to implement a list of radio buttons like enquirer does,
+    but that is way more difficult.
+    """
+
+    choices: Union[list[str], dict[str, str], None]
+
+    def __init__(
+        self,
+        prompt: TextType,
+        *,
+        console: Console,
+        password: bool,
+        choices: Union[list[str], dict[str, str]],
+        show_default: bool,
+        show_choices: bool,
+    ) -> None:
+        super().__init__(
+            prompt=prompt,
+            console=console,
+            password=password,
+            choices=choices,
+            show_default=show_default,
+            show_choices=show_choices,
+        )
+
+    def check_choice(self, value: str) -> bool:
+        assert self.choices is not None
+        if isinstance(self.choices, list):
+            return super().check_choice(value)
+        else:
+            return value.strip() in (
+                set(self.choices.keys()) | set(self.choices.values())
+            )
+
+    def make_prompt(self, default: DefaultType) -> Text:
+        prompt = self.prompt.copy()
+        prompt.end = ""
+
+        if self.show_choices and self.choices:
+            if isinstance(self.choices, list):
+                _choices = "/".join(self.choices)
+            else:
+                _choices = "/".join(f"{k}: {v}" for k, v in self.choices.items())
+            choices = f"[{_choices}]"
+            prompt.append(" ")
+            prompt.append(choices, "prompt.choices")
+
+        if (
+            default != ...
+            and self.show_default
+            and isinstance(default, (str, self.response_type))
+        ):
+            prompt.append(" ")
+            _default = self.render_default(default)
+            prompt.append(_default)
+
+        prompt.append(self.prompt_suffix)
+
+        return prompt
+
+    def process_response(self, value: str) -> PromptType:
+        val = super().process_response(value)
+        if isinstance(self.choices, dict):
+            if val not in self.choices.values() and val in self.choices.keys():
+                return self.choices[val]
+        return val
+
+
+def readable_on(background: str, light: str = "FFFFFF", dark: str = "000000") -> str:
     """
     Choses either ``light`` or ``dark`` based on the background color
     the text is supposed to be written on ``background`` (also given as an hex int)
     
     WARN: All the color strings must be exactly 6 digits long.
     
-    >>> readable_text_color_on('FEFAFE')
+    >>> readable_on('FEFAFE')
     '000000'
-    >>> readable_text_color_on('333333')
+    >>> readable_on('333333')
     'FFFFFF'
     """
     r, g, b = hex_to_rgb(background)
@@ -67,31 +120,28 @@ def get_random_color_hexstring() -> str:
     return f"{randint(0x0, 0xFFFFFF):6x}".upper()
 
 
-def ask(*questions) -> Union[list[Any], Any]:
-    if len(questions) == 1:
-        # No need to turn the hash into a tuple, just return the only value
-        questions[0].name = "ans"
-        return inquirer.prompt(questions)["ans"]
-
-    for i, _ in enumerate(questions):
-        questions[i].name = i
-    # Ask dem questions
-    answers = inquirer.prompt(questions)
-    # Turn into a list of tuple
-    answers = list(answers.items())
-    # Sort by key
-    answers = sorted(answers, key=lambda a: a[0])
-    # Get only the answers
-    answers = [a[1] for a in answers]
-    return answers
-
-
-def ask_text(question: str):
-    return ask(inquirer.Text("ans", message=question))
+def ask(
+    question: str,
+    is_valid: Callable[[str], bool] = lambda _: True,
+    choices: Optional[list[str]] = None,
+    password=False,
+    default="",
+) -> str:
+    answer = ""
+    while True:
+        answer = BetterPrompt.ask(
+            question, password=password, choices=choices, default=default
+        )
+        try:
+            if is_valid(answer):
+                break
+        except InvalidResponse as error:
+            print(error.message)
+    return answer
 
 
-def answered_yes_to(question: str) -> bool:
-    return ask(inquirer.Confirm("ans", message=question))
+def answered_yes_to(question: str, default: bool = False) -> bool:
+    return Confirm.ask(question, default=default)
 
 
 def english_join(items: list[str]) -> str:
@@ -116,66 +166,33 @@ def print_dry_run(text: str):
     """
     Apply special formatting for dry-run specific messages
     """
-    DRY_RUN_FMT = dye(" DRY RUN ", bg=0x333, fg=0xFFF) + dye("  {}", style="dim")
-    print(DRY_RUN_FMT.format(text))
+    print(f"[black on yellow] DRY RUN [/]   [dim]{text}")
 
 
 def error_message_no_object_found(objtype: str, objname: str) -> str:
     return (
-        dye(f"Error: missing {objtype} {objname!r}", fg=0xF00,)
+        f"[red]Error: missing {objtype} {objname!r}"
         + """
 TIP: Use --create-missing and ideaseed will ask you if you want to create missing labels, issues, projects, columns, milestones..."""
     )
 
 
-def render_markdown(text: str) -> str:
-    heading = re.compile(r"(#+)\s*(.+)")
-    list_item = re.compile(r"(\s*)-\s+(.+)")
-    image = re.compile(r"!\[(.+)\]\((.+)\)")
-    code = re.compile(r"`([^`]+)`")
-    em = re.compile(r"(?:_([^_].+[^_])_)|(?:\*([^*].+[^*])\*)")
-    strong = re.compile(r"(?:__(.+)__)|(?:\*\*(.+)\*\*)")
-    rendered = ""
-    in_code_block = False
-    for line in text.splitlines():
-        if line.strip().startswith("```"):
-            in_code_block = not in_code_block
-            rendered += "\n"
-            continue
-        if in_code_block:
-            rendered += " " * 2 + line + "\n"
-            continue
-        if heading.match(line):
-            match = heading.search(line)
-            rendered_line = dye(match.group(2), style="bold")
-        elif list_item.match(line):
-            match = list_item.search(line)
-            rendered_line = match.group(1) + dye("• ", style="dim") + match.group(2)
-        else:
-            rendered_line = line
-        rendered_line = image.sub(dye(r"(image: \1)", style="dim"), rendered_line)
-        rendered_line = code.sub(dye(r" \1 ", bg=0xDEDEDE), rendered_line)
-        rendered_line = emojize(rendered_line, use_aliases=True)
-        rendered_line = strong.sub(dye(r"\1\2", style="bold"), rendered_line)
-        rendered_line = em.sub(dye(r"\1\2", style="italic"), rendered_line)
-        # rendered_line = link.sub(dye(r' (link: \1)', style="dim"), rendered_line)
-        rendered += rendered_line + "\n"
-    return rendered
-
-
-def case_insensitive_find(haystack: Iterable[str], needle: str) -> str:
+def case_insensitive_find(haystack: Iterable[str], needle: str) -> Optional[str]:
     for item in haystack:
         if item.lower() == needle.lower():
             return item
 
     return None
 
-def strwidth(o: str) -> int:
+
+def remove_duplicates_in_list_of_dict(o: dict[Any, Union[Any, list]]) -> dict:
     """
-    Smartly calculates the actual width taken on a terminal of `o`. 
-    Handles ANSI codes (using `strip-ansi`) and Unicode (using `wcwidth`)
+    Remove duplicates in values of `o` of type `list`.
     """
-    return wcswidth(strip_ansi(o))
+    return {
+        k: (list(dict.fromkeys(v)) if isinstance(v, list) else v) for k, v in o.items()
+    }
+
 
 if __name__ == "__main__":
     import doctest

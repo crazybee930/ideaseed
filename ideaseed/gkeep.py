@@ -3,107 +3,119 @@ from __future__ import annotations
 import json
 import sys
 import webbrowser
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Optional, Tuple, Union
 
-import inquirer
+import gkeepapi
+import gkeepapi.node
+import rich.traceback
 from gkeepapi import Keep
 from gkeepapi.exception import APIException, LoginException
 from gkeepapi.node import ColorValue
+from rich import print
 
-from ideaseed.constants import (
-    COLOR_ALIASES,
-    C_PRIMARY,
-    COLOR_NAME_TO_HEX_MAP,
-    VALID_COLOR_NAMES,
-)
-from ideaseed.dumb_utf8_art import make_google_keep_art
-from ideaseed.utils import (
-    answered_yes_to,
-    case_insensitive_find,
-    dye,
-    error_message_no_object_found,
-    print_dry_run,
-)
+from ideaseed import authentication, ui
+from ideaseed.constants import (COLOR_ALIASES, COLOR_NAME_TO_HEX_MAP,
+                                VALID_COLOR_NAMES)
+from ideaseed.utils import (answered_yes_to, ask, case_insensitive_find,
+                            error_message_no_object_found, print_dry_run)
+
+rich.traceback.install()
 
 
-def write_to_cache(keep: Keep, email: str, cache_path: Path) -> None:
-    cache = {}
-    cache_path.parent.mkdir(exist_ok=True, parents=True)
-    if cache_path.exists():
-        cache = json.loads(cache_path.read_text(encoding="utf-8"))
-    cache["keep"] = {"master_token": keep.getMasterToken(), "email": email}
-    cache_path.write_text(json.dumps(cache), encoding="utf-8")
+class AuthCache(authentication.Cache):
+    def __init__(self, path: Path):
+        super().__init__(path=path, service="google_keep")
 
-
-def login_from_cache(cache_path: Path) -> Optional[Keep]:
-    if not cache_path.exists():
-        return None
-
-    creds = json.loads(cache_path.read_text(encoding="utf-8")).get("keep")
-    if not creds:
-        return None
-
-    keep = Keep()
-    keep.resume(email=creds["email"], master_token=creds["master_token"])
-    return keep
-
-
-def login(
-    auth_cache: Optional[str],
-    username: Optional[str] = None,
-    password: Optional[str] = None,
-    entering_app_password: bool = False,
-    **_,
-) -> Keep:
-    # Try to log in from cache
-    if auth_cache:
-        keep = login_from_cache(Path(auth_cache))
-    if keep is not None:
-        return keep
-    else:
-        del keep
-
-    # Ask for creds
-    if not username:
-        username = inquirer.text("E-mail")
-    if not password:
-        password = inquirer.password(
-            "App password" if entering_app_password else "Password"
-        )
-
-    # Log in
-    keep = Keep()
-    try:
-        keep.login(username, password)
-        if auth_cache:
-            write_to_cache(keep, username, cache_path=Path(auth_cache))
-        # elif keyring:
-        #     service, name =
-    except LoginException as error:
-        # Handle errors...
-        topic, _ = error.args
-        if topic == "BadAuthentication":
-            print(dye("Bad credentials", fg=0xF00))
-            return login(auth_cache)
-        elif topic == "NeedsBrowser":
-            print(
-                dye(
-                    """You have two-step authentification set up, please add an App Password.
-Go to https://myaccount.google.com/apppasswords (a tab should've been opened)""",
-                    fg=0xF00,
-                )
+    def login_manually(
+        self,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
+        entering_app_password: bool = False,
+    ) -> Tuple[Keep, dict[str, Any]]:
+        # Ask for creds
+        if not username:
+            username = ask("Email")
+        if not password:
+            password = ask(
+                "App password" if entering_app_password else "Password", password=True
             )
-            webbrowser.open("https://myaccount.google.com/apppasswords")
-            try:
-                return login(auth_cache, username=username, entering_app_password=True)
-            except RecursionError:
-                print("Too much attempts.")
+
+        # Log in
+        keep = Keep()
+
+        try:
+            keep.login(username, password)
+
+            # elif keyring:
+            #     service, name =
+        except LoginException as error:
+            # Handle errors...
+            topic, _ = error.args
+            if topic == "BadAuthentication":
+                print("[red]Bad credentials")
+                return self.login_manually()
+            elif topic == "NeedsBrowser":
+                print(
+                    """[red]You have two-step authentification set up, please add an App Password.
+    Go to https://myaccount.google.com/apppasswords (a tab should've been opened)""",
+                )
+                webbrowser.open("https://myaccount.google.com/apppasswords")
+                try:
+                    return self.login_manually(
+                        username=username, entering_app_password=True
+                    )
+                except RecursionError:
+                    print("Too much attempts.")
+                    sys.exit()
+            else:
+                print(topic)
                 sys.exit()
-        else:
-            print(topic)
-            sys.exit()
-    return keep
+        return keep, {"master_token": keep.getMasterToken(), "email": username,}
+
+    def login_from_cache(self) -> Optional[Keep]:
+        try:
+            keep = Keep()
+            keep.resume(**self.cache)
+            return keep
+        except LoginException:
+            return None
+
+
+@contextmanager
+def handle_api_errors():
+    try:
+        yield
+    except APIException as error:
+        print("Error with the Google Keep API")
+        if error.code == 429:
+            print(
+                """Too much requests per minute. Try again later.
+Don't worry, your idea is still safe,
+just up-arrow on your terminal to re-run the command :)"""
+            )
+        print(f"[dim]{error}[/]")
+        return
+
+
+def find_and_create_labels(
+    keep: Keep, tags: list[str], create_missing: bool
+) -> list[gkeepapi.node.Label]:
+    labels = []
+    for tag in tags:
+        label = keep.findLabel(tag)
+        if label is None:
+            if create_missing:
+                if answered_yes_to(f"Create missing tag {tag!r}?"):
+                    label = keep.createLabel(tag)
+            else:
+                print(error_message_no_object_found("tag", tag))
+                return []
+
+        if label:
+            labels += [label]
+    return labels
 
 
 def push_to_gkeep(
@@ -130,65 +142,39 @@ def push_to_gkeep(
     # Log in
     sys.stdout.flush()
     # Handle API errors
-    print("Logging in...")
-    try:
-        keep = login(auth_cache, keyring)
-    except APIException as error:
-        print("Error with the Google Keep API")
-        if error.code == 429:
-            print(
-                """Too much requests per minute. Try again later.
-Don't worry, your idea is still safe,
-just up-arrow on your terminal to re-run the command :)"""
-            )
-        print(dye(error, style="dim"))
-        return
-    print("Logged in.")
-
-    note = None
+    with handle_api_errors():
+        keep = AuthCache(Path(auth_cache)).login()
 
     # Find/create all the labels
-    labels = []
-    for tag in tags:
-        label = keep.findLabel(tag)
-        if label is None and create_missing:
-            if answered_yes_to(f"Create missing tag {tag!r}?"):
-                label = keep.createLabel(tag)
-        elif label is None:
-            print(error_message_no_object_found("tag", tag))
-            return
-        labels += [label]
+    labels = find_and_create_labels(keep, tags, create_missing=create_missing)
 
     # Create the card
     if not dry_run:
-        note = keep.createNote(title=title, text=body)
-        note.color = getattr(ColorValue, color)
-        note.pinned = pin
-        url = f"https://keep.google.com/u/0/#NOTE/{note.id}"
-        for label in labels:
-            note.labels.add(label)
-        for email in assign:
-            note.collaborators.add(email)
-    else:
-        print_dry_run(f"Create note with title {title!r} and text {body!r}")
-        print_dry_run(f"Set its color to {color!r}")
-        if pin:
-            print_dry_run(f"Pin it")
-        url = "N/A"
-        for label in labels:
-            print_dry_run(f"Add label {label!r}")
+        note = create_card(
+            keep,
+            assign=assign,
+            color=color,
+            labels=labels,
+            pin=pin,
+            title=title,
+            body=body,
+        )
+
+    url = f"https://keep.google.com/u/0/#NOTE/{note.id}" if not dry_run else None
 
     # Announce created card
-    print(
-        make_google_keep_art(
-            url=url,
-            title=title,
-            pinned=pin,
-            tags=tags,
-            body=body,
-            color=color,
-            collaborators=assign,
-        )
+    ui.show(
+        title=title or "",
+        right_of_title="pinned" if pin else "",
+        description=body,
+        labels=map(to_ui_label, labels),
+        card_title="",
+        card_style=to_rich_color(color) + " on black",
+        milestone=None,
+        assignees=assign,
+        project=None,
+        project_column=None,
+        url=url,
     )
 
     # Beam it up to Google's servers
@@ -197,6 +183,36 @@ just up-arrow on your terminal to re-run the command :)"""
     # Open the browser
     if open and not dry_run:
         webbrowser.open(url)
+
+
+def create_card(
+    keep: Keep,
+    assign: list[str],
+    color: str,
+    labels: list[gkeepapi.node.Label],
+    pin: bool,
+    title: str,
+    body: str,
+) -> gkeepapi.node.Note:
+    note = keep.createNote(title=title, text=body)
+    note.color = getattr(ColorValue, color)
+    note.pinned = pin
+    for label in labels:
+        note.labels.add(label)
+    for email in assign:
+        note.collaborators.add(email)
+
+
+def to_ui_label(label: gkeepapi.node.Label) -> ui.Label:
+    return ui.Label(name=label.name, url=f"https://keep.google.com/#label/{label.name}")
+
+
+def to_rich_color(color: str) -> str:
+    return (
+        "#" + COLOR_NAME_TO_HEX_MAP[color]
+        if color in COLOR_NAME_TO_HEX_MAP
+        else "default"
+    )
 
 
 if __name__ == "__main__":

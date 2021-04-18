@@ -1,17 +1,19 @@
-from __future__ import annotations
-
 import re
 import subprocess
-from typing import Any, Optional, Union
 from xml.dom.minidom import parseString as parse_xml
 
-import cli_box
-import inquirer as q
 import requests
+from rich.console import Console
+from rich.markdown import Markdown
+from rich.rule import Rule
 from semantic_version import Version
 
-from ideaseed.constants import C_PRIMARY, RELEASES_RSS_URL, VERSION
-from ideaseed.utils import ask, dye, render_markdown
+from ideaseed.constants import RELEASES_RSS_URL, VERSION
+from ideaseed.ui import \
+    FramelessCodeBlock  # markdown with no ugly frame around code blocks
+from ideaseed.utils import answered_yes_to, ask
+
+Markdown.elements["code_block"] = FramelessCodeBlock
 
 
 def get_latest_version() -> Version:
@@ -28,21 +30,21 @@ def get_latest_version() -> Version:
     return Version(version)
 
 
+def get_release_notes() -> str:
+    return requests.get(
+        "https://raw.githubusercontent.com/ewen-lbh/ideaseed/master/CHANGELOG.md"
+    ).text
+
+
 def get_changelog_heading_anchor(release_notes: str, upgrade_to: Version) -> str:
     """
     Get the changelog heading anchor for github.
-    >>> get_changelog_heading_anchor(Version('0.8.0'))
+    >>> get_changelog_heading_anchor(get_release_notes(), Version('0.8.0'))
     '080---2020-06-20'
     """
     pattern = re.compile(r"## \[" + str(upgrade_to) + r"\] - (.+)")
     date = pattern.search(release_notes).group(1)
     return f"{str(upgrade_to).replace('.', '')}---{date}"
-
-
-def get_release_notes() -> str:
-    return requests.get(
-        "https://raw.githubusercontent.com/ewen-lbh/ideaseed/master/CHANGELOG.md"
-    ).text
 
 
 def get_release_notes_for_version(release_notes: str, version: Version) -> str:
@@ -108,15 +110,13 @@ def get_release_notes_link(release_notes: str, upgrade_to: Version) -> str:
     return f"https://github.com/ewen-lbh/ideaseed/tree/master/CHANGELOG.md#{anchor}"
 
 
-def notification(upgrade_from: Version, upgrade_to: Version) -> str:
-    return cli_box.rounded(
-        f"""==== Update available! ====
+def notification(upgrade_from: Version, upgrade_to: Version) -> None:
+    print(Rule("Update available!"))
+    print(
+        f"""A new version of ideaseed is available for download:
+[blue bold]{upgrade_from}[/] [magenta]->[/] [blue bold]{upgrade_to}[/]
 
-A new version of ideaseed is available for download:
-{upgrade_from} -> {upgrade_to}
-
-Use `ideaseed update` to see what changed and do the update.
-"""
+Use [blue bold]ideaseed update[/] to see what changed and do the update."""
     )
 
 
@@ -124,16 +124,13 @@ def prompt(upgrade_from: Version, upgrade_to: Version) -> bool:
     """
     Returns ``True`` if the user wants to upgrade, ``False`` otherwise.
     """
-    answer = ask(
-        q.list(
-            "ans",
-            message=f"Upgrade to v{upgrade_to} now?",
-            choices=["Yes", "What has changed?", "No"],
-        )
-    )
-    if answer == "What has changed?":
+    if not answered_yes_to(
+        f"Upgrade to v{upgrade_to} now? (you will be able to view the release notes)",
+    ):
+        return False
+
+    if answered_yes_to("List what changed?"):
         release_notes = get_release_notes()
-        url = get_release_notes_link(release_notes, upgrade_to)
         all_versions = get_versions_list_from_release_notes(release_notes)
         # If the version jump is more than one version, print concatednated release notes
         # so that the user can get all of the changes.
@@ -149,42 +146,26 @@ def prompt(upgrade_from: Version, upgrade_to: Version) -> bool:
         else:
             notes = get_release_notes_for_version(release_notes, upgrade_to)
         print(
-            f"""\
-Release notes for v{upgrade_from} -> v{upgrade_to}
-====================================
-
-{render_markdown(notes).strip()}
-
----------------------------------------------
-To see images, you can also read this online:
-{url}
-"""
+            Rule(
+                f"Release notes for [bold blue]{upgrade_from}[/] [magenta]->[/] [bold blue]{upgrade_to}[/]"
+            )
         )
-        return ask(q.Confirm("ans", message="Upgrade now?"))
-    else:
-        return answer == "Yes"
+        print(Markdown(notes))
+        return answered_yes_to("Update now?")
+
+    return True
 
 
 def upgrade(upgrade_from: Version, upgrade_to: Version):
     cmd = ["pip", "install", "--upgrade", f"ideaseed=={upgrade_to}"]
-    if upgrade_from.major != upgrade_to.major:
-        print(
-            f"""\
-You are upgrading to another major version (from {upgrade_from.major}.x.y to {upgrade_to.major}.x.y).
-To prevent issues, the command you initially entered will not be run again automatically.
-
-Please check for breaking changes that might affect the result of your command before running it again."""
-        )
-    else:
-        print(f"Running {' '.join(cmd)}...")
-        subprocess.run(cmd)
+    print(f"Running {' '.join(cmd)}...")
+    subprocess.run(cmd)
 
 
 def check_and_prompt():
     latest_version = get_latest_version()
-    if latest_version > VERSION:
-        if prompt(VERSION, latest_version):
-            upgrade(latest_version)
-            return
+    if latest_version > VERSION and prompt(VERSION, latest_version):
+        upgrade(VERSION, latest_version)
+        return
     else:
         print("Great, you're already up to date!")

@@ -1,12 +1,5 @@
 """Note down your ideas and get them to the right place, without switching away from your terminal
 Usage:
-    ideaseed [options] [-# TAG...] [-@ USER...] BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] REPO TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] REPO PROJECT TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] REPO PROJECT COLUMN TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] user PROJECT COLUMN TITLE BODY
-    ideaseed [options] [-# TAG...] [-@ USER...] user PROJECT TITLE BODY
     ideaseed [options] config
     ideaseed [options] logout
     ideaseed [options] login
@@ -14,6 +7,15 @@ Usage:
     ideaseed [options] version | --version
     ideaseed [options] help | --help
     ideaseed [options] update
+    ideaseed [options] [-# TAG...] [-@ USER...] user BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] user TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] user PROJECT TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] user PROJECT COLUMN TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] REPO TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] REPO COLUMN TITLE BODY
+    ideaseed [options] [-# TAG...] [-@ USER...] REPO PROJECT COLUMN TITLE BODY
 
 
 Commands:
@@ -101,22 +103,22 @@ Placeholders:
                       Not available to --default-project or PROJECT.
 """
 
+# TODO: big refactoring: have a common abstract "IdeaCard" that holds all the attrs (milestone, etc.) so I don't have to pass 54654 args to each func.
 
 from __future__ import annotations
 
-from typing import Any, Optional, Union
 from pathlib import Path
+from typing import Any, Optional
 
 from docopt import docopt
+from rich import print
 
-from ideaseed import config_wizard, update_checker, gkeep, github_cards
-from ideaseed.constants import (
-    VALID_COLOR_NAMES,
-    VERSION,
-)
-from ideaseed.dumb_utf8_art import ABOUT_SCREEN
+from ideaseed import (authentication, config_wizard, github_cards, gkeep,
+                      update_checker)
+from ideaseed.constants import VALID_COLOR_NAMES, VERSION
+from ideaseed.ui import ABOUT_SCREEN
 from ideaseed.update_checker import get_latest_version
-from ideaseed.utils import english_join
+from ideaseed.utils import english_join, remove_duplicates_in_list_of_dict
 
 __doc__ = __doc__.replace("$HOME", str(Path.home()))
 
@@ -128,54 +130,68 @@ class UsageError(Exception):
 def run(argv=None):
     flags = docopt(__doc__, argv)
     args = flags_to_args(flags)
-    args |= {"keyring": None}  # I'll add support for keyrings in another PR
 
+    # docopt freaks out and duplicates any non-first --tag occurence, so we remove them
+    args = remove_duplicates_in_list_of_dict(args)
+
+    # I'll add support for keyrings in another PR
+    args |= {"keyring": None}
+
+    # Let keyring take precedence from auth_cache right off the bat
     if args["keyring"] and args["auth_cache"]:
         args["auth_cache"] = None
 
-    print(args)
+    # Initialize auth caches
+    if args["auth_cache"]:
+        auth_cache_path = Path(args["auth_cache"])
+        github_cache = github_cards.AuthCache(auth_cache_path)
+        gkeep_cache = gkeep.AuthCache(auth_cache_path)
+    else:
+        auth_cache_path = None
 
-    if args["color"] and args["color"] not in map(str.lower, VALID_COLOR_NAMES):
-        raise UsageError(
-            f"{args['color']!r} is not a valid color name. Valid color names are {english_join(map(str.lower, VALID_COLOR_NAMES))}"
+    # Crash if auth_cache_path is None, I'll implement this in another PR
+    if auth_cache_path is None:
+        raise NotImplementedError(
+            "You need to provide an authentication cache path, keyrings will get support later."
         )
 
-    if args["check_for_updates"]:
-        latest_version = get_latest_version()
-        if latest_version > VERSION:
-            print(update_checker.notification(VERSION, latest_version))
+    # Validate color's value
+    validate_tag_color(args["color"])
 
-    # Handle defaults
-
+    # Check for updates
+    check_for_updates(args["check_for_updates"])
 
     if args["about"]:
         print(ABOUT_SCREEN.format(version=VERSION))
+
     elif args["version"]:
         print(VERSION)
+
     elif args["help"]:
         print(__doc__)
+
     elif args["update"]:
         update_checker.check_and_prompt()
+
     elif args["config"]:
         config_wizard.run()
+
     elif args["login"]:
-        print("Logging into Google Keep:")
-        gkeep.login(**args)
-        print("Logging into GitHub:")
-        github_cards.login(**args)
+        github_cache.login()
+        gkeep_cache.login()
+
     elif args["logout"]:
-        if args["auth_cache"] is None:
-            # print("No cache to clear (remove --keyring or set --auth-cache to not '<None>')")
-            print("No cache to clear")
-        else:
-            Path(args["auth_cache"]).unlink(missing_ok=True)
-            print("Cache cleared.")
+        authentication.Cache(auth_cache_path, "whatever").clear_all()
+
     elif args["user"]:
         github_cards.push_to_user(**args)
+
     elif args["repo"]:
         github_cards.push_to_repo(**args)
+
     else:
         gkeep.push_to_gkeep(**args)
+
 
 def flags_to_args(flags: dict[str, Any]) -> dict[str, Any]:
     """
@@ -211,3 +227,17 @@ def flags_to_args(flags: dict[str, Any]) -> dict[str, Any]:
         else:
             args[normalized_name] = flags[name]
     return args
+
+
+def check_for_updates(check_for_updates_flag: bool):
+    if check_for_updates_flag:
+        latest_version = get_latest_version()
+        if latest_version > VERSION:
+            print(update_checker.notification(VERSION, latest_version))
+
+
+def validate_tag_color(color: Optional[str]):
+    if color and color not in map(str.lower, VALID_COLOR_NAMES):
+        raise UsageError(
+            f"{color!r} is not a valid color name. Valid color names are {english_join(list(map(str.lower, VALID_COLOR_NAMES)))}"
+        )

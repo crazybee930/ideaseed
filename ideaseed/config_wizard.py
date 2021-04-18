@@ -1,11 +1,18 @@
 from __future__ import annotations
 
 import shlex
-from os import getenv, path
-from os.path import isfile
-from typing import Any, Optional, Union
+import string
+from os import getenv
+from pathlib import Path
+from typing import Any, Callable
 
-from ideaseed.dumb_utf8_art import ask_text
+from rich import print
+from rich.panel import Panel
+from rich.prompt import InvalidResponse
+
+from ideaseed.utils import answered_yes_to, ask, english_join
+
+VALID_PLACEHOLDERS = {"owner", "repository", "username", "project"}
 
 
 class UnknownShellError(Exception):
@@ -19,7 +26,7 @@ def get_shell_name() -> str:
     executable_path = getenv("SHELL")
     if not executable_path:
         return ""
-    shell_name = path.split(executable_path)[1]
+    shell_name = Path(executable_path).stem
     return shell_name
 
 
@@ -38,40 +45,38 @@ def reverse_docopt(program_name: str, args_map: dict[str, Any]) -> str:
     Turns a docopt-style dict of arguments and flags into a string
     you would type into your shell (WIP)
     
-    >>> reverse_docopt('prog', { '--ab': 4, '--bb': 'yes', '--cb': True, '--db': False, '--eb' ['5', 'fefez$$/./!**fe'], 'thingie': True, 'nothingie': False, 'SHOUT': ':thinking:' })
-    'prog --ab --ab --ab --ab --bb=yes --cb --eb=5 --eb=5 --eb="fefez\\$\\$/./\\!\\*\\*fe" thingie :thinking:'
+    >>> reverse_docopt('prog', { '--ab': 4, '--bb': 'yes', '--cb': True, '--db': False, '--eb': ['5', 'fefez$$/./!**fe'], 'thingie': True, 'nothingie': False, 'SHOUT': ':thinking:' })
+    "prog --ab --ab --ab --ab --bb=yes --cb --eb=5 --eb='fefez$$/./!**fe' thingie :thinking:"
     """
-    line = program_name
+    line = [program_name]
 
     for key, value in args_map.items():
         # Arguments
         if not key.startswith("--"):
             # Strings in the command that are either present or not
             if type(value) is bool and value:
-                line += f" {key}"
+                line += [key]
             # Positional arguments
             elif type(value) is str:
-                line += f" {value}"
+                line += [value]
             continue
         # Flag with a value, but is not specified
         if value is None:
             continue
         # Flags with a value
         elif type(value) is str:
-            line += f" {key}={shlex.quote(value)}"
+            line += [f"{key}={shlex.quote(value)}"]
         # Count (repeated value-less flag)
         elif type(value) is int:
-            line += f" {key}" * value
+            line += [key] * value
         # list (repeated flag with value)
         elif type(value) is list:
-            for v in value:
-                line += f" {key}={shlex.quote(str(v))}"
+            line += [f"{key}={shlex.quote(str(v))}" for v in value]
         # Boolean (value-less flag, ony present if `True`)
-        elif type(value) is bool:
-            if value:
-                line += f" {key}"
+        elif type(value) is bool and value:
+            line += [key]
 
-    return line
+    return " ".join(line)
 
 
 def get_alias_command(args_map: dict[str, Any], shortcut_name: str) -> str:
@@ -82,15 +87,12 @@ def get_alias_command(args_map: dict[str, Any], shortcut_name: str) -> str:
     {
         '--option': 'value'
     }
+    >>> get_alias_command({ '--ab': 4, '--bb': 'yes', '--cb': True, '--db': False, '--eb': ['5', 'fefez$$/./!**fe'], 'thingie': True, 'nothingie': False, 'SHOUT': ':thinking:' }, 'idea')
+    "alias idea='ideaseed --ab --ab --ab --ab --bb=yes --cb --eb=5 --eb=\\\\'fefez$$/./!**fe\\\\' thingie :thinking:'"
     """
-    return (
-        "alias "
-        + shortcut_name
-        + "="
-        + "'"
-        + reverse_docopt("ideaseed", args_map).replace("'", "\\'")
-        + "'"
-    )
+    # nested shlex.quote gives completely bonkers output, adding '"'" to each side of a deeply-quoted string (the fezfez... here, for example)
+    shortcut = reverse_docopt("ideaseed", args_map).replace("'", "\\'")
+    return f"alias {shortcut_name}='{shortcut}'"
 
 
 def write_alias_to_rc_file(shell_name: str, alias_line: str):
@@ -98,14 +100,15 @@ def write_alias_to_rc_file(shell_name: str, alias_line: str):
     if shell_name not in supported_shells:
         raise UnknownShellError()
 
-    rcfile_path = path.expandvars(path.expanduser(SHELL_NAMES_TO_RC_PATHS[shell_name]))
-    if not isfile(rcfile_path):
+    rcfile_path = Path(SHELL_NAMES_TO_RC_PATHS[shell_name]).expanduser()
+    if not (rcfile_path.exists() and rcfile_path.is_file()):
         err = FileNotFoundError()
         err.filename = rcfile_path
         raise err
 
     with open(rcfile_path, "a") as file:
-        print(f"Appending the following to {rcfile_path}:\n\n  {alias_line}\n")
+        print(f"Appending the following to {rcfile_path}:")
+        print("\n\t" + alias_line + "\n")
         file.writelines([alias_line + "\n"])
         print(
             "Restart your shell or source the file for the new alias to take effect, or execute the 'alias' line above"
@@ -119,57 +122,56 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
 
     settings: dict[str, Any] = {}
 
-    settings["--user-project"] = ask_text(
-        "What GitHub project do you use on your GitHub profile?", "--user-project="
+    settings["--auth-cache"] = str(
+        Path(
+            ask(
+                "Path to the authentification cache",
+                default="~/.cache/ideaseed/auth.json",
+            ),
+        ).expanduser()
     )
-    settings["--user-keyword"] = ask_text(
-        "What 'repository' name do you want to type to tell ideaseed to use your GitHub user profile's project instead?",
-        "--user-keyword=",
+    settings["--check-for-updates"] = answered_yes_to("Check for updates?", False)
+    settings["--self-assign"] = answered_yes_to(
+        "Assign yourself to issues if you don't assign anyone with -@ ?", True
     )
-    settings["--no-auth-cache"] = (
-        not ask_text("Cache credentials? (y/N)").lower().strip().startswith("y")
-    )
-    settings["--no-check-for-updates"] = (
-        not ask_text("Check for updates? (y/N)").lower().strip().startswith("y")
-    )
-    settings["--no-self-assign"] = (
-        not ask_text(
-            "Assign yourself to issues if you don't assign anyone with -@ ? (y/N)"
-        )
-        .lower()
-        .strip()
-        .startswith("y")
-    )
+
     print(
-        """\
-
-For the two following questions, you can use %(placeholders)s.
-See https://github.com/ewen-lbh/ideaseed#available-placeholders-for---default--options
-for the full list of available placeholders.
-
-"""
+        """
+        For the two following questions, you can use {placeholders}.
+        See https://github.com/ewen-lbh/ideaseed#placeholders
+        for the full list of available placeholders.
+        """.strip()
     )
-    settings["--default-project"] = (
-        ask_text(
-            "Enter the default value for the project name (default: %(repository)s)",
-            "--default-project=",
-        )
-        or "%(repository)s"
+
+    settings["--default-project"] = ask(
+        "Enter the default value for the project name",
+        is_valid=placeholders_validator({"repository", "owner"}),
     )
-    settings["--default-column"] = (
-        ask_text(
-            "Enter the default value for the column name (default: To Do)",
-            "--default-column=",
-        )
-        or "To Do"
+    settings["--default-column"] = ask(
+        "Enter the default value for the column name",
+        is_valid=placeholders_validator({"repository", "owner", "project"}),
     )
 
     return (
         settings,
-        ask_text(
-            "What name do you want to invoke your configured ideaseed with? (a good one is 'idea')"
+        ask(
+            "What name do you want to invoke your configured ideaseed with? [dim](a good one is 'idea')",
+            is_valid=lambda alias: alias not in ("/", ""),
+            default="ideaseed",
         ),
     )
+
+
+def placeholders_validator(valid_placeholers: set[str]) -> Callable[[str], bool]:
+    def _validate(text: str):
+        all_placeholders = [p[1] for p in string.Formatter().parse(text)]
+        if not all(p in valid_placeholers for p in all_placeholders):
+            raise InvalidResponse(
+                f"Allowed placeholders are {english_join(['{%s}' % p for p in valid_placeholers])}"
+            )
+        return True
+
+    return _validate
 
 
 def run():

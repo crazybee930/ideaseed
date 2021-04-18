@@ -8,19 +8,19 @@ VERSION = Version("0.11.0")
 
 RELEASES_RSS_URL = "https://pypi.org/rss/project/ideaseed/releases.xml"
 
-COLOR_NAME_TO_HEX_MAP: dict[str, int] = {
-    "Blue": 0xAECBFA,
-    "Brown": 0xE6C9A8,
-    "DarkBlue": 0xAECBFA,
-    "Gray": 0xE8EAED,
-    "Green": 0xCCFF90,
-    "Orange": 0xFBBC04,
-    "Pink": 0xFDCFE8,
-    "Purple": 0xD7AEFB,
-    "Red": 0xF28B82,
-    "Teal": 0xA7FFEB,
-    "White": 0xFFFFFF,
-    "Yellow": 0xFFF475,
+COLOR_NAME_TO_HEX_MAP: dict[str, str] = {
+    "Blue": "AECBFA",
+    "Brown": "E6C9A8",
+    "DarkBlue": "AECBFA",
+    "Gray": "E8EAED",
+    "Green": "CCFF90",
+    "Orange": "FBBC04",
+    "Pink": "FDCFE8",
+    "Purple": "D7AEFB",
+    "Red": "F28B82",
+    "Teal": "A7FFEB",
+    "White": "FFFFFF",
+    "Yellow": "FFF475",
 }
 
 COLOR_ALIASES = {
@@ -32,5 +32,6 @@ COLOR_ALIASES = {
 
 VALID_COLOR_NAMES = list(COLOR_ALIASES.keys()) + list(COLOR_NAME_TO_HEX_MAP.keys())
 
-# colors
-C_PRIMARY = "blue"
+
+class UsageError(Exception):
+    pass

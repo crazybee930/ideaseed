@@ -7,13 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Ability to choose where to store authentication data ('auth cache')
+- update command to update ideaseed
+
 ### Changed
 
 - Reduce friction when connecting to Google Keep from a 2FA-secured account
+- All-new UI using [rich](https://pypi.org/project/rich), including
+    - Full markdown (commonmark) rendering
+    - Revamped Card
+    - Revamped 'timeline' (now just a listing of properties)
+- More intuitive CLI, using a bunch of positional arguments. See 0f86a87 and related issues (#112 mainly)
+- about, config and version are now commands instead of flags (do `ideaseed config` instead of `ideaseed --config`, for example.)
+- `--no-*` flags are now --* (i.e. negative flags are positive) (e.g. --no-check-for-updates is now --check-for-updates)
+- The update checking is less intrusive, the notification just tells you that an update is available, but does not ask for upgrading
+- Creating issues is now the default behavior. A new flag `-I`/`--no-issue` has been created to prevent issue creation.
+- `--assign` now works for Google Keep
+
+### Removed
+
+- Color shorthands. You'll have to type out the full color name now. Note that aliases (e.g. gray -> grey) are still around.
+- Deprecated shorthand flags -l and -t as well as flag --label
 
 ### Fixed
 
 - Crash with google keep (see #100)
+- Authentication data wasn't cached for Google Keep
 
 ## [0.11.0] - 2020-06-29
 
@@ -63,7 +84,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-#### Several UI improvements for cards
+- #### Several UI improvements for cards
 - Increased spacing between different sections of the cards
 - Get rid of the ugly line separator in cards (#34)
 - Show labels with their background colors instead of using `[label name]` (#25 and #53)
