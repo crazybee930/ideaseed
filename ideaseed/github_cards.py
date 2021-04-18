@@ -427,7 +427,8 @@ def search_for_object(
             break
     else:
         if create_missing and answered_yes_to(
-            f"Create missing {object_name} {name!r}?"
+            f"Create missing {object_name} {name!r}?",
+            True
         ):
             the_object = create()
         else:
