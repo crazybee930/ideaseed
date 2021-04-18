@@ -329,7 +329,9 @@ def push_to_repo(
     if milestone is not None:
         milestone: Milestone = get_milestone_from_name(repo, create_missing, milestone)
         if milestone.state != "closed":
-            if not answered_yes_to(f"[yellow]:warning:[/] The selected milestone is {milestone.state}. Use this milestone?"):
+            if not answered_yes_to(
+                f"[yellow]:warning:[/] The selected milestone is {milestone.state}. Use this milestone?"
+            ):
                 return
 
     url = None if dry_run else repo.html_url
