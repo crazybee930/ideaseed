@@ -102,9 +102,10 @@ def get_random_color_hexstring() -> str:
 
 def ask(
     question: str,
-    is_valid: Callable[[str], bool] = bool,
+    is_valid: Callable[[str], bool] = lambda _: True,
     choices: Optional[list[str]] = None,
     password=False,
+    default="",
 ) -> str:
     answer = ""
     while True:
@@ -117,8 +118,8 @@ def ask(
     return answer
 
 
-def answered_yes_to(question: str) -> bool:
-    return Confirm.ask(question)
+def answered_yes_to(question: str, default: bool = False) -> bool:
+    return Confirm.ask(question, default=default)
 
 
 def english_join(items: list[str]) -> str:

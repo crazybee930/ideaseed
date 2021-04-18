@@ -5,11 +5,13 @@ from pathlib import Path
 import string
 from os import getenv
 from typing import Any, Callable
+from rich.panel import Panel
+from rich import print
 
-from ideaseed.utils import answered_yes_to, ask
 from rich.prompt import InvalidResponse
 
 from ideaseed.utils import answered_yes_to, ask, english_join
+
 VALID_PLACEHOLDERS = {
     "owner",
     "repository",
@@ -109,7 +111,8 @@ def write_alias_to_rc_file(shell_name: str, alias_line: str):
         raise err
 
     with open(rcfile_path, "a") as file:
-        print(f"Appending the following to {rcfile_path}:\n\n  {alias_line}\n")
+        print(f"Appending the following to {rcfile_path}:")
+        print("\n\t" + alias_line + "\n")
         file.writelines([alias_line + "\n"])
         print(
             "Restart your shell or source the file for the new alias to take effect, or execute the 'alias' line above"
@@ -123,13 +126,12 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
 
     settings: dict[str, Any] = {}
 
-    settings["--auth-cache"] = (
-        ask("Path to the authentification cache (leave blank to not use any)")
-        or "<None>"
-    )
-    settings["--check-for-updates"] = answered_yes_to("Check for updates?")
+    settings["--auth-cache"] = str(Path(
+        ask("Path to the authentification cache", default="~/.cache/ideaseed/auth.json"),
+    ).expanduser())
+    settings["--check-for-updates"] = answered_yes_to("Check for updates?", False)
     settings["--self-assign"] = answered_yes_to(
-        "Assign yourself to issues if you don't assign anyone with -@ ?"
+        "Assign yourself to issues if you don't assign anyone with -@ ?", True
     )
 
     print(
@@ -148,7 +150,9 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
     return (
         settings,
         ask(
-            "What name do you want to invoke your configured ideaseed with? (a good one is 'idea')"
+            "What name do you want to invoke your configured ideaseed with? [dim](a good one is 'idea')",
+            is_valid=lambda alias: alias not in ("/", ""),
+            default="ideaseed"
         ),
     )
 
