@@ -149,3 +149,4 @@ dmypy.json
 callgraph.{dot,pdf,svg,json}
 depends-dv8map.mapping
 depends.log
+AUR
