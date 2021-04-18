@@ -4,7 +4,7 @@ from typing import Any, Optional, Union
 
 from semantic_version import Version
 
-VERSION = Version("0.11.0")
+VERSION = Version("1.0.0")
 
 RELEASES_RSS_URL = "https://pypi.org/rss/project/ideaseed/releases.xml"
 
