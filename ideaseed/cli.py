@@ -111,6 +111,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from docopt import docopt
+from rich import print
 
 from ideaseed import (authentication, config_wizard, github_cards, gkeep,
                       update_checker)

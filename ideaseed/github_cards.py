@@ -373,6 +373,8 @@ def push_to_user(
     auth_cache: Optional[str],
     dry_run: bool,
     open: bool,
+    default_project: str,
+    default_column: str,
     **_,
 ) -> None:
     # FIXME: creates a duplicated title in the card.
@@ -388,6 +390,14 @@ def push_to_user(
     # XXX: for some reason, we have to call get_user again to get a NamedUser
     # and not an AuthenticatedUser, because those don't have .get_projects() defined
     user = gh.get_user(gh.get_user().login)
+    project, column = resolve_defaults(
+        column,
+        project,
+        default_project=default_project,
+        default_column=default_column,
+        repo_full_name=f"{user.login}/",
+        username=user.login,
+    )
     project, column = get_project_and_column(user, project, column, create_missing,)
 
     if not column or not project:
@@ -427,8 +437,7 @@ def search_for_object(
             break
     else:
         if create_missing and answered_yes_to(
-            f"Create missing {object_name} {name!r}?",
-            True
+            f"Create missing {object_name} {name!r}?", True
         ):
             the_object = create()
         else:
