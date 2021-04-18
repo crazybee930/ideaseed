@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import shlex
-from os import getenv, path
-from os.path import isfile
 from typing import Any, Optional, Union
+from pathlib import Path
+from os import getenv
 
 from ideaseed.utils import answered_yes_to, ask
 
@@ -19,7 +19,7 @@ def get_shell_name() -> str:
     executable_path = getenv("SHELL")
     if not executable_path:
         return ""
-    shell_name = path.split(executable_path)[1]
+    shell_name = Path(executable_path).stem
     return shell_name
 
 
@@ -93,8 +93,8 @@ def write_alias_to_rc_file(shell_name: str, alias_line: str):
     if shell_name not in supported_shells:
         raise UnknownShellError()
 
-    rcfile_path = path.expandvars(path.expanduser(SHELL_NAMES_TO_RC_PATHS[shell_name]))
-    if not isfile(rcfile_path):
+    rcfile_path = Path(SHELL_NAMES_TO_RC_PATHS[shell_name]).expanduser()
+    if not (rcfile_path.exists() and rcfile_path.is_file()):
         err = FileNotFoundError()
         err.filename = rcfile_path
         raise err
