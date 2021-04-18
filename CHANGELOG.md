@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.0] - 2021-04-18
 
 ### Added
 
@@ -18,12 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Reduce friction when connecting to Google Keep from a 2FA-secured account
 - All-new UI using [rich](https://pypi.org/project/rich), including
-    - Full markdown (commonmark) rendering
-    - Revamped Card
-    - Revamped 'timeline' (now just a listing of properties)
-    - New prompts (not necessarily better, but good enough. This was done to not depend on enquirer anymore, and use rich's prompts.)
-    - Revamped "update available" notification
-    - One clear banner when running in dry-run mode
+- Full markdown (commonmark) rendering
+- Revamped Card
+- Revamped 'timeline' (now just a listing of properties)
+- New prompts (not necessarily better, but good enough. This was done to not depend on enquirer anymore, and use rich's prompts.)
+- Revamped "update available" notification
+- One clear banner when running in dry-run mode
 - More intuitive CLI, using a bunch of positional arguments. See 0f86a87 and related issues (#112 mainly)
 - about, config and version are now commands instead of flags (do `ideaseed config` instead of `ideaseed --config`, for example.)
 - `--no-*` flags are now --* (i.e. negative flags are positive) (e.g. --no-check-for-updates is now --check-for-updates)
@@ -212,7 +212,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] - 2020-06-16
 
-[Unreleased]: https://github.com/ewen-lbh/ideaseed/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/ewen-lbh/ideaseed/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/ewen-lbh/ideaseed/compare/v0.11.0...v1.0.0
 [0.11.0]: https://github.com/ewen-lbh/ideaseed/compare/v0.10.2...v0.11.0
 [0.10.2]: https://github.com/ewen-lbh/ideaseed/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/ewen-lbh/ideaseed/compare/v0.10.0...v0.10.1
