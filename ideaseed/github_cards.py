@@ -223,7 +223,7 @@ def create_and_show_issue(
         labels=map(lambda l: to_ui_label(l, repo), labels),
         card_title=get_card_title(repo),
         milestone=with_link(milestone) if milestone else None,
-        assignees=map(linkify_github_username, assignees),
+        assignees=list(map(linkify_github_username, assignees)),  # maps are generators, and generators exhaust!
         project=with_link(project) if project else None,
         project_column=ui.href(column.name, project.html_url) if column else None,
         url=url,
@@ -298,7 +298,9 @@ def push_to_repo(
     repo_full_name = resolve_self_repository_shorthand(gh, repo)
     repo: Repository = gh.get_repo(repo_full_name)
     username = gh.get_user().login
-    assignees = assign or ([username] if self_assign else [])
+    assignees = assign
+    if self_assign and not len(assignees):
+        assignees = [username]
     project, column = resolve_defaults(
         column, project, default_project, default_column, repo_full_name, username
     )
