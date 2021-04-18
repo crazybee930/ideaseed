@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Ability to choose where to store authentication data ('auth cache')
 - update command to update ideaseed
+- AUR packages! see [ideaseed](https://aur.archlinux.org/packages/ideaseed) (synced with PyPI) and [ideaseed-git](https://aur.archlinux.org/packages/ideaseed-git) (bleeding edge, using the latest commit)
+- A warning when adding the issue to a closed milestone ([but warns of the opposite because of a bug, whoops!](https://github.com/ewen-lbh/ideaseed/issues/159))
 
 ### Changed
 
@@ -19,17 +21,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Full markdown (commonmark) rendering
     - Revamped Card
     - Revamped 'timeline' (now just a listing of properties)
+    - New prompts (not necessarily better, but good enough. This was done to not depend on enquirer anymore, and use rich's prompts.)
+    - Revamped "update available" notification
+    - One clear banner when running in dry-run mode
 - More intuitive CLI, using a bunch of positional arguments. See 0f86a87 and related issues (#112 mainly)
 - about, config and version are now commands instead of flags (do `ideaseed config` instead of `ideaseed --config`, for example.)
 - `--no-*` flags are now --* (i.e. negative flags are positive) (e.g. --no-check-for-updates is now --check-for-updates)
 - The update checking is less intrusive, the notification just tells you that an update is available, but does not ask for upgrading
 - Creating issues is now the default behavior. A new flag `-I`/`--no-issue` has been created to prevent issue creation.
 - `--assign` now works for Google Keep
+- Remove all references to "tags" -- github "tags" are actually also _labels_, so this "tag" wording has nothing to do in ideaseed
 
 ### Removed
 
 - Color shorthands. You'll have to type out the full color name now. Note that aliases (e.g. gray -> grey) are still around.
-- Deprecated shorthand flags -l and -t as well as flag --label
+- Deprecated shorthand flags `-l` and `-t` as well as flag `--tag`
 
 ### Fixed
 
