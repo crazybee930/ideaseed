@@ -67,6 +67,7 @@ Options:
                             Can be specified multiple times.
                             Cannot be used in the 'user' command.
                             Cannot be used with --no-issue
+       --debug              Shows extra information. Used for debugging purposes.
 
     REPO only: 
        --self-assign        Assign the created issue to yourself. 
@@ -142,6 +143,9 @@ def run(argv=None):
     # Let keyring take precedence from auth_cache right off the bat
     if args["keyring"] and args["auth_cache"]:
         args["auth_cache"] = None
+
+    if args["debug"]:
+        print(args)
 
     # Initialize auth caches
     if args["auth_cache"]:
