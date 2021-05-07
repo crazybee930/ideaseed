@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import sys
 import webbrowser
 from contextlib import contextmanager

@@ -53,9 +53,7 @@ class Cache:
         self.path.unlink(missing_ok=True)
 
     def login(self) -> Any:
-        print(
-            f"[dim]Logging into [blue bold]{self.service}[/]..."
-        )
+        print(f"[dim]Logging into [blue bold]{self.service}[/]...")
         if self.cache:
             return self.login_from_cache()
 
