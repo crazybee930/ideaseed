@@ -83,27 +83,34 @@ Options:
 
 
 Configuration:
-   --default-column=COLUMN    Specifies the Default Column. 
-                              Used when PROJECT is set but not COLUMN
-                              Can use Placeholders.
-   --default-project=PROJECT  Specifies the Default Project. 
-                              Used when REPO is set but not PROJECT
-                              Can use Placeholders.
-                              If not set, or set to '<None>',
-                              using REPO without PROJECT creates an issue
-                              without its project card.
-   --auth-cache=FILEPATH      Set the filepath for the auth. cache [default: $HOME/cache/ideaseed/auth.json]
-                              If set to '<None>', disables caching of credentials.
-                              Has no effect when used with --keyring.
-   --check-for-updates        Check for new versions and show a notification if a new one is found.
+   --default-column=COLUMN          Specifies the Default Column. 
+                                    Used when PROJECT is set but not COLUMN
+                                    Can use Placeholders.
+   --default-project=PROJECT        Specifies the Default Project. 
+                                    Used when REPO is set but not PROJECT
+                                    Can use Placeholders.
+                                    If not set, or set to '<None>',
+                                    using REPO without PROJECT creates an issue
+                                    without its project card.
+   --default-user-project=PROJECT   Specifies an override to Default Project,
+                                    that will only be used when the ‘user’ command is used
+                                    Can use Placeholders.
+                                    When not set, --default-project is used.
+   --default-user-column=COLUMN     Same as --default-user-project, but for the Default Column.                                   
+   --auth-cache=FILEPATH            Set the filepath for the auth. cache [default: $HOME/cache/ideaseed/auth.json]
+                                    If set to '<None>', disables caching of credentials.
+                                    Has no effect when used with --keyring.
+   --check-for-updates              Check for new versions and show a notification if a new one is found.
 
 
 Placeholders:
     {repository}      Replaced with the repository's name
+                      Not available to --default-user-* flags
     {owner}           Replaced with the repository's owner
+                      Not available to --default-user-* flags
     {username}        Replaced with the currently-logged-in GitHub user's username
     {project}         Replaced with the project the card will be added to.
-                      Not available to --default-project or PROJECT.
+                      Not available to --default-project, --default-user-project or PROJECT.
 """
 
 # TODO: big refactoring: have a common abstract "IdeaCard" that holds all the attrs (milestone, etc.) so I don't have to pass 54654 args to each func.

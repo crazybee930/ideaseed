@@ -379,7 +379,9 @@ def push_to_user(
     dry_run: bool,
     open: bool,
     default_project: str,
+    default_user_project: str,
     default_column: str,
+    default_user_column: str,
     **_,
 ) -> None:
     # FIXME: creates a duplicated title in the card.
@@ -398,8 +400,8 @@ def push_to_user(
     project, column = resolve_defaults(
         column,
         project,
-        default_project=default_project,
-        default_column=default_column,
+        default_project=default_user_project or default_project,
+        default_column=default_user_column or default_column,
         repo_full_name=f"{user.login}/",
         username=user.login,
     )
