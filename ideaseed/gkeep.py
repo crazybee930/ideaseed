@@ -17,6 +17,7 @@ from rich import print
 from ideaseed import authentication, ui
 from ideaseed.constants import (COLOR_ALIASES, COLOR_NAME_TO_HEX_MAP,
                                 VALID_COLOR_NAMES)
+from ideaseed.ondisk import Idea
 from ideaseed.utils import (answered_yes_to, ask, case_insensitive_find,
                             error_message_no_object_found, print_dry_run)
 
@@ -129,13 +130,17 @@ def push_to_gkeep(
     open: bool,
     auth_cache: Optional[str],
     **_,
-) -> None:
+) -> Idea:
+
+    idea = Idea(pinned=pin, body=body, title=title or "", assignees=assign,)
 
     # Get correct color name casing
     color = case_insensitive_find(VALID_COLOR_NAMES, color)
     # Resolve color aliases
     if color in COLOR_ALIASES.keys():
         color = COLOR_ALIASES[color]
+
+    idea.color = color
 
     # Log in
     sys.stdout.flush()
@@ -145,6 +150,8 @@ def push_to_gkeep(
 
     # Find/create all the labels
     labels = find_and_create_labels(keep, label, create_missing=create_missing)
+
+    idea.labels = labels
 
     # Create the card
     if not dry_run:
@@ -181,6 +188,10 @@ def push_to_gkeep(
     # Open the browser
     if open and not dry_run:
         webbrowser.open(url)
+
+    idea.url = url or ""
+
+    return idea
 
 
 def create_card(

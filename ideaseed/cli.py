@@ -101,6 +101,11 @@ Configuration:
                                     If set to '<None>', disables caching of credentials.
                                     Has no effect when used with --keyring.
    --check-for-updates              Check for new versions and show a notification if a new one is found.
+   --local-copy=DIR                 Directory to save a copy of ideas to.
+                                    If not set, or set to '<None>',
+                                    ideas will not get saved locally.
+                                    DIR must exist beforehand.
+                                    See Local Copy for more information.
 
 
 Placeholders:
@@ -111,6 +116,35 @@ Placeholders:
     {username}        Replaced with the currently-logged-in GitHub user's username
     {project}         Replaced with the project the card will be added to.
                       Not available to --default-project, --default-user-project or PROJECT.
+
+Local Copy:
+    If you use --local-copy=DIR, copies of all created ideas will get saved as files inside of DIR.
+    If USER/REPO or REPO is used, the file will be written into DIR/[USER/]REPO instead.
+    If the ‘user’ command is used, the file will be written into DIR/PROJECT instead.
+
+    The file's name will be a slugified (meaning lowercased, with spaces replaced by dashes, mostly)
+    version of either the title or, if not set, the body's first line.
+
+    The file is a markdown with a YAML header that holds metadata such as labels and assigned people.
+    Values that count as false (empty strings, empty lists, empty objects, the False boolean and 0)
+    will not be included in the header.
+    The following information is written to the header:
+
+    assignees:      People assigned           (related to -@ / --assign)
+    color:          The card's color          (related to --color)
+    column:         The project's column      (related to -C / --column)
+    labels:         Included labels           (related to -# / --label)
+    milestone:      Assigned milestone        (related to -M / --milestone)
+    pinned:         The card's pinned state   (related to --pin)
+    project:        The github project        (related to -P / --project)
+    url:            A link to the idea        
+
+    The values correspond to what was actually used to publish the idea, so defaults get applied,
+    and things created with --create-missing also appear here.
+
+    If 'url' is not in the header, than either the idea failed to get uploaded to the service (github, google keep)
+    Note that --dry-run prevents this file from being created
+
 """
 
 # TODO: big refactoring: have a common abstract "IdeaCard" that holds all the attrs (milestone, etc.) so I don't have to pass 54654 args to each func.
@@ -124,8 +158,9 @@ from docopt import docopt
 from rich import print
 
 from ideaseed import (authentication, config_wizard, github_cards, gkeep,
-                      update_checker)
+                      ondisk, update_checker)
 from ideaseed.constants import VALID_COLOR_NAMES, VERSION
+from ideaseed.ondisk import Idea
 from ideaseed.ui import ABOUT_SCREEN, show_dry_run_banner
 from ideaseed.update_checker import get_latest_version
 from ideaseed.utils import english_join, remove_duplicates_in_list_of_dict
@@ -140,6 +175,7 @@ class UsageError(Exception):
 def run(argv=None):
     flags = docopt(__doc__, argv)
     args = flags_to_args(flags)
+    idea = Idea()
 
     # docopt freaks out and duplicates any non-first --label occurence, so we remove them
     args = remove_duplicates_in_list_of_dict(args)
@@ -198,15 +234,22 @@ def run(argv=None):
 
     elif args["user"]:
         show_dry_run_banner(**args)
-        github_cards.push_to_user(**args)
+        idea = github_cards.push_to_user(**args) or Idea()
 
     elif args["repo"]:
         show_dry_run_banner(**args)
-        github_cards.push_to_repo(**args)
+        idea = github_cards.push_to_repo(**args) or Idea()
 
     else:
         show_dry_run_banner(**args)
-        gkeep.push_to_gkeep(**args)
+        idea = gkeep.push_to_gkeep(**args) or Idea()
+
+    if args["local_copy"] and idea.body:
+        saved_to = ondisk.save(**args, idea=idea)
+        if saved_to:
+            print(f"[dim]Local copy saved to [blue]{saved_to}")
+        else:
+            print(f"[yellow]Did not save a local copy")
 
 
 def flags_to_args(flags: dict[str, Any]) -> dict[str, Any]:

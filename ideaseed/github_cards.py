@@ -21,6 +21,7 @@ from rich import print
 from ideaseed import ui
 from ideaseed.authentication import Cache as BaseCache
 from ideaseed.constants import UsageError
+from ideaseed.ondisk import Idea
 from ideaseed.utils import (answered_yes_to, ask,
                             error_message_no_object_found,
                             get_random_color_hexstring)
@@ -292,7 +293,8 @@ def push_to_repo(
     dry_run: bool,
     open: bool,
     **_,
-) -> None:
+) -> Idea:
+    idea = Idea(title=title, body=body)
     if auth_cache is None:
         raise NotImplementedError(
             "You need to specify a cache for now, I'll get to the --keyring implementation later"
@@ -304,6 +306,7 @@ def push_to_repo(
     assignees = assign
     if self_assign and not len(assignees):
         assignees = [username]
+    idea.assignees = assignees
     project, column = resolve_defaults(
         column, project, default_project, default_column, repo_full_name, username
     )
@@ -313,6 +316,8 @@ def push_to_repo(
         # but it was not found nor created
         if not (project and column):
             return
+        idea.project = project.name
+        idea.column = column.name
     # user _did not_ specify a name (ie do not create a project card)
     else:
         project, column = None, None
@@ -327,13 +332,16 @@ def push_to_repo(
     if len(labels) != len(label):
         return
 
+    idea.labels = labels
+
     if milestone is not None:
         milestone: Milestone = get_milestone_from_name(repo, create_missing, milestone)
-        if milestone.state != "closed":
+        if milestone.state != "open":
             if not answered_yes_to(
                 f"[yellow]:warning:[/] The selected milestone is {milestone.state}. Use this milestone?"
             ):
                 return
+        idea.milestone = milestone.title
 
     url = None if dry_run else repo.html_url
 
@@ -368,6 +376,10 @@ def push_to_repo(
     if open and url:
         webbrowser.open(url)
 
+    idea.url = url or ""
+
+    return idea
+
 
 def push_to_user(
     body: str,
@@ -383,7 +395,7 @@ def push_to_user(
     default_column: str,
     default_user_column: str,
     **_,
-) -> None:
+) -> Idea:
     # FIXME: creates a duplicated title in the card.
     #           the thing is that the card displays the title and the body
     #           but github cards themselves do not have a title, so we need
@@ -397,6 +409,7 @@ def push_to_user(
     # XXX: for some reason, we have to call get_user again to get a NamedUser
     # and not an AuthenticatedUser, because those don't have .get_projects() defined
     user = gh.get_user(gh.get_user().login)
+    idea = Idea(body=body, title=title)
     project, column = resolve_defaults(
         column,
         project,
@@ -406,6 +419,8 @@ def push_to_user(
         username=user.login,
     )
     project, column = get_project_and_column(user, project, column, create_missing,)
+    idea.project = project.name if project else ""
+    idea.column = column.name if column else ""
 
     if not column or not project:
         return
@@ -421,9 +436,13 @@ def push_to_user(
         body=body,
     )
 
+    idea.url = url or ""
+
     # Open project URL
     if open and url:
         webbrowser.open(url)
+
+    return idea
 
 
 T = TypeVar("T")
