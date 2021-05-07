@@ -201,6 +201,8 @@ def create_card(
     for email in assign:
         note.collaborators.add(email)
 
+    return note
+
 
 def to_ui_label(label: gkeepapi.node.Label) -> ui.Label:
     return ui.Label(name=label.name, url=f"https://keep.google.com/#label/{label.name}")
