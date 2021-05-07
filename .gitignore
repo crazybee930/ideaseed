@@ -143,8 +143,8 @@ dmypy.json
 .auth-cache--*
 **.ai
 
-# Symlinked .interpreter
-.interpreter
+# Symlinked poetry venv
+venv
 
 callgraph.{dot,pdf,svg,json}
 depends-dv8map.mapping
