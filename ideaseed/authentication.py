@@ -54,7 +54,7 @@ class Cache:
 
     def login(self) -> Any:
         print(
-            f"[dim][black]Logging into [/black][blue bold]{self.service}[/][black]..."
+            f"[dim]Logging into [blue bold]{self.service}[/]..."
         )
         if self.cache:
             return self.login_from_cache()
