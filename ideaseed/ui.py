@@ -1,6 +1,7 @@
 from shutil import get_terminal_size
 from typing import Iterable, NamedTuple, Optional
 
+import rich.box
 import rich.markup
 from rich import print
 from rich.align import Align
@@ -69,7 +70,7 @@ class Label(NamedTuple):
     url: Optional[str] = None
 
     def __str__(self) -> str:
-        s = f"[#{readable_on(self.color)} on #{self.color}]{self.name}[/]"
+        s = f"[{readable_on(self.color)} on #{self.color}]{self.name}[/]"
         if self.url:
             s = href(s, self.url)
         return s
@@ -107,7 +108,12 @@ def make_card(
         label_row.add_row(", ".join(map(str, labels)))
         card.add_row(label_row)
 
-    return Panel(card, title=card_title, style=card_style)
+    return Panel(
+        card,
+        title=card_title,
+        style=card_style,
+        box=rich.box.ROUNDED if "on " not in card_style else Box("    \n" * 8),
+    )
 
 
 def make_table(

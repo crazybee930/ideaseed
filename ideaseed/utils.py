@@ -83,7 +83,7 @@ class BetterPrompt(Prompt):
         return val
 
 
-def readable_on(background: str, light: str = "FFFFFF", dark: str = "000000") -> str:
+def readable_on(background: str, light: str = "white", dark: str = "black") -> str:
     """
     Choses either ``light`` or ``dark`` based on the background color
     the text is supposed to be written on ``background`` (also given as an hex int)

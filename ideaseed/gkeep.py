@@ -19,7 +19,8 @@ from ideaseed.constants import (COLOR_ALIASES, COLOR_NAME_TO_HEX_MAP,
                                 VALID_COLOR_NAMES)
 from ideaseed.ondisk import Idea
 from ideaseed.utils import (answered_yes_to, ask, case_insensitive_find,
-                            error_message_no_object_found, print_dry_run)
+                            error_message_no_object_found, print_dry_run,
+                            readable_on)
 
 rich.traceback.install()
 
@@ -174,7 +175,9 @@ def push_to_gkeep(
         description=body,
         labels=map(to_ui_label, labels),
         card_title="",
-        card_style=to_rich_color(color) + " on black",
+        card_style="default"
+        if color == "White"
+        else f"{readable_on(COLOR_NAME_TO_HEX_MAP[color])} on {to_rich_color(color)}",
         milestone=None,
         assignees=assign,
         project=None,
