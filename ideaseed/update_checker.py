@@ -170,4 +170,5 @@ def check_and_prompt():
         upgrade(VERSION, latest_version)
         return
     else:
+        # FIXME: also gets printed out if answered no to the prompt
         print("Great, you're already up to date!")
