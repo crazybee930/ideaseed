@@ -104,7 +104,7 @@ Configuration:
    --local-copy=DIR                 Directory to save a copy of ideas to.
                                     If not set, or set to '<None>',
                                     ideas will not get saved locally.
-                                    DIR must exist beforehand.
+                                    DIR must exist beforehand. ~ and ~user constructs get expanded.
                                     See Local Copy for more information.
 
 
