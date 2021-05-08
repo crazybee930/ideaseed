@@ -336,6 +336,9 @@ def push_to_repo(
 
     if milestone is not None:
         milestone: Milestone = get_milestone_from_name(repo, create_missing, milestone)
+        if milestone is None:
+            print(f"[red]Given milestone does not exist")
+            return
         if milestone.state != "open":
             if not answered_yes_to(
                 f"[yellow]:warning:[/] The selected milestone is {milestone.state}. Use this milestone?"
