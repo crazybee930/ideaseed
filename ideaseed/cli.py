@@ -245,11 +245,17 @@ def run(argv=None):
         idea = gkeep.push_to_gkeep(**args) or Idea()
 
     if args["local_copy"] and idea.body:
-        saved_to = ondisk.save(**args, idea=idea)
-        if saved_to:
-            print(f"[dim]Local copy saved to [blue]{saved_to}")
+        local_copy_dir = Path(args["local_copy"]).expanduser()
+        if not (local_copy_dir.exists() and local_copy_dir.is_dir()):
+            print(
+                f"[red]Given directory for --local-copy ([bold]{local_copy_dir}[/bold]) does not exist or is not a directory"
+            )
         else:
-            print(f"[yellow]Did not save a local copy")
+            saved_to = ondisk.save(local_copy=local_copy_dir, idea=idea)
+            if saved_to:
+                print(f"[dim]Local copy saved to [blue]{saved_to}")
+            else:
+                print(f"[yellow]Did not save a local copy")
 
 
 def flags_to_args(flags: dict[str, Any]) -> dict[str, Any]:

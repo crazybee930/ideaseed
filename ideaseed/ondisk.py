@@ -58,7 +58,7 @@ class Idea(RecordClass):
         }
 
 
-def save(local_copy: str, idea: Idea, repo: str, **_) -> str:
+def save(local_copy: Path, idea: Idea, repo: str, **_) -> str:
     """
     Saves a local copy of the given Idea to the right path
     Returns the path where the file was written.
@@ -69,7 +69,7 @@ def save(local_copy: str, idea: Idea, repo: str, **_) -> str:
         root_dir=local_copy, repo_full=repo, title=idea.title, body=idea.body
     )
     if filepath.exists() and not answered_yes_to(
-        f"The local copy [bold blue]{filepath.relative_to(Path(local_copy).expanduser())}[/] already exists. Overwrite it?"
+        f"The local copy [bold blue]{filepath.relative_to(local_copy)}[/] already exists. Overwrite it?"
     ):
         return ""
 
@@ -78,8 +78,12 @@ def save(local_copy: str, idea: Idea, repo: str, **_) -> str:
     return filepath
 
 
+def first_line(text: str) -> str:
+    return text.splitlines()[0]
+
+
 def get_path(
-    root_dir: str, repo_full: Optional[str], title: Optional[str], body: str
+    root_dir: Path, repo_full: Optional[str], title: Optional[str], body: str
 ) -> Path:
     repo_full = repo_full or ""
     if "/" in repo_full:
@@ -87,6 +91,4 @@ def get_path(
     else:
         user, repo = "", repo_full
 
-    return (
-        Path(root_dir).expanduser() / user / repo / (slugify(title or body.splitlines()[0]) + ".md")
-    )
+    return root_dir / user / repo / slugify(title or first_line(body)) + ".md"
