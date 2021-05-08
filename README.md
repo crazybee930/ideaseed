@@ -39,6 +39,7 @@ Note down your ideas and get them to the right place, without switching away fro
 <ul>
 <li><a href="#--open"><code>--open</code></a></li>
 <li><a href="#--dry-run"><code>--dry-run</code></a></li>
+<li><a href="#local-copy">Local copy</a></li>
 </ul></li>
 </ul></li>
 <li><a href="#configuration">Configuration</a>
