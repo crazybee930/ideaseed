@@ -143,7 +143,7 @@ Local Copy:
     and things created with --create-missing also appear here.
 
     If 'url' is not in the header, than either the idea failed to get uploaded to the service (github, google keep)
-    Note that --dry-run prevents this file from being created
+    Or that --dry-run was used.
 
 """
 
