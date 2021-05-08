@@ -6,6 +6,7 @@ import requests
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.rule import Rule
+from rich import print
 from semantic_version import Version
 
 from ideaseed.constants import RELEASES_RSS_URL, VERSION
@@ -118,6 +119,7 @@ def notification(upgrade_from: Version, upgrade_to: Version) -> None:
 
 Use [blue bold]ideaseed update[/] to see what changed and do the update."""
     )
+    print(Rule())
 
 
 def prompt(upgrade_from: Version, upgrade_to: Version) -> bool:

@@ -292,7 +292,7 @@ def check_for_updates(check_for_updates_flag: bool):
     if check_for_updates_flag:
         latest_version = get_latest_version()
         if latest_version > VERSION:
-            print(update_checker.notification(VERSION, latest_version))
+            update_checker.notification(VERSION, latest_version)
 
 
 def validate_tag_color(color: Optional[str]):
