@@ -182,10 +182,11 @@ def placeholders_validator(valid_placeholders: set[str]) -> Callable[[str], bool
     rich.prompt.InvalidResponse: No placeholders allowed
     """
     def _validate(text: str):
-        all_placeholders = [p[1] for p in string.Formatter().parse(text)]
+        all_placeholders = {p[1] for p in string.Formatter().parse(text) if p[1] is not None}
         if not all(p in valid_placeholders for p in all_placeholders):
             raise InvalidResponse(
                 f"Allowed placeholders are {english_join(['{%s}' % p for p in valid_placeholders])}"
+                if valid_placeholders else "No placeholders allowed"
             )
         return True
 
