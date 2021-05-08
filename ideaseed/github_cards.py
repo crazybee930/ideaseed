@@ -332,7 +332,7 @@ def push_to_repo(
     if len(labels) != len(label):
         return
 
-    idea.labels = labels
+    idea.labels = [l.name for l in labels]
 
     if milestone is not None:
         milestone: Milestone = get_milestone_from_name(repo, create_missing, milestone)
