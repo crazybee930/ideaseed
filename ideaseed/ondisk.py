@@ -91,4 +91,4 @@ def get_path(
     else:
         user, repo = "", repo_full
 
-    return root_dir / user / repo / slugify(title or first_line(body)) + ".md"
+    return root_dir / user / repo / (slugify(title or first_line(body)) + ".md")
