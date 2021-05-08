@@ -77,7 +77,10 @@ class Label(NamedTuple):
 
 
 def href(s: str, url: str) -> str:
-    return f"[link={url}]{s}[/link]"
+    """
+    Turns `s` into a console link pointing to `url`, escaping `s` from rich markup
+    """
+    return f"[link={url}]{rich.markup.escape(s)}[/link]"
 
 
 def make_card(
@@ -94,7 +97,7 @@ def make_card(
     header.add_column(justify="right")
     header.add_row(
         f"[bold]{rich.markup.escape(title)}",
-        f"[bold blue]{rich.markup.escape(right_of_title)}",
+        f"[bold blue]{right_of_title}",
     )
 
     card = Table.grid(padding=1, expand=True)
@@ -130,11 +133,11 @@ def make_table(
     if project:
         listing.add_row(
             "Card in",
-            f"[bold blue]{rich.markup.escape(project)}[/] [bold dim]>[/] [blue]{rich.markup.escape(project_column)}",
+            f"[bold blue]{project}[/] [bold dim]>[/] [blue]{project_column}",
         )
     if milestone:
         listing.add_row(
-            "Milestone'd to", f"[bold blue]{rich.markup.escape(milestone)}[/]"
+            "Milestone'd to", f"[bold blue]{milestone}[/]"
         )
     if list(assignees):
         listing.add_row(
