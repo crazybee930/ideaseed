@@ -526,12 +526,8 @@ def with_link(o: Union[ProjectColumn, Project, Issue, NamedUser, Milestone]) -> 
     # can't wait for py310 pattern matching
     if not o:
         return ""
-    
-    url = (
-        o.html_url
-        if hasattr(o, "html_url")
-        else o.raw_data.get("html_url", None)
-    )
+
+    url = o.html_url if hasattr(o, "html_url") else o.raw_data.get("html_url", None)
 
     name = (
         f"#{o.number}"

@@ -251,7 +251,9 @@ def run(argv=None):
                 f"[red]Given directory for --local-copy ([bold]{local_copy_dir}[/bold]) does not exist or is not a directory"
             )
         else:
-            saved_to = ondisk.save(local_copy=local_copy_dir, idea=idea, repo=args["repo"])
+            saved_to = ondisk.save(
+                local_copy=local_copy_dir, idea=idea, repo=args["repo"]
+            )
             if saved_to:
                 print(f"[dim]Local copy saved to [blue]{saved_to}")
             else:
