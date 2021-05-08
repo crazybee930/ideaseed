@@ -249,6 +249,11 @@ You can specify default values for `COLUMN` and `PROJECT`. You can use {placehol
 |------|------------------------|------------------------|
 | `--default-project` | `PROJECT` | {repository}, {username}, {owner} |
 | `--default-column` | `COLUMN` | {project}, {repository}, {username}, {owner} |
+| `--default-user-project` | `PROJECT` when using `user` | none
+| `--default-user-column` | `COLUMN` when using `user` | {project} 
+
+Note: if a `--default-user-*` is not set, it will fall back to the corresponding `--default-*`.
+These are essentially overrides for the `user` command, since you might want different defaults with that one.
 
 ### Miscelleanous options
 
