@@ -14,6 +14,23 @@ from ideaseed.utils import answered_yes_to, ask, english_join
 
 VALID_PLACEHOLDERS = {"owner", "repository", "username", "project"}
 
+def validate_directory(ans: str) -> bool:
+    """
+    Validates the given path to check if
+    1. It exists
+    2. It is a directory
+
+    If not, raises a rich.prompt.InvalidResponse
+    Otherwise, returns True
+    """
+    path = Path(ans).expanduser()
+
+    if not path.exists():
+        raise InvalidResponse("This path does not exist.")
+    if not path.is_dir():
+        raise InvalidResponse("The path must be a directory")
+       
+    return True
 
 class UnknownShellError(Exception):
     """The current login shell is not known"""
@@ -141,10 +158,29 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
 
     print(
         """
-        For the two following questions, you can use {placeholders}.
+        Local Copy is a feature that allows you to save a copy of any idea
+        locally, somewhere safe on your disk.
+
+        Ideas will get saved as markdown files with a YAML header for metadata,
+        see https://github.com/ewen-lbh/ideaseed#local-copy for more info
+        """
+    )
+
+    settings["--local-copy"] = str(
+        Path(
+            ask(
+                "Directory to save local copies to (leave blank to not save local copies)",
+                is_valid=validate_directory
+            )
+        ).expanduser()
+    )
+
+    print(
+        """
+        For the following questions, you can use {placeholders}.
         See https://github.com/ewen-lbh/ideaseed#placeholders
         for the full list of available placeholders.
-        """.strip()
+        """
     )
 
     settings["--default-project"] = ask(
@@ -155,6 +191,21 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
         "Enter the default value for the column name",
         is_valid=placeholders_validator({"repository", "owner", "project"}),
     )
+
+    if answered_yes_to("Define overrides for the [bold]user[/bold] command?"):
+        print(
+            "Note that here, {owner} and {repository} are not available: the user command adds cards to your user profile directly"
+        )
+
+        settings["--default-user-column"] = ask(
+            "Enter the default value for the project name in user command",
+            is_valid=placeholders_validator({"project"}),
+        )
+
+        settings["--default-user-project"] = ask(
+            "Enter the default value for the colum name in user command",
+            is_valid=placeholders_validator(set()),
+        )
 
     return (
         settings,
@@ -181,12 +232,16 @@ def placeholders_validator(valid_placeholders: set[str]) -> Callable[[str], bool
         ...
     rich.prompt.InvalidResponse: No placeholders allowed
     """
+
     def _validate(text: str):
-        all_placeholders = {p[1] for p in string.Formatter().parse(text) if p[1] is not None}
+        all_placeholders = {
+            p[1] for p in string.Formatter().parse(text) if p[1] is not None
+        }
         if not all(p in valid_placeholders for p in all_placeholders):
             raise InvalidResponse(
                 f"Allowed placeholders are {english_join(['{%s}' % p for p in valid_placeholders])}"
-                if valid_placeholders else "No placeholders allowed"
+                if valid_placeholders
+                else "No placeholders allowed"
             )
         return True
 
