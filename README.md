@@ -304,6 +304,8 @@ Usage:
     ideaseed [options] [-# LABEL...] [-@ USER...] REPO TITLE BODY
     ideaseed [options] [-# LABEL...] [-@ USER...] REPO COLUMN TITLE BODY
     ideaseed [options] [-# LABEL...] [-@ USER...] REPO PROJECT COLUMN TITLE BODY
+
+
 Commands:
     user                    Creates cards in your user's project. 
                             (see https://github.com/users/YOURUSERNAME/projects)
@@ -316,6 +318,8 @@ Commands:
     version                 Outputs the version number
     update                  Check for updates. If any is available, shows the changelog. 
                             You can then decide to install the new version.
+
+
 Arguments:
     BODY      Sets the note's body. Required.
     TITLE     Sets the title.
@@ -329,6 +333,8 @@ Arguments:
               Can use Placeholders
     COLUMN    Specify which column to use.
               Can use Placeholders.
+
+
 Options:
     -I --no-issue           Only creates a project card, no issue is created.
                             Has no effect when used without a REPO
@@ -349,36 +355,83 @@ Options:
                             Can be specified multiple times.
                             Cannot be used in the 'user' command.
                             Cannot be used with --no-issue
+       --debug              Shows extra information. Used for debugging purposes.
+
     REPO only: 
        --self-assign        Assign the created issue to yourself. 
                             Has no effect when --assign is used.
     -M --milestone=NAME     Adds the issue to the milestone NAME.
+
     Google Keep only:
        --pin                Pins the card. 
        --color=COLOR        Sets the card's color. [default: white]
                             Available values: blue, brown, darkblue (or indigo), 
                             gray (or grey), green, orange, pink, purple (or magenta), 
                             red, teal (or cyan), white, yellow. 
+
+
 Configuration:
-   --default-column=COLUMN    Specifies the Default Column. 
-                              Used when PROJECT is set but not COLUMN
-                              Can use Placeholders.
-   --default-project=PROJECT  Specifies the Default Project. 
-                              Used when REPO is set but not PROJECT
-                              Can use Placeholders.
-                              If not set, or set to '<None>',
-                              using REPO without PROJECT creates an issue
-                              without its project card.
-   --auth-cache=FILEPATH      Set the filepath for the auth. cache [default: ~/.cache/ideaseed/auth.json]
-                              If set to '<None>', disables caching of credentials.
-                              Has no effect when used with --keyring.
-   --check-for-updates        Check for new versions and show a notification if a new one is found.
+   --default-column=COLUMN          Specifies the Default Column. 
+                                    Used when PROJECT is set but not COLUMN
+                                    Can use Placeholders.
+   --default-project=PROJECT        Specifies the Default Project. 
+                                    Used when REPO is set but not PROJECT
+                                    Can use Placeholders.
+                                    If not set, or set to '<None>',
+                                    using REPO without PROJECT creates an issue
+                                    without its project card.
+   --default-user-project=PROJECT   Specifies an override to Default Project,
+                                    that will only be used when the ‘user’ command is used
+                                    Can use Placeholders.
+                                    When not set, --default-project is used.
+   --default-user-column=COLUMN     Same as --default-user-project, but for the Default Column.                                   
+   --auth-cache=FILEPATH            Set the filepath for the auth. cache [default: /home/ewen/cache/ideaseed/auth.json]
+                                    If set to '<None>', disables caching of credentials.
+                                    Has no effect when used with --keyring.
+   --check-for-updates              Check for new versions and show a notification if a new one is found.
+   --local-copy=DIR                 Directory to save a copy of ideas to.
+                                    If not set, or set to '<None>',
+                                    ideas will not get saved locally.
+                                    DIR must exist beforehand. ~ and ~user constructs get expanded.
+                                    See Local Copy for more information.
+
+
 Placeholders:
     {repository}      Replaced with the repository's name
+                      Not available to --default-user-* flags
     {owner}           Replaced with the repository's owner
+                      Not available to --default-user-* flags
     {username}        Replaced with the currently-logged-in GitHub user's username
     {project}         Replaced with the project the card will be added to.
-                      Not available to --default-project or PROJECT.
+                      Not available to --default-project, --default-user-project or PROJECT.
+
+Local Copy:
+    If you use --local-copy=DIR, copies of all created ideas will get saved as files inside of DIR.
+    If USER/REPO or REPO is used, the file will be written into DIR/[USER/]REPO instead.
+    If the ‘user’ command is used, the file will be written into DIR/PROJECT instead.
+
+    The file's name will be a slugified (meaning lowercased, with spaces replaced by dashes, mostly)
+    version of either the title or, if not set, the body's first line.
+
+    The file is a markdown with a YAML header that holds metadata such as labels and assigned people.
+    Values that count as false (empty strings, empty lists, empty objects, the False boolean and 0)
+    will not be included in the header.
+    The following information is written to the header:
+
+    assignees:      People assigned           (related to -@ / --assign)
+    color:          The card's color          (related to --color)
+    column:         The project's column      (related to -C / --column)
+    labels:         Included labels           (related to -# / --label)
+    milestone:      Assigned milestone        (related to -M / --milestone)
+    pinned:         The card's pinned state   (related to --pin)
+    project:        The github project        (related to -P / --project)
+    url:            A link to the idea        
+
+    The values correspond to what was actually used to publish the idea, so defaults get applied,
+    and things created with --create-missing also appear here.
+
+    If 'url' is not in the header, than either the idea failed to get uploaded to the service (github, google keep)
+    Or that --dry-run was used.
 ```
 
 [v1.0.0]: https://github.com/ewen-lbh/ideaseed/milestone/2
