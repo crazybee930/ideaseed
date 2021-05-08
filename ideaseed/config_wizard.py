@@ -167,6 +167,20 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
 
 
 def placeholders_validator(valid_placeholders: set[str]) -> Callable[[str], bool]:
+    """
+    >>> placeholders_validator({"spam", "eggs", "bacon"})("I love {soup}!") # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+        ...
+    rich.prompt.InvalidResponse: Allowed placeholders are ...
+    >>> placeholders_validator({"spam", "eggs"})("I love {{you}} (and {eggs})")
+    True
+    >>> placeholders_validator({"spam"})("A constant value")
+    True
+    >>> placeholders_validator(set())("{anything} goes wrong")
+    Traceback (most recent call last):
+        ...
+    rich.prompt.InvalidResponse: No placeholders allowed
+    """
     def _validate(text: str):
         all_placeholders = [p[1] for p in string.Formatter().parse(text)]
         if not all(p in valid_placeholders for p in all_placeholders):
