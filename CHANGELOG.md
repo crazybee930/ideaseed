@@ -15,15 +15,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- When using `--color`, the cards have their background colored instead of their text and have no borders [5041355]
+- When using `--color`, the cards have their background colored instead of their text and have no borders (See [`5041355`](https://github.com/ewen-lbh/ideaseed/commit/5041355))
 - When using Google Keep, if `--color` is `White`, the card has no background color and appears with a border, the same way as Github cards do
 
 ### Fixed
 
 - Link for milestone being to the API (see [#161](https://github.com/ewen-lbh/ideaseed/issues/161))
-- Crash when selecting non-existent milestone without `--create-missing` [#158]
-- Cards weren't escaped from Rich's markup syntax [#163]
-- The “Upgrade available” notification was not formatted properly [#160]
+- Crash when selecting non-existent milestone without `--create-missing` (See [#158](https://github.com/ewen-lbh/ideaseed/issues/158))
+- Cards weren't escaped from Rich's markup syntax (See [#163](https://github.com/ewen-lbh/ideaseed/issues/163))
+- The “Upgrade available” notification was not formatted properly (See [#160](https://github.com/ewen-lbh/ideaseed/issues/160))
 
 ## [1.0.0] - 2021-04-18
 
