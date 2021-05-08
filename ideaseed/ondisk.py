@@ -88,5 +88,5 @@ def get_path(
         user, repo = "", repo_full
 
     return (
-        Path.expanduser(root_dir) / user / repo / (slugify(title or body.splitlines()[0]) + ".md")
+        Path(root_dir).expanduser() / user / repo / (slugify(title or body.splitlines()[0]) + ".md")
     )
