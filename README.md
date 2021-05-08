@@ -62,15 +62,18 @@ Note down your ideas and get them to the right place, without switching away fro
 Ideaseed is available [on PyPI.org](https://pypi.org/project/ideaseed):
 
 ```sh
-pip install ideaseed
+pip install ideaseed # latest version
+pip install git+https://github.com/ewen-lbh/ideaseed # latest commit
 ```
 
-### Arch Linux
+<!-- ### Arch Linux
 
 Arch users can also get _ideaseed_ from the AUR:
 
 - latest stable: [`ideaseed`](https://aur.archlinux.org/packages/ideaseed)
 - bleeding edge (latest commit): [`ideaseed-git`](https://aur.archlinux.org/packages/ideaseed-git)
+
+-->
 
 ## Authentication
 
