@@ -9,8 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- default flag overrides for the 'user' command (--default-user-project and --default-user-column)
-- ability to save local copies of ideas as plaintext files on your disk, with flag `--local-copy`
+- Default flag overrides for the 'user' command (`--default-user-project ` and `--default-user-column`)
+- Ability to save local copies of ideas as plaintext files on your disk, with flag `--local-copy`
+- A `--debug` flag to print debugging information
+
+### Changed
+
+- When using `--color`, the cards have their background colored instead of their text and have no borders [5041355]
+- When using Google Keep, if `--color` is `White`, the card has no background color and appears with a border, the same way as Github cards do
+
+### Fixed
+
+- Link for milestone being to the API (see [#161](https://github.com/ewen-lbh/ideaseed/issues/161))
+- Crash when selecting non-existent milestone without `--create-missing` [#158]
+- Cards weren't escaped from Rich's markup syntax [#163]
+- The “Upgrade available” notification was not formatted properly [#160]
 
 ## [1.0.0] - 2021-04-18
 
@@ -25,12 +38,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Reduce friction when connecting to Google Keep from a 2FA-secured account
 - All-new UI using [rich](https://pypi.org/project/rich), including
-  - Full markdown (commonmark) rendering
-  - Revamped Card
-  - Revamped 'timeline' (now just a listing of properties)
-  - New prompts (not necessarily better, but good enough. This was done to not depend on enquirer anymore, and use rich's prompts.)
-  - Revamped "update available" notification
-  - One clear banner when running in dry-run mode
+- Full markdown (commonmark) rendering
+- Revamped Card
+- Revamped 'timeline' (now just a listing of properties)
+- New prompts (not necessarily better, but good enough. This was done to not depend on enquirer anymore, and use rich's prompts.)
+- Revamped "update available" notification
+- One clear banner when running in dry-run mode
 - More intuitive CLI, using a bunch of positional arguments. See 0f86a87 and related issues (#112 mainly)
 - about, config and version are now commands instead of flags (do `ideaseed config` instead of `ideaseed --config`, for example.)
 - `--no-*` flags are now --* (i.e. negative flags are positive) (e.g. --no-check-for-updates is now --check-for-updates)
