@@ -196,6 +196,43 @@ The following will appear to let you know that you are dry-running:
 >
 > _(e.g. missing labels will be created if you answer 'yes')_
 
+#### Local copy
+
+Save copies of your ideas locally, somewhere safe on your disk.
+
+If you use `--local-copy=DIR`, copies of all created ideas will get saved as files inside of `DIR`.
+
+If `USER/REPO` or `REPO` is used, the file will be written into `DIR/[USER/]REPO` instead.
+If the ‘user’ command is used, the file will be written into `DIR/PROJECT` instead.
+
+The file's name will be a [slugified](https://en.wikipedia.org/wiki/Clean_URL#Slug)<sup>1</sup> version of either the title or, if not set, the body's first line.
+
+The file is a markdown with a YAML header that holds metadata such as labels and assigned people.
+
+Values that count as false (empty strings, empty lists, empty objects, the False boolean and 0) will not be included in the header.
+
+The following information is written to the header:
+
+YAML key  | Description             | Related to flag
+----------|-------------------------|------------------
+assignees | People assigned         |  `-@` / `--assign`
+color     | The card's color        |  `--color`
+column    | The project's column    |  `-C` / `--column`
+labels    | Included labels         |  `-#` / `--label`
+milestone | Assigned milestone      |  `-M` / `--milestone`
+pinned    | The card's pinned state |  `--pin`
+project   | The github project      |  `-P` / `--project`
+url       | A link to the idea      |  
+
+The values correspond to what was actually used to publish the idea, so defaults get applied,
+and things created with `--create-missing` also appear here.
+
+If 'url' is not in the header, then either the idea failed to get uploaded to the service (github, google keep), or `--dry-run` was used.
+
+---
+
+<sup>1</sup> As defined by [unicode-slugify](https://pypi.org/project/unicode-slugify)'s `slugify` function
+
 ## Configuration
 
 Configuration is done through aliasing ideaseed and adding flags to the alias.
