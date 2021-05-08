@@ -1,6 +1,7 @@
 from shutil import get_terminal_size
 from typing import Iterable, NamedTuple, Optional
 
+import rich.markup
 from rich import print
 from rich.align import Align
 from rich.box import Box
@@ -90,7 +91,10 @@ def make_card(
     header = Table.grid(expand=True)
     header.add_column()
     header.add_column(justify="right")
-    header.add_row(f"[bold]{title}", f"[bold blue]{right_of_title}")
+    header.add_row(
+        f"[bold]{rich.markup.escape(title)}",
+        f"[bold blue]{rich.markup.escape(right_of_title)}",
+    )
 
     card = Table.grid(padding=1, expand=True)
     card.add_column()
@@ -119,10 +123,13 @@ def make_table(
     listing.add_column(justify="right")
     if project:
         listing.add_row(
-            "Card in", f"[bold blue]{project}[/] [bold dim]>[/] [blue]{project_column}"
+            "Card in",
+            f"[bold blue]{rich.markup.escape(project)}[/] [bold dim]>[/] [blue]{rich.markup.escape(project_column)}",
         )
     if milestone:
-        listing.add_row("Milestone'd to", f"[bold blue]{milestone}[/]")
+        listing.add_row(
+            "Milestone'd to", f"[bold blue]{rich.markup.escape(milestone)}[/]"
+        )
     if list(assignees):
         listing.add_row(
             "Assigned to",
@@ -130,7 +137,7 @@ def make_table(
         )
 
     if url:
-        listing.add_row("Available at", f"[blue link {url}]{url}")
+        listing.add_row("Available at", f"[blue link {url}]{rich.markup.escape(url)}")
 
     return listing
 
