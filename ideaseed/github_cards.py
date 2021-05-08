@@ -181,7 +181,7 @@ def label_names_to_labels(
 
 def get_milestone_from_name(
     repo: Repository, create_missing: bool, name: str
-) -> Milestone:
+) -> Optional[Milestone]:
     return search_for_object(
         repo.get_milestones(),
         name,
@@ -517,12 +517,19 @@ def to_ui_label(label: Label, repo: Repository) -> ui.Label:
 
 def with_link(o: Union[ProjectColumn, Project, Issue, NamedUser, Milestone]) -> str:
     """
-    Returns `o.name` (or `o.title`, or `o.login`) wrapped around a terminal link sequence pointing to `o.html_url` (or `o.url`)
+    Returns `o.name` (or `o.title`, or `o.login`) wrapped around a terminal link sequence pointing to the (HTML) url
     Special case: uses `f"#{o.number}"` as a name for issues
     """
     # can't wait for py310 pattern matching
     if not o:
         return ""
+    
+    url = (
+        o.html_url
+        if hasattr(o, "html_url")
+        else o.raw_data.get("html_url", None)
+    )
+
     name = (
         f"#{o.number}"
         if isinstance(o, Issue)
@@ -532,17 +539,13 @@ def with_link(o: Union[ProjectColumn, Project, Issue, NamedUser, Milestone]) -> 
         if isinstance(o, Milestone)
         else o.name
     )
+
     if name is None:
         raise ValueError(
             f"ideaseed.github_cards.with_link: object {o!r} has neither .number, nor .name, nor .title, nor .login attributes"
         )
 
-    if isinstance(o, ProjectColumn) or isinstance(o, Milestone):
-        url = o.url
-    else:
-        url = o.html_url
-
-    return ui.href(name, url)
+    return ui.href(name, url) if url is not None else name
 
 
 def linkify_github_username(username: str) -> str:
