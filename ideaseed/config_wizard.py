@@ -197,12 +197,12 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
             "Note that here, {owner} and {repository} are not available: the user command adds cards to your user profile directly"
         )
 
-        settings["--default-user-column"] = ask(
+        settings["--default-user-project"] = ask(
             "Enter the default value for the project name in user command",
             is_valid=placeholders_validator({"project"}),
         )
 
-        settings["--default-user-project"] = ask(
+        settings["--default-user-column"] = ask(
             "Enter the default value for the colum name in user command",
             is_valid=placeholders_validator(set()),
         )
