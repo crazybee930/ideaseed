@@ -72,7 +72,7 @@ class Label(NamedTuple):
     def __str__(self) -> str:
         s = f"[{readable_on(self.color)} on #{self.color}]{self.name}[/]"
         if self.url:
-            s = href(s, self.url)
+            s = f"[link={self.url}]{s}[/link]"
         return s
 
 
