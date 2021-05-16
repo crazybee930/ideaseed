@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Successful local copy write message is displayed as part of the table, like other information (See [#173](https://github.com/ewen-lbh/ideaseed/issues/173))
+
 ### Fixed
 
 - Interactive configuration (through `ideaseed config`) was writing `--default-user-column` for project's value and vice-versa (`--default-user-*` flags had their values swapped)
+- Markup for labels was escaped and shown on the card instead of rendered (See [#178](https://github.com/ewen-lbh/ideaseed/issues/178))
 
 ## [1.1.0] - 2021-05-08
 
