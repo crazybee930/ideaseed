@@ -255,7 +255,7 @@ def run(argv=None):
                 local_copy=local_copy_dir, idea=idea, repo=args["repo"]
             )
             if saved_to:
-                print(f"[dim]Local copy saved to [blue]{saved_to}")
+                ui.get_console().print(make_table(local_copy=saved_to))
             else:
                 print(f"[yellow]Did not save a local copy")
 

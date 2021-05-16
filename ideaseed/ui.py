@@ -124,6 +124,7 @@ def make_table(
     project: Optional[str] = None,
     project_column: Optional[str] = None,
     url: Optional[str] = None,
+    local_copy: Optional[str] = None,
 ) -> Table:
     assignees = assignees or []
     listing = Table.grid(expand=True, padding=0)
@@ -144,8 +145,13 @@ def make_table(
     if url:
         listing.add_row("Available at", f"[blue link {url}]{rich.markup.escape(url)}")
 
+    if local_copy:
+        listing.add_row("Local copy saved to", f"[blue]{local_copy}")
+
     return listing
 
+def get_console() -> Console:
+    return Console(width=min(get_terminal_size().columns, 75))
 
 def show(
     title: str,
@@ -160,7 +166,7 @@ def show(
     project_column: Optional[str] = None,
     url: Optional[str] = None,
 ):
-    c = Console(width=min(get_terminal_size().columns, 75))
+    c = get_console()
     c.print(
         make_card(
             title=title,
