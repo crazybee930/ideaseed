@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ideaseed"
-version = "1.2.0"
+version = "1.2.1"
 description = "Note down your ideas and get them to the right place, without switching away from your terminal"
 authors = ["Ewen Le Bihan <ewen.lebihan7@gmail.com>"]
 license = "MIT"
