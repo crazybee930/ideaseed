@@ -161,7 +161,7 @@ from ideaseed import (authentication, config_wizard, github_cards, gkeep,
                       ondisk, update_checker, ui)
 from ideaseed.constants import VALID_COLOR_NAMES, VERSION
 from ideaseed.ondisk import Idea
-from ideaseed.ui import ABOUT_SCREEN, show_dry_run_banner
+from ideaseed.ui import ABOUT_SCREEN, show_dry_run_banner, make_table
 from ideaseed.update_checker import get_latest_version
 from ideaseed.utils import english_join, remove_duplicates_in_list_of_dict
 
