@@ -146,7 +146,7 @@ def make_table(
         listing.add_row("Available at", f"[blue link {url}]{rich.markup.escape(url)}")
 
     if local_copy:
-        listing.add_row("Local copy saved to", f"[blue]{local_copy}")
+        listing.add_row("Local copy at", f"[blue]{local_copy}")
 
     return listing
 
