@@ -4,7 +4,6 @@ from xml.dom.minidom import parseString as parse_xml
 
 import requests
 from rich import print
-from rich.console import Console
 from rich.markdown import Markdown
 from rich.rule import Rule
 from semantic_version import Version
@@ -117,7 +116,10 @@ def notification(upgrade_from: Version, upgrade_to: Version) -> None:
         f"""A new version of ideaseed is available for download:
 [blue bold]{upgrade_from}[/] [magenta]->[/] [blue bold]{upgrade_to}[/]
 
-Use [blue bold]ideaseed update[/] to see what changed and do the update."""
+Use [blue bold]ideaseed update[/] to see what changed and do the update.
+
+[dim]This appears because you use the [/dim][bold]--check-for-updates[/][dim] flag.[/]
+"""
     )
     print(Rule())
 
