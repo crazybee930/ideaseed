@@ -122,19 +122,26 @@ def get_random_color_hexstring() -> str:
 
 def ask(
     question: str,
-    is_valid: Callable[[str], bool] = lambda _: True,
+    is_valid: Callable[[str], Union[bool, str]] = lambda _: True,
     choices: Optional[list[str]] = None,
     password=False,
     default="",
 ) -> str:
+    """
+    Asks question until the answer is_valid.
+    If is_valid returns a string, it is considered an error message. Thus, if is_valid returns an empty string, then answer was valid. Else, the error message is shown.
+    """
     answer = ""
     while True:
         answer = BetterPrompt.ask(
             question, password=password, choices=choices, default=default
         )
         try:
-            if is_valid(answer):
+            validation = is_valid(answer)
+            if validation in (True, ""):
                 break
+            elif isinstance(validation, str):
+                print(validation)
         except InvalidResponse as error:
             print(error.message)
     return answer

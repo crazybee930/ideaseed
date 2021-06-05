@@ -151,7 +151,7 @@ def resolve_defaults(
 def interactively_create_label(repo: Repository, name: str):
     label_data = {
         "color": get_random_color_hexstring(),
-        "description": ask("A short description of your label"),
+        "description": ask("A short description of your label (100 chars max)", is_valid=lambda answer: "" if len(answer) <= 100 else "Keep the description under 100 characters"),
         "name": name,
     }
     print(f"Creating label {ui.Label(name, label_data['color'])}...")
