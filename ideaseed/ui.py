@@ -39,6 +39,10 @@ https://github.com/kiwiz
     internal REST API so that anyone could
     use it with ease.
 
+https://github.com/willmcgugan/rich
+    A wonderful library to make terminal output
+    pretty. Very pythonic. Batteries-included.
+
 https://github.com/PyGithub
     This one of the cleanest libs I've ever used.
     Like `requests`-level cleanliness.
