@@ -1,7 +1,7 @@
 <center><p align="center">
 <img alt="ideaseed" src="https://raw.githubusercontent.com/ewen-lbh/ideaseed/master/visual-identity/ideaseed-logomark-color-transparent.svg" width="550px">
   <br>
-<a href="https://pypi.org/project/ideased"><img alt="PyPI Latest version" src="https://img.shields.io/pypi/v/ideaseed"/></a>
+<a href="https://pypi.org/project/ideaseed"><img alt="PyPI Latest version" src="https://img.shields.io/pypi/v/ideaseed"/></a>
 <a href="https://pepy.tech/project/ideaseed"><img alt="Downloads count" src="https://pepy.tech/badge/ideaseed"/></a>
 </p></center>
 
