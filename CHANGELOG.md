@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Put small notice that shows how to disable the upgrade popup (See [#195](https://github.com/ewen-lbh/ideaseed/issues/195))
+- Don't prompt for upgrading when doing `update` (See [#194](https://github.com/ewen-lbh/ideaseed/issues/194))
+- Don't show upgrade popup when doing `update` (See [#193](https://github.com/ewen-lbh/ideaseed/issues/193))
+- When you hit Ctrl-C, exit with
+  - a different status code (See [#190](https://github.com/ewen-lbh/ideaseed/issues/190))
+  - a simple error message, instead of a gigantic traceback (See [#164](https://github.com/ewen-lbh/ideaseed/issues/164))
+- Mention rich in about screen (See [#165](https://github.com/ewen-lbh/ideaseed/issues/165))
+- Set a maximum length of 100 on label description (See [#86](https://github.com/ewen-lbh/ideaseed/issues/86)). Otherwise, ideaseed crashes with an error from Github's API
+
+### Fixed
+
+- In the configuration wizard, leaving blank the "Local Copy" field (i.e. refusing local copies) would result in a --local-copy=. added to the alias (See [#177](https://github.com/ewen-lbh/ideaseed/issues/177))
+
 ## [1.2.2] - 2021-06-03
 
 ### Fixed
