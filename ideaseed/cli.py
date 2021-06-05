@@ -171,8 +171,18 @@ __doc__ = __doc__.replace("$HOME", str(Path.home()))
 class UsageError(Exception):
     pass
 
-
 def run(argv=None):
+    """
+    `run` is `do` with KeyboardInterrupts catched and displayed nicely.
+    """
+
+    try:
+        do(argv)
+    except KeyboardInterrupt:
+        print("\n[red]Stopped by user.")
+        exit(2)
+
+def do(argv=None):
     flags = docopt(__doc__, argv)
     args = flags_to_args(flags)
     idea = Idea()
