@@ -162,18 +162,12 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
         locally, somewhere safe on your disk.
 
         Ideas will get saved as markdown files with a YAML header for metadata,
-        see https://github.com/ewen-lbh/ideaseed#local-copy for more info
+        see https://github.com/ewen-lbh/ideaseed#local-copy for learn more.
         """
     )
 
-    settings["--local-copy"] = str(
-        Path(
-            ask(
-                "Directory to save local copies to (leave blank to not save local copies)",
-                is_valid=validate_directory
-            )
-        ).expanduser()
-    )
+    if (local_copy_dir := ask("Directory to save local copies to (leave blank to not save local copies)", is_valid=validate_directory)):
+        settings["--local-copy"] = str(Path(local_copy_dir).expanduser()) 
 
     print(
         """
