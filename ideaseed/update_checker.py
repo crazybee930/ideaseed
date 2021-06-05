@@ -128,12 +128,9 @@ def prompt(upgrade_from: Version, upgrade_to: Version) -> bool:
     """
     Returns ``True`` if the user wants to upgrade, ``False`` otherwise.
     """
-    if not answered_yes_to(
-        f"Upgrade to v{upgrade_to} now? (you will be able to view the release notes)",
+    if answered_yes_to(
+        f"See what changed from v{upgrade_from} to v{upgrade_to}?",
     ):
-        return False
-
-    if answered_yes_to("List what changed?"):
         release_notes = get_release_notes()
         all_versions = get_versions_list_from_release_notes(release_notes)
         # If the version jump is more than one version, print concatednated release notes
