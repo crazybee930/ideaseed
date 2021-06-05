@@ -208,7 +208,8 @@ def run(argv=None):
     validate_tag_color(args["color"])
 
     # Check for updates
-    check_for_updates(args["check_for_updates"])
+    if not args["update"]:
+        check_for_updates(args["check_for_updates"])
 
     if args["about"]:
         print(ABOUT_SCREEN.format(version=VERSION))
