@@ -17,14 +17,19 @@ from github.Project import Project
 from github.ProjectColumn import ProjectColumn
 from github.Repository import Repository
 from rich import print
+from thefuzz import process as fuzzy_process
 
 from ideaseed import ui
 from ideaseed.authentication import Cache as BaseCache
 from ideaseed.constants import UsageError
 from ideaseed.ondisk import Idea
-from ideaseed.utils import (answered_yes_to, ask,
-                            error_message_no_object_found,
-                            get_random_color_hexstring)
+from ideaseed.utils import (
+    answered_yes_to,
+    ask,
+    english_join,
+    error_message_no_object_found,
+    get_random_color_hexstring,
+)
 
 
 def validate_label_color(color: str):
@@ -151,7 +156,12 @@ def resolve_defaults(
 def interactively_create_label(repo: Repository, name: str):
     label_data = {
         "color": get_random_color_hexstring(),
-        "description": ask("A short description of your label (100 chars max)", is_valid=lambda answer: "" if len(answer) <= 100 else "Keep the description under 100 characters"),
+        "description": ask(
+            "A short description of your label (100 chars max)",
+            is_valid=lambda answer: ""
+            if len(answer) <= 100
+            else "Keep the description under 100 characters",
+        ),
         "name": name,
     }
     print(f"Creating label {ui.Label(name, label_data['color'])}...")
@@ -173,6 +183,7 @@ def label_names_to_labels(
             create_missing=create_missing,
             object_name="label",
             create=lambda: interactively_create_label(repo, label_name),
+            available_names=label_names,
         )
         if label:
             labels.append(label)
@@ -182,13 +193,15 @@ def label_names_to_labels(
 def get_milestone_from_name(
     repo: Repository, create_missing: bool, name: str
 ) -> Optional[Milestone]:
+    milestones = repo.get_milestones(),
     return search_for_object(
-        repo.get_milestones(),
+        milestones,
         name,
         create_missing=create_missing,
         object_name="milestone",
         create=lambda: repo.create_milestone(title=name),
         get_name=lambda obj: obj.title,
+        available_names=[m.title for m in milestones]
     )
 
 
@@ -458,6 +471,7 @@ def search_for_object(
     object_name: str,
     create: Callable[[], Optional[T]],
     get_name: Callable[[T], str] = lambda obj: obj.name,
+    available_names: Optional[list[str]] = None,
 ) -> Optional[T]:
     the_object = None
     for obj in objects:
@@ -465,6 +479,18 @@ def search_for_object(
             the_object = obj
             break
     else:
+        if available_names:
+            suggestions = [
+                (suggestion, score)
+                for (suggestion, score) in fuzzy_process.extract(
+                    name, available_names, limit=5
+                )
+                if suggestion != name
+            ]
+            print(f"{object_name} {name!r} was not found.")
+            if suggestions:
+                print(f"Did you mean {english_join(name for name, _ in suggestions)} ?")
+
         if create_missing and answered_yes_to(
             f"Create missing {object_name} {name!r}?", True
         ):
