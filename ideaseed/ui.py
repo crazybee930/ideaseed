@@ -13,6 +13,7 @@ from rich.panel import Panel
 from rich.syntax import Syntax
 from rich.table import Table
 
+from ideaseed import queyd
 from ideaseed.utils import readable_on
 
 ABOUT_SCREEN = """
@@ -130,6 +131,7 @@ def make_table(
     project_column: Optional[str] = None,
     url: Optional[str] = None,
     local_copy: Optional[str] = None,
+    queyd_id: Optional[str] = None,
 ) -> Table:
     assignees = assignees or []
     listing = Table.grid(expand=True, padding=0)
@@ -153,6 +155,12 @@ def make_table(
 
     if local_copy:
         listing.add_row("Local copy at", f"[blue]{local_copy}")
+
+    if queyd_id:
+        listing.add_row(
+            "Saved on Queyd with ID",
+            f"[blue link {queyd_id}]{rich.markup.escape(queyd_id)}",
+        )
 
     return listing
 

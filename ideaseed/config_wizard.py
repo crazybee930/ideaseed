@@ -6,6 +6,8 @@ from os import getenv
 from pathlib import Path
 from typing import Any, Callable
 
+import requests
+from requests.sessions import PreparedRequest
 from rich import print
 from rich.panel import Panel
 from rich.prompt import InvalidResponse
@@ -32,6 +34,15 @@ def validate_directory(ans: str) -> bool:
         raise InvalidResponse("The path must be a directory")
 
     return True
+
+
+def validate_url(ans: str) -> bool:
+    try:
+        PreparedRequest().prepare_url(ans, None)
+    except requests.exceptions.MissingSchema as e:
+        raise InvalidResponse(f"Invalid URL: {e}") from e
+    return True
+
 
 class UnknownShellError(Exception):
     """The current login shell is not known"""
@@ -172,6 +183,19 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
         is_valid=validate_directory,
     ):
         settings["--local-copy"] = str(Path(local_copy_dir).expanduser())
+
+    print(
+        """
+    Queyd is a remotes notes storage system that uses a GraphQL API.
+    See https://github.com/ewen-lbh/queyd
+    """
+    )
+
+    if queyd_service_url := ask(
+        "GraphQL API endpoint for Queyd (leave blank to not use Queyd)",
+        is_valid=validate_url,
+    ):
+        settings["--queyd"] = queyd_service_url
 
     print(
         """

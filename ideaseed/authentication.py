@@ -63,6 +63,9 @@ class Cache:
         return loggedin
 
     def login_manually(self, **params) -> Tuple[Any, dict[str, Any]]:
+        """
+        Return a client object (anything) and a cache dictionary
+        """
         raise NotImplementedError("Please implement login_manually in your subclass.")
 
     def login_from_cache(self) -> Any:

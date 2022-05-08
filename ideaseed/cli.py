@@ -106,6 +106,7 @@ Configuration:
                                     ideas will not get saved locally.
                                     DIR must exist beforehand. ~ and ~user constructs get expanded.
                                     See Local Copy for more information.
+   --queyd=SERVICE_URL              Set Queyd GraphQL API endpoint URL.
 
 
 Placeholders:
@@ -158,10 +159,11 @@ from docopt import docopt
 from rich import print
 
 from ideaseed import (authentication, config_wizard, github_cards, gkeep,
-                      ondisk, update_checker, ui)
+                      ondisk, queyd, ui, update_checker)
 from ideaseed.constants import VALID_COLOR_NAMES, VERSION
 from ideaseed.ondisk import Idea
-from ideaseed.ui import ABOUT_SCREEN, show_dry_run_banner, make_table
+from ideaseed.queyd import QueydClient
+from ideaseed.ui import ABOUT_SCREEN, make_table, show_dry_run_banner
 from ideaseed.update_checker import get_latest_version
 from ideaseed.utils import english_join, remove_duplicates_in_list_of_dict
 
@@ -206,10 +208,17 @@ def do(argv=None):
     auth_cache_path = None
     github_cache = None
     gkeep_cache = None
+    queyd_cache = None
     if args["auth_cache"]:
         auth_cache_path = Path(args["auth_cache"])
         github_cache = github_cards.AuthCache(auth_cache_path)
         gkeep_cache = gkeep.AuthCache(auth_cache_path)
+        if args["queyd"]:
+            queyd_cache = queyd.AuthCache(auth_cache_path, args["queyd"])
+
+    queyd_client = None
+    if args["queyd"] and queyd_cache:
+        queyd_client: QueydClient = queyd_cache.login()
 
     # Crash if auth_cache_path is None, I'll implement this in another PR
     if auth_cache_path is None:
@@ -226,18 +235,23 @@ def do(argv=None):
 
     if args["about"]:
         print(ABOUT_SCREEN.format(version=VERSION))
+        return
 
     elif args["version"]:
         print(VERSION)
+        return
 
     elif args["help"]:
         print(__doc__)
+        return
 
     elif args["update"]:
         update_checker.check_and_prompt()
+        return
 
     elif args["config"]:
         config_wizard.run()
+        return
 
     elif args["login"]:
         if github_cache:
@@ -246,9 +260,11 @@ def do(argv=None):
             gkeep_cache.login()
         if queyd_cache:
             queyd_cache.login()
+        return
 
     elif args["logout"]:
         authentication.Cache(auth_cache_path, "whatever").clear_all()
+        return
 
     elif args["user"]:
         show_dry_run_banner(**args)
@@ -275,8 +291,16 @@ def do(argv=None):
         else:
             print("[yellow]Did not save a local copy")
 
+    if args["queyd"] and queyd and not args["dry_run"]:
+        try:
+            gql_response = queyd_client.add(idea).json()
+            if gql_response.get("data"):
+                data = gql_response["data"]
+                ui.get_console().print(make_table(queyd_id=data["add"]["id"]))
             else:
-                print(f"[yellow]Did not save a local copy")
+                print(f"[red]Couldn't add idea to Queyd: {gql_response.get('errors')}")
+        except Exception as e:
+            print(f"[red]Failed to add idea to Queyd: {e}")
 
 
 def flags_to_args(flags: dict[str, Any]) -> dict[str, Any]:
