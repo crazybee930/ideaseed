@@ -260,7 +260,7 @@ def do(argv=None):
         show_dry_run_banner(**args)
         idea = gkeep.push_to_gkeep(**args) or Idea()
 
-    if args["local_copy"] and idea.body:
+    if args["local_copy"] and idea.body and not args["dry_run"]:
         local_copy_dir = Path(args["local_copy"]).expanduser()
         if not (local_copy_dir.exists() and local_copy_dir.is_dir()):
             print(
