@@ -100,7 +100,8 @@ def make_card(
     header.add_column()
     header.add_column(justify="right")
     header.add_row(
-        f"[bold]{rich.markup.escape(title)}", f"[bold blue]{right_of_title}",
+        f"[bold]{rich.markup.escape(title)}",
+        f"[bold blue]{right_of_title}",
     )
 
     card = Table.grid(padding=1, expand=True)
@@ -136,7 +137,8 @@ def make_table(
     listing.add_column(justify="right")
     if project:
         listing.add_row(
-            "Card in", f"[bold blue]{project}[/] [bold dim]>[/] [blue]{project_column}",
+            "Card in",
+            f"[bold blue]{project}[/] [bold dim]>[/] [blue]{project_column}",
         )
     if milestone:
         listing.add_row("Milestone'd to", f"[bold blue]{milestone}[/]")
@@ -154,8 +156,10 @@ def make_table(
 
     return listing
 
+
 def get_console() -> Console:
     return Console(width=min(get_terminal_size().columns, 75))
+
 
 def show(
     title: str,

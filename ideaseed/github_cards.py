@@ -23,13 +23,9 @@ from ideaseed import ui
 from ideaseed.authentication import Cache as BaseCache
 from ideaseed.constants import UsageError
 from ideaseed.ondisk import Idea
-from ideaseed.utils import (
-    answered_yes_to,
-    ask,
-    english_join,
-    error_message_no_object_found,
-    get_random_color_hexstring,
-)
+from ideaseed.utils import (answered_yes_to, ask, english_join,
+                            error_message_no_object_found,
+                            get_random_color_hexstring)
 
 
 def validate_label_color(color: str):
@@ -60,7 +56,8 @@ class AuthCache(BaseCache):
 
     def login_manually(self, method: str = None) -> Tuple[Github, dict[str, Any]]:
         LOGIN_METHODS = namedtuple("LoginMethods", ["PAT", "username"])(
-            PAT="Personal Access Token", username="Username and password",
+            PAT="Personal Access Token",
+            username="Username and password",
         )
 
         method = method or ask(
@@ -127,11 +124,11 @@ def resolve_defaults(
     ``repo_full_name`` must be of the form ``OWNER/REPO``
 
     Returns a `(project, column)` tuple.
-    
+
     >>> resolve_defaults(
-    ...     column=None, 
+    ...     column=None,
     ...     project='testy',
-    ...     default_project='1', 
+    ...     default_project='1',
     ...     default_column='{project}',
     ...     repo_full_name='ewen-lbh/project',
     ...     username='ewen-lbh',
@@ -193,7 +190,7 @@ def label_names_to_labels(
 def get_milestone_from_name(
     repo: Repository, create_missing: bool, name: str
 ) -> Optional[Milestone]:
-    milestones = repo.get_milestones(),
+    milestones = (repo.get_milestones(),)
     return search_for_object(
         milestones,
         name,
@@ -201,7 +198,7 @@ def get_milestone_from_name(
         object_name="milestone",
         create=lambda: repo.create_milestone(title=name),
         get_name=lambda obj: obj.title,
-        available_names=[m.title for m in milestones]
+        available_names=[m.title for m in milestones],
     )
 
 
@@ -285,7 +282,7 @@ def create_and_show_github_card(
 
 
 class AbstractCard:
-    """ Represents a future github card/issue, with all attributes refering to their names instead of their resolved github objects """
+    """Represents a future github card/issue, with all attributes refering to their names instead of their resolved github objects"""
 
 
 def push_to_repo(
@@ -434,7 +431,12 @@ def push_to_user(
         repo_full_name=f"{user.login}/",
         username=user.login,
     )
-    project, column = get_project_and_column(user, project, column, create_missing,)
+    project, column = get_project_and_column(
+        user,
+        project,
+        column,
+        create_missing,
+    )
     idea.project = project.name if project else ""
     idea.column = column.name if column else ""
 
@@ -518,7 +520,8 @@ def get_project_and_column(
         create_missing=create_missing,
         object_name="project",
         create=lambda: repo.create_project(
-            name=project_name, body=ask("Enter the project's description..."),
+            name=project_name,
+            body=ask("Enter the project's description..."),
         ),
     )
 

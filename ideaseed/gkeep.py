@@ -73,7 +73,10 @@ class AuthCache(authentication.Cache):
             else:
                 print(topic)
                 sys.exit()
-        return keep, {"master_token": keep.getMasterToken(), "email": username,}
+        return keep, {
+            "master_token": keep.getMasterToken(),
+            "email": username,
+        }
 
     def login_from_cache(self) -> Optional[Keep]:
         try:
@@ -133,7 +136,12 @@ def push_to_gkeep(
     **_,
 ) -> Idea:
 
-    idea = Idea(pinned=pin, body=body, title=title or "", assignees=assign,)
+    idea = Idea(
+        pinned=pin,
+        body=body,
+        title=title or "",
+        assignees=assign,
+    )
 
     # Get correct color name casing
     color = case_insensitive_find(VALID_COLOR_NAMES, color)

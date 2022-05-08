@@ -14,6 +14,7 @@ from ideaseed.utils import answered_yes_to, ask, english_join
 
 VALID_PLACEHOLDERS = {"owner", "repository", "username", "project"}
 
+
 def validate_directory(ans: str) -> bool:
     """
     Validates the given path to check if
@@ -29,7 +30,7 @@ def validate_directory(ans: str) -> bool:
         raise InvalidResponse("This path does not exist.")
     if not path.is_dir():
         raise InvalidResponse("The path must be a directory")
-       
+
     return True
 
 class UnknownShellError(Exception):
@@ -61,7 +62,7 @@ def reverse_docopt(program_name: str, args_map: dict[str, Any]) -> str:
     """
     Turns a docopt-style dict of arguments and flags into a string
     you would type into your shell (WIP)
-    
+
     >>> reverse_docopt('prog', { '--ab': 4, '--bb': 'yes', '--cb': True, '--db': False, '--eb': ['5', 'fefez$$/./!**fe'], 'thingie': True, 'nothingie': False, 'SHOUT': ':thinking:' })
     "prog --ab --ab --ab --ab --bb=yes --cb --eb=5 --eb='fefez$$/./!**fe' thingie :thinking:"
     """
@@ -98,7 +99,7 @@ def reverse_docopt(program_name: str, args_map: dict[str, Any]) -> str:
 
 def get_alias_command(args_map: dict[str, Any], shortcut_name: str) -> str:
     """
-    Returns the alias line, sth. like `idea='ideaseed --opt=value --opt2'`, 
+    Returns the alias line, sth. like `idea='ideaseed --opt=value --opt2'`,
     where ``shortcut_name`` is the alias' equation's LHS (`'idea'` in the example above)
     ``args_map`` is a map of options, docopt-style:
     {
@@ -166,8 +167,11 @@ def prompt_for_settings() -> tuple[dict[str, str], str]:
         """
     )
 
-    if (local_copy_dir := ask("Directory to save local copies to (leave blank to not save local copies)", is_valid=validate_directory)):
-        settings["--local-copy"] = str(Path(local_copy_dir).expanduser()) 
+    if local_copy_dir := ask(
+        "Directory to save local copies to (leave blank to not save local copies)",
+        is_valid=validate_directory,
+    ):
+        settings["--local-copy"] = str(Path(local_copy_dir).expanduser())
 
     print(
         """

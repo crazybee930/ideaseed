@@ -87,9 +87,9 @@ def readable_on(background: str, light: str = "white", dark: str = "black") -> s
     """
     Choses either ``light`` or ``dark`` based on the background color
     the text is supposed to be written on ``background`` (also given as an hex int)
-    
+
     WARN: All the color strings must be exactly 6 digits long.
-    
+
     >>> readable_on('FEFAFE')
     '000000'
     >>> readable_on('333333')
@@ -105,9 +105,9 @@ def readable_on(background: str, light: str = "white", dark: str = "black") -> s
 
 def hex_to_rgb(hexstring: Union[str, int]) -> tuple[int, int, int]:
     """
-    Converts a hexstring (without initial '#') ``hexstring`` into a 
+    Converts a hexstring (without initial '#') ``hexstring`` into a
     3-tuple of ints in [0, 255] representing an RGB color
-    
+
     >>> hex_to_rgb('FF00AA')
     (255, 0, 170)
     """

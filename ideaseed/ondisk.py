@@ -43,7 +43,7 @@ class Idea(RecordClass):
         """
         Returns a YAML header to be used by `self.as_markdown`
 
-        >>> 
+        >>>
         """
         excluded_keys = "body", "title", "repo"
         return {

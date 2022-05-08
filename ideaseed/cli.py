@@ -171,6 +171,7 @@ __doc__ = __doc__.replace("$HOME", str(Path.home()))
 class UsageError(Exception):
     pass
 
+
 def run(argv=None):
     """
     `run` is `do` with KeyboardInterrupts catched and displayed nicely.
@@ -181,6 +182,7 @@ def run(argv=None):
     except KeyboardInterrupt:
         print("\n[red]Stopped by user.")
         exit(2)
+
 
 def do(argv=None):
     flags = docopt(__doc__, argv)
@@ -266,11 +268,13 @@ def do(argv=None):
             print(
                 f"[red]Given directory for --local-copy ([bold]{local_copy_dir}[/bold]) does not exist or is not a directory"
             )
-        elif saved_to := ondisk.save(local_copy=local_copy_dir, idea=idea, repo=args["repo"]):
+        elif saved_to := ondisk.save(
+            local_copy=local_copy_dir, idea=idea, repo=args["repo"]
+        ):
             ui.get_console().print(make_table(local_copy=saved_to))
         else:
             print("[yellow]Did not save a local copy")
-    
+
             else:
                 print(f"[yellow]Did not save a local copy")
 
@@ -278,7 +282,7 @@ def do(argv=None):
 def flags_to_args(flags: dict[str, Any]) -> dict[str, Any]:
     """
     Turn flags dict from docopt into **kwargs-usable dict.
-    '--'-prefix is removed, dashes are turned into underscores 
+    '--'-prefix is removed, dashes are turned into underscores
     and keys are lowercased.
     When conflicts arise (ie --repo: None vs REPO: "ideaseed"), do a 'or',
     prefering values appearing sooner in the dict.
@@ -304,7 +308,11 @@ def flags_to_args(flags: dict[str, Any]) -> dict[str, Any]:
         if value == "<None>":
             flags[name] = None
         normalized_name = name.removeprefix("--").replace("-", "_").lower()
-        args[normalized_name] = args[normalized_name] or flags[name] if normalized_name in args else flags[name]
+        args[normalized_name] = (
+            args[normalized_name] or flags[name]
+            if normalized_name in args
+            else flags[name]
+        )
 
     return args
 
