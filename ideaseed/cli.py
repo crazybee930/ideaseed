@@ -201,12 +201,13 @@ def do(argv=None):
         print(args)
 
     # Initialize auth caches
+    auth_cache_path = None
+    github_cache = None
+    gkeep_cache = None
     if args["auth_cache"]:
         auth_cache_path = Path(args["auth_cache"])
         github_cache = github_cards.AuthCache(auth_cache_path)
         gkeep_cache = gkeep.AuthCache(auth_cache_path)
-    else:
-        auth_cache_path = None
 
     # Crash if auth_cache_path is None, I'll implement this in another PR
     if auth_cache_path is None:
@@ -237,8 +238,12 @@ def do(argv=None):
         config_wizard.run()
 
     elif args["login"]:
-        github_cache.login()
-        gkeep_cache.login()
+        if github_cache:
+            github_cache.login()
+        if gkeep_cache:
+            gkeep_cache.login()
+        if queyd_cache:
+            queyd_cache.login()
 
     elif args["logout"]:
         authentication.Cache(auth_cache_path, "whatever").clear_all()
