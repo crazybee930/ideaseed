@@ -262,16 +262,15 @@ def do(argv=None):
 
     if args["local_copy"] and idea.body and not args["dry_run"]:
         local_copy_dir = Path(args["local_copy"]).expanduser()
-        if not (local_copy_dir.exists() and local_copy_dir.is_dir()):
+        if not local_copy_dir.exists() or not local_copy_dir.is_dir():
             print(
                 f"[red]Given directory for --local-copy ([bold]{local_copy_dir}[/bold]) does not exist or is not a directory"
             )
+        elif saved_to := ondisk.save(local_copy=local_copy_dir, idea=idea, repo=args["repo"]):
+            ui.get_console().print(make_table(local_copy=saved_to))
         else:
-            saved_to = ondisk.save(
-                local_copy=local_copy_dir, idea=idea, repo=args["repo"]
-            )
-            if saved_to:
-                ui.get_console().print(make_table(local_copy=saved_to))
+            print("[yellow]Did not save a local copy")
+    
             else:
                 print(f"[yellow]Did not save a local copy")
 
@@ -301,14 +300,12 @@ def flags_to_args(flags: dict[str, Any]) -> dict[str, Any]:
     {'about': False, 'assign': None, 'auth_cache': '~/.cache/ideaseed/auth.json', 'create_missing': False, 'default_project': None, 'label': None, 'title': 'a', 'version': True, 'body': 'b', 'column': None, 'repo': None}
     """
     args = {}
-    for name in flags.keys():
-        if flags[name] == "<None>":
+    for name, value in flags.items():
+        if value == "<None>":
             flags[name] = None
         normalized_name = name.removeprefix("--").replace("-", "_").lower()
-        if normalized_name in args.keys():
-            args[normalized_name] = args[normalized_name] or flags[name]
-        else:
-            args[normalized_name] = flags[name]
+        args[normalized_name] = args[normalized_name] or flags[name] if normalized_name in args else flags[name]
+
     return args
 
 
