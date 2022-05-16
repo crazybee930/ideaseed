@@ -190,7 +190,7 @@ def label_names_to_labels(
 def get_milestone_from_name(
     repo: Repository, create_missing: bool, name: str
 ) -> Optional[Milestone]:
-    milestones = (repo.get_milestones(),)
+    milestones = repo.get_milestones()
     return search_for_object(
         milestones,
         name,
