@@ -11,13 +11,6 @@ from rich.text import TextType
 
 
 class BetterPrompt(Prompt):
-    """
-    Provides a nicer way to select from a *dict* of choices that maps aliases to descriptions,
-    so that the user doesn't have to type out the full option when choosing.
-
-    Would like to implement a list of radio buttons like enquirer does,
-    but that is way more difficult.
-    """
 
     choices: Union[list[str], dict[str, str], None]
 
