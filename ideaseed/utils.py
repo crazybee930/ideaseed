@@ -11,7 +11,6 @@ from rich.text import TextType
 
 
 class BetterPrompt(Prompt):
-
     choices: Union[list[str], dict[str, str], None]
 
     def __init__(
