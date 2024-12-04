@@ -47,11 +47,6 @@ https://github.com/willmcgugan/rich
 https://github.com/PyGithub
     This one of the cleanest libs I've ever used.
     Like `requests`-level cleanliness.
-
-https://github.com/docopt
-    Designing CLIs with this is a fucking breeze.
-    I can almost copy-paste documentation into
-    a docstring and call it a day, it's crazy.
 """
 
 
